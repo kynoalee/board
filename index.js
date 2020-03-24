@@ -4,6 +4,8 @@ var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
+var flash = require('connect-flash'); // 1
+var session = require('express-session'); // 1
 var app = express();
 
 // DB setting
@@ -26,6 +28,8 @@ app.use(express.static(__dirname+'/public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(methodOverride('_method'));
+app.use(flash()); // 2
+app.use(session({secret:'MySecret', resave:true, saveUninitialized:true})); //3
 
 // Routes
 app.use('/', require('./routes/home'));
