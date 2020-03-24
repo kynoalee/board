@@ -1,112 +1,41 @@
-// routes/users.js
-
-var express = require('express');
-var router = express.Router();
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 var User = require('../models/User');
 
-// Index // 1
-router.get('/', function(req, res){
-  User.find({})
-    .sort({username:1})
-    .exec(function(err, users){
-      if(err) return res.json(err);
-      res.render('users/index', {users:users});
-    });
+// serialize & deserialize User
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+passport.deserializeUser(function(id, done) {
+  User.findOne({_id:id}, function(err, user) {
+    done(err, user);
+  });
 });
 
-// New
-router.get('/new', function(req, res){
-  var user = req.flash('user')[0] || {};
-  var errors = req.flash('errors')[0] || {};
-  res.render('users/new', { user:user, errors:errors });
-});
+// local strategy
+passport.use('local-login',
+  new LocalStrategy({
+      usernameField : 'username',
+      passwordField : 'password',
+      passReqToCallback : true
+    },
+    function(req, username, password, done) {
+      User.findOne({username:username})
+        .select({password:1})
+        .exec(function(err, user) {
+          if (err) return done(err);
 
-// create
-router.post('/', function(req, res){
-  User.create(req.body, function(err, user){
-    if(err){
-      req.flash('user', req.body);
-      req.flash('errors', parseError(err));
-      return res.redirect('/users/new');
+          if (user && user.authenticate(password)){
+            return done(null, user);
+          }
+          else {
+            req.flash('username', username);
+            req.flash('errors', {login:'The username or password is incorrect.'});
+            return done(null, false);
+          }
+        });
     }
-    res.redirect('/users');
-  });
-});
+  )
+);
 
-// show
-router.get('/:username', function(req, res){
-  User.findOne({username:req.params.username}, function(err, user){
-    if(err) return res.json(err);
-    res.render('users/show', {user:user});
-  });
-});
-
-// edit
-router.get('/:username/edit', function(req, res){
-  var user = req.flash('user')[0];
-  var errors = req.flash('errors')[0] || {};
-  if(!user){
-    User.findOne({username:req.params.username}, function(err, user){
-      if(err) return res.json(err);
-      res.render('users/edit', { username:req.params.username, user:user, errors:errors });
-    });
-  }
-  else {
-    res.render('users/edit', { username:req.params.username, user:user, errors:errors });
-  }
-});
-
-// update
-router.put('/:username', function(req, res, next){
-  User.findOne({username:req.params.username})
-    .select('password')
-    .exec(function(err, user){
-      if(err) return res.json(err);
-
-      // update user object
-      user.originalPassword = user.password;
-      user.password = req.body.newPassword? req.body.newPassword : user.password;
-      for(var p in req.body){
-        user[p] = req.body[p];
-      }
-
-      // save updated user
-      user.save(function(err, user){
-        if(err){
-          req.flash('user', req.body);
-          req.flash('errors', parseError(err));
-          return res.redirect('/users/'+req.params.username+'/edit');
-        }
-        res.redirect('/users/'+user.username);
-      });
-  });
-});
-
-
-// destroy
-router.delete('/:username', function(req, res){
-  User.deleteOne({username:req.params.username}, function(err){
-    if(err) return res.json(err);
-    res.redirect('/users');
-  });
-});
-
-module.exports = router;
-
-// functions
-function parseError(errors){
-  var parsed = {};
-  if(errors.name == 'ValidationError'){
-    for(var name in errors.errors){
-      var validationError = errors.errors[name];
-      parsed[name] = { message:validationError.message };
-    }
-  }
-  else if(errors.code == '11000' && errors.errmsg.indexOf('username') > 0) {
-    parsed.username = { message:'This username already exists!' };
-  }
-  else {
-    parsed.unhandled = JSON.stringify(errors);
-  }
-  return parsed;
-}
+module.exports = passport;

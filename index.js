@@ -22,29 +22,30 @@ db.once('open', function(){
 db.on('error', function(err){
   console.log('DB ERROR : ', err);
 });
-// Passport // 2
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Custom Middlewares // 3
-app.use(function(req,res,next){
-  res.locals.isAuthenticated = req.isAuthenticated();
-  res.locals.currentUser = req.user;
-  next();
-});
 // Other settings
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname+'/public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(methodOverride('_method'));
-app.use(flash()); // 2
-app.use(session({secret:'MySecret', resave:true, saveUninitialized:true})); //3
+app.use(flash());
+app.use(session({secret:'MySecret', resave:true, saveUninitialized:true}));
+
+// Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Custom Middlewares
+app.use(function(req,res,next){
+  res.locals.isAuthenticated = req.isAuthenticated();
+  res.locals.currentUser = req.user;
+  next();
+});
 
 // Routes
 app.use('/', require('./routes/home'));
-app.use('/posts', require('./routes/posts')); // 
-app.use('/users', require('./routes/users')); //1
+app.use('/posts', require('./routes/posts'));
+app.use('/users', require('./routes/users'));
 
 // Port setting
 var port = 3000;
