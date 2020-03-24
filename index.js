@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var flash = require('connect-flash'); // 1
 var session = require('express-session'); // 1
+var passport = require('./config/passport'); //1
 var app = express();
 
 // DB setting
@@ -21,7 +22,16 @@ db.once('open', function(){
 db.on('error', function(err){
   console.log('DB ERROR : ', err);
 });
+// Passport // 2
+app.use(passport.initialize());
+app.use(passport.session());
 
+// Custom Middlewares // 3
+app.use(function(req,res,next){
+  res.locals.isAuthenticated = req.isAuthenticated();
+  res.locals.currentUser = req.user;
+  next();
+});
 // Other settings
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname+'/public'));
