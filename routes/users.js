@@ -109,3 +109,4 @@ function parseError(errors){
     parsed.unhandled = JSON.stringify(errors);
   }
   return parsed;
+}
