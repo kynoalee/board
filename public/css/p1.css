@@ -73,4 +73,18 @@
   
   .overflow-hidden { overflow: hidden; }
   
-  .navbar-light .navbar-nav .nav-link { color:#ffffff }
+  .navbar-light .navbar-nav .nav-link{ color:#ffffff }
+
+  .btn.btn-primary {
+    background-color: $purple;
+    border-color: $purple;
+    outline: none;
+    &:hover {
+      background-color: darken($purple, 10%);
+      border-color: darken($purple, 10%);
+    }
+    &:active, &:focus {
+      background-color: lighten($purple, 5%);
+      border-color: lighten($purple, 5%);
+    }
+  }
