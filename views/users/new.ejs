@@ -13,9 +13,8 @@
       <h3 class="contentBoxTop mb-3">New User</h3>
 
       <form action="/users" method="post">
-
         <div class="form-group row">
-          <label for="username" class="col-sm-3 col-form-label">Username*</label>
+          <label for="username" class="col-sm-3 col-form-label">ID</label>
           <div class="col-sm-9">
             <input type="text" id="username" name="username" value="<%= user.username %>" class="form-control <%= (errors.username)?'is-invalid':'' %>"> <!-- 1, 2 -->
             <% if(errors.username){ %> <!-- 3 -->
@@ -24,7 +23,25 @@
           </div>
         </div>
         <div class="form-group row">
-          <label for="name" class="col-sm-3 col-form-label">Name*</label>
+          <label for="password" class="col-sm-3 col-form-label">Password</label>
+          <div class="col-sm-9">
+            <input type="password" id="password" name="password" value="" class="form-control <%= (errors.password)?'is-invalid':'' %>"> <!-- 1, 2 -->
+            <% if(errors.password){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.password.message %></span>
+            <% } %>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="passwordConfirmation" class="col-sm-3 col-form-label">Password Confirmation</label>
+          <div class="col-sm-9 col-sm-offset-3">
+            <input type="password" id="passwordConfirmation" name="passwordConfirmation" value="" class="form-control <%= (errors.passwordConfirmation)?'is-invalid':'' %>"> <!-- 1, 2 -->
+            <% if(errors.passwordConfirmation){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.passwordConfirmation.message %></span>
+            <% } %>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="name" class="col-sm-3 col-form-label">Nickname</label>
           <div class="col-sm-9">
             <input type="text" id="name" name="name" value="<%= user.name %>" class="form-control <%= (errors.name)?'is-invalid':'' %>"> <!-- 1, 2 -->
             <% if(errors.name){ %> <!-- 3 -->
@@ -32,6 +49,26 @@
             <% } %>
           </div>
         </div>
+        <!-- 만들기 시작한 곳 -->
+        <div class="form-group row">
+          <label for="company" class="col-sm-3 col-form-label">Company</label>
+          <div class="col-sm-9">
+            <input type="text" id="company" name="company" value="<%= user.company %>" class="form-control <%= (errors.company)?'is-invalid':'' %>"> <!-- 1, 2 -->
+            <% if(errors.company){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.company.message %></span>
+            <% } %>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="contactnumber" class="col-sm-3 col-form-label">Contact Number</label>
+          <div class="col-sm-9">
+            <input type="text" id="contactnumber" name="contactnumber" value="<%= user.contactnumber %>" class="form-control <%= (errors.contactnumber)?'is-invalid':'' %>"> <!-- 1, 2 -->
+            <% if(errors.contactnumber){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.contactnumber.message %></span>
+            <% } %>
+          </div>
+        </div>
+        <!--/-->
         <div class="form-group row">
           <label for="email" class="col-sm-3 col-form-label">Email</label>
           <div class="col-sm-9">
@@ -41,27 +78,7 @@
             <% } %>
           </div>
         </div>
-        <div class="form-group row">
-          <label for="password" class="col-sm-3 col-form-label">Password*</label>
-          <div class="col-sm-9">
-            <input type="password" id="password" name="password" value="" class="form-control <%= (errors.password)?'is-invalid':'' %>"> <!-- 1, 2 -->
-            <% if(errors.password){ %> <!-- 3 -->
-              <span class="invalid-feedback"><%= errors.password.message %></span>
-            <% } %>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="passwordConfirmation" class="col-sm-3 col-form-label">Password Confirmation*</label>
-          <div class="col-sm-9 col-sm-offset-3">
-            <input type="password" id="passwordConfirmation" name="passwordConfirmation" value="" class="form-control <%= (errors.passwordConfirmation)?'is-invalid':'' %>"> <!-- 1, 2 -->
-            <% if(errors.passwordConfirmation){ %> <!-- 3 -->
-              <span class="invalid-feedback"><%= errors.passwordConfirmation.message %></span>
-            <% } %>
-          </div>
-        </div>
-        <p>
-          <small>*Required</small>
-        </p>
+        
 
         <% if(errors.unhandled){ %> <!-- 4 -->
           <div class="alert alert-danger">

@@ -88,3 +88,6 @@
       border-color: lighten($purple, 5%);
     }
   }
+  .red {
+    color : red;
+  }

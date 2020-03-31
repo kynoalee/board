@@ -7,25 +7,38 @@ var bcrypt = require('bcryptjs'); // 1
 var userSchema = mongoose.Schema({
   username:{
     type:String,
-    required:[true,'Username is required!'],
-    match:[/^.{4,12}$/,'Should be 4-12 characters!'],
+    required:[true,'Should be 4-12 English letters or numbers'],
+    match:[/^[A-Za-z0-9+]{4,12}$/,'Should be 4-12 English letters or numbers'],
     trim:true,
     unique:true
   },
   password:{
     type:String,
-    required:[true,'Password is required!'],
+    required:[true,'Should be minimum 8 characters of alphabet and number combination'],
+    match:[/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,'Should be minimum 8 characters of alphabet and number combination'],
     select:false
   },
   name:{
     type:String,
-    required:[true,'Name is required!'],
-    match:[/^.{4,12}$/,'Should be 4-12 characters!'],
+    required:[true,'Nickname is required'],
+    match:[/^.{1,12}$/,'Should be maximum 12 characters!'],
+    trim:true
+  },
+  company:{
+    type:String,
+    required:[true,'Company is required'],
+    trim:true
+  },
+  contactnumber:{
+    type:String,
+    required:[true,'Contact number is required'],
+    match:[/^([0-9]{2,4}-[0-9]{3,4}-[0-9]{4})$|^([0-9]{11})$/,'Should be a valid number'],
     trim:true
   },
   email:{
     type:String,
-    match:[/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,'Should be a vaild email address!'],
+    required:[],
+    match:[/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,'Should be a vaild email address'],
     trim:true
   }
 },{
@@ -51,7 +64,7 @@ userSchema.virtual('newPassword')
 
 // password validation // 2
 var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/;
-var passwordRegexErrorMessage = 'Should be minimum 8 characters of alphabet and number combination!';
+var passwordRegexErrorMessage = 'Should be minimum 8 characters of alphabet and number combination';
 userSchema.path('password').validate(function(v) {
   var user = this;
 
