@@ -35,6 +35,14 @@ $(function(){
     });
   }
 
+  
   convertDate();
   convertDateTime();
 });
+
+// users/new.ejs 관련 함수
+function initiateError(id){
+  var target = document.getElementById(id);
+  target.classList.remove('is-invalid');
+}
+

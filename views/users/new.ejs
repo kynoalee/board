@@ -14,11 +14,11 @@
 
       <form action="/users" method="post">
         <div class="form-group row">
-          <label for="username" class="col-sm-3 col-form-label">ID</label>
+          <label for="userid" class="col-sm-3 col-form-label">ID</label>
           <div class="col-sm-9">
-            <input type="text" id="username" name="username" value="<%= user.username %>" class="form-control <%= (errors.username)?'is-invalid':'' %>"> <!-- 1, 2 -->
-            <% if(errors.username){ %> <!-- 3 -->
-              <span class="invalid-feedback"><%= errors.username.message %></span>
+            <input type="text" id="userid" name="userid" value="<%= user.userid %>" class="form-control <%= (errors.userid)?'is-invalid':'' %>" onkeydown="initiateError('userid')">  <!-- 1, 2 -->
+            <% if(errors.userid){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.userid.message %></span>
             <% } %>
           </div>
         </div>
@@ -44,7 +44,7 @@
           <label for="name" class="col-sm-3 col-form-label">Nickname</label>
           <div class="col-sm-9">
             <input type="text" id="name" name="name" value="<%= user.name %>" class="form-control <%= (errors.name)?'is-invalid':'' %>"> <!-- 1, 2 -->
-            <% if(errors.name){ %> <!-- 3 -->
+            <% if(errors.name ){ %> <!-- 3 -->
               <span class="invalid-feedback"><%= errors.name.message %></span>
             <% } %>
           </div>
