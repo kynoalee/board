@@ -1,27 +1,29 @@
 // models/User.js
-var validation = require("../public/js/validation.js").users;
+var fs = require("fs");
 var mongoose = require('mongoose');
 var bcrypt = require('bcryptjs'); // 1
 
+var validationJSON = fs.readFileSync("public/json/validation.json");
+var validation = JSON.parse(validationJSON);
 // schema //1
 var userSchema = mongoose.Schema({
   userid:{
     type:String,
     required:[true,'Should be 4-12 English letters or numbers'],
-    match:[validation.userid,'Should be 4-12 English letters or numbers'],
+    match:[RegExp(validation.userid),'Should be 4-12 English letters or numbers'],
     trim:true,
     unique:true
   },
   password:{
     type:String,
     required:[true,'Should be minimum 8 characters of alphabet and number combination'],
-    match:[validation.password,'Should be minimum 8 characters of alphabet and number combination'],
+    match:[RegExp(validation.password),'Should be minimum 8 characters of alphabet and number combination'],
     select:false
   },
   name:{
     type:String,
     required:[true,'Nickname is required'],
-    match:[validation.name,'Should be maximum 12 characters!'],
+    match:[RegExp(validation.name),'Should be maximum 12 characters!'],
     trim:true
   },
   company:{
@@ -32,13 +34,13 @@ var userSchema = mongoose.Schema({
   contactnumber:{
     type:String,
     required:[true,'Contact number is required'],
-    match:[validation.contactnumber,'Should be a valid number'],
+    match:[RegExp(validation.contactnumber),'Should be a valid number'],
     trim:true
   },
   email:{
     type:String,
     required:[],
-    match:[validation.email,'Should be a vaild email address'],
+    match:[RegExp(validation.email),'Should be a vaild email address'],
     trim:true
   }
 },{
