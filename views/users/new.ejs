@@ -9,6 +9,8 @@
     <%- include('../partials/nav') %>
 
     <div class="container mb-3">
+      <%=time%>
+      <%=JSON.stringify(user)%>
       <h3 class="contentBoxTop mb-3">New User</h3>
       <form action="/users" method="post">
         <div class="radio row">

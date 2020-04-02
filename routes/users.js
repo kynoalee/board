@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var User = require('../models/User');
 var util = require('../util'); // 1
+var moment = require('moment');
 
 // New
 router.get('/new', function(req, res){
@@ -25,8 +26,9 @@ router.post('/', function(req, res){
 // show
 router.get('/:userid', util.isLoggedin, checkPermission, function(req, res){
   User.findOne({userid:req.params.userid}, function(err, user){
+    var wdateFormated = moment(user.wdate).format("YYYY-MM-DD");
     if(err) return res.json(err);
-    res.render('users/show', {user:user});
+    res.render('users/show', {user:user,wdateFormated:wdateFormated});
   });
 });
 

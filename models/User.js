@@ -2,9 +2,10 @@
 var fs = require("fs");
 var mongoose = require('mongoose');
 var bcrypt = require('bcryptjs'); // 1
-
 var validationJSON = fs.readFileSync("public/json/validation.json");
 var validation = JSON.parse(validationJSON);
+
+
 // schema //1
 var userSchema = mongoose.Schema({
   userclass:{
@@ -50,9 +51,24 @@ var userSchema = mongoose.Schema({
   },
   email:{
     type:String,
-    required:[],
+    required:[true,"Email is required"],
     match:[RegExp(validation.email),'Should be a vaild email address'],
-    trim:true
+    trim:true,
+    unique:true
+  },
+  wdate:{
+    type:Date,
+    default:Date()
+  },
+  mdate:{
+    type:Date,
+    default:Date()
+  },
+  edate:{
+    type:Date
+  },
+  disabled:{
+    type:Boolean
   }
 },{
   toObject:{virtuals:true}
