@@ -12,7 +12,7 @@
 
       <h3 class="mb-3">Edit User</h3>
 
-      <form action="/users/<%= username %>?_method=put" method="post"> <!-- 1 -->
+      <form action="/users/<%= userid %>?_method=put" method="post"> <!-- 1 -->
 
         <div class="form-group row">
           <label for="currentPassword" class="col-sm-3 col-form-label">Current Password*</label>
@@ -27,11 +27,11 @@
         <hr></hr>
 
         <div class="form-group row">
-          <label for="username" class="col-sm-3 col-form-label">Username*</label>
+          <label for="userid" class="col-sm-3 col-form-label">ID</label>
           <div class="col-sm-9">
-            <input type="text" id="username" name="username" value="<%= user.username %>" class="form-control <%= (errors.username)?'is-invalid':'' %>"> <!-- 2 -->
-            <% if(errors.username){ %> <!-- 3 -->
-              <span class="invalid-feedback"><%= errors.username.message %></span>
+            <input type="text" id="userid" name="userid" value="<%= user.userid %>" class="form-control <%= (errors.userid)?'is-invalid':'' %>"> <!-- 2 -->
+            <% if(errors.userid){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.userid.message %></span>
             <% } %>
           </div>
         </div>
@@ -87,7 +87,7 @@
         <% } %>
 
         <div class="buttons">
-          <a class="btn btn-primary" href="/users/<%= user.username %>">Back</a>
+          <a class="btn btn-primary" href="/users/<%= user.userid %>">Back</a>
           <button type="submit" class="btn btn-primary">Submit</button>
         </div>
 

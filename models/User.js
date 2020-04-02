@@ -1,31 +1,57 @@
 // models/User.js
-
+var fs = require("fs");
 var mongoose = require('mongoose');
 var bcrypt = require('bcryptjs'); // 1
 
+var validationJSON = fs.readFileSync("public/json/validation.json");
+var validation = JSON.parse(validationJSON);
 // schema //1
 var userSchema = mongoose.Schema({
-  username:{
+  userclass:{
     type:String,
-    required:[true,'Username is required!'],
-    match:[/^.{4,12}$/,'Should be 4-12 characters!'],
+    required:[true,'User classification is required'],
+    match:[RegExp(validation.userclass),'Invalid value detected. Please resubmit'],
+    trim:true
+  },
+  userid:{
+    type:String,
+    required:[true,'Should be 4-12 English letters or numbers'],
+    match:[RegExp(validation.userid),'Should be 4-12 English letters or numbers'],
     trim:true,
     unique:true
   },
   password:{
     type:String,
-    required:[true,'Password is required!'],
+    required:[true,'Should be minimum 8 characters of alphabet and number combination'],
+    match:[RegExp(validation.password),'Should be minimum 8 characters of alphabet and number combination'],
     select:false
   },
   name:{
     type:String,
-    required:[true,'Name is required!'],
-    match:[/^.{4,12}$/,'Should be 4-12 characters!'],
+    required:[true,'Nickname is required'],
+    match:[RegExp(validation.name),'Should be maximum 12 characters!'],
+    trim:true
+  },
+  company:{
+    type:String,
+    required:[true,'Company is required'],
+    trim:true
+  },
+  countrycode:{
+    type:Number,
+    required:[true,'Country code is required'],
+    trim:true
+  },
+  contactnumber:{
+    type:String,
+    required:[true,'Contact number is required'],
+    match:[RegExp(validation.contactnumber),'Should be a valid number'],
     trim:true
   },
   email:{
     type:String,
-    match:[/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,'Should be a vaild email address!'],
+    required:[],
+    match:[RegExp(validation.email),'Should be a vaild email address'],
     trim:true
   }
 },{
@@ -50,8 +76,8 @@ userSchema.virtual('newPassword')
   .set(function(value){ this._newPassword=value; });
 
 // password validation // 2
-var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/;
-var passwordRegexErrorMessage = 'Should be minimum 8 characters of alphabet and number combination!';
+var passwordRegex = RegExp(validation.password);
+var passwordRegexErrorMessage = 'Should be minimum 8 characters of alphabet and number combination';
 userSchema.path('password').validate(function(v) {
   var user = this;
 

@@ -12,10 +12,10 @@ router.get('/about', function(req, res){
 
 // Login
 router.get('/login', function (req,res) {
-  var username = req.flash('username')[0];
+  var userid = req.flash('userid')[0];
   var errors = req.flash('errors')[0] || {};
   res.render('home/login', {
-    username:username,
+    userid:userid,
     errors:errors
   });
 });
@@ -26,9 +26,9 @@ router.post('/login',
     var errors = {};
     var isValid = true;
 
-    if(!req.body.username){
+    if(!req.body.userid){
       isValid = false;
-      errors.username = 'Username is required!';
+      errors.userid = 'Userid is required!';
     }
     if(!req.body.password){
       isValid = false;
@@ -44,8 +44,8 @@ router.post('/login',
     }
   },
   passport.authenticate('local-login', {
-    successRedirect : '/posts',
-    failureRedirect : '/login'
+    successRedirect : '/',
+    failureRedirect : '/users/new'
   }
 ));
 

@@ -9,59 +9,97 @@
     <%- include('../partials/nav') %>
 
     <div class="container mb-3">
-
       <h3 class="contentBoxTop mb-3">New User</h3>
-
       <form action="/users" method="post">
-
+        <div class="radio row">
+          <label for="userclass" class="col-sm-3 col-form-label">User Classification</label>
+          <div class="col-sm-9 align-self-center">
+            <label for="userclassnormal" class="cursor-pointer">
+              <input type="radio" id="userclassnormal" name="userclass" class="cursor-pointer" value="normal" checked>
+              normal
+            </label>
+            <label for="userclassvender" class="cursor-pointer">
+              <input type="radio" id="userclassvender" name="userclass" class="cursor-pointer" value="vender">
+              Vender
+            </label>
+          <% if(errors.userclass){ %> <!-- 3 -->
+            <span class="red"><%= errors.userclass.message %></span>
+          <% } %>
+          </div>
+        </div>
         <div class="form-group row">
-          <label for="username" class="col-sm-3 col-form-label">Username*</label>
+          <label for="userid" class="col-sm-3 col-form-label">ID</label>
           <div class="col-sm-9">
-            <input type="text" id="username" name="username" value="<%= user.username %>" class="form-control <%= (errors.username)?'is-invalid':'' %>"> <!-- 1, 2 -->
-            <% if(errors.username){ %> <!-- 3 -->
-              <span class="invalid-feedback"><%= errors.username.message %></span>
+            <input type="text" id="userid" name="userid" value="<%= user.userid %>" class="form-control <%= (errors.userid)?'is-invalid':'' %>" onkeydown="initiateError('userid')">  <!-- 1, 2 -->
+            <% if(errors.userid){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.userid.message %></span>
             <% } %>
           </div>
         </div>
         <div class="form-group row">
-          <label for="name" class="col-sm-3 col-form-label">Name*</label>
+          <label for="password" class="col-sm-3 col-form-label">Password</label>
           <div class="col-sm-9">
-            <input type="text" id="name" name="name" value="<%= user.name %>" class="form-control <%= (errors.name)?'is-invalid':'' %>"> <!-- 1, 2 -->
-            <% if(errors.name){ %> <!-- 3 -->
-              <span class="invalid-feedback"><%= errors.name.message %></span>
-            <% } %>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="email" class="col-sm-3 col-form-label">Email</label>
-          <div class="col-sm-9">
-            <input type="text" id="email" name="email" value="<%= user.email %>" class="form-control <%= (errors.email)?'is-invalid':'' %>"> <!-- 1, 2 -->
-            <% if(errors.email){ %>
-              <span class="invalid-feedback"><%= errors.email.message %></span>
-            <% } %>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="password" class="col-sm-3 col-form-label">Password*</label>
-          <div class="col-sm-9">
-            <input type="password" id="password" name="password" value="" class="form-control <%= (errors.password)?'is-invalid':'' %>"> <!-- 1, 2 -->
+            <input type="password" id="password" name="password" value="" class="form-control <%= (errors.password)?'is-invalid':'' %>" onkeydown="initiateError('password')"> <!-- 1, 2 -->
             <% if(errors.password){ %> <!-- 3 -->
               <span class="invalid-feedback"><%= errors.password.message %></span>
             <% } %>
           </div>
         </div>
         <div class="form-group row">
-          <label for="passwordConfirmation" class="col-sm-3 col-form-label">Password Confirmation*</label>
+          <label for="passwordConfirmation" class="col-sm-3 col-form-label">Password Confirmation</label>
           <div class="col-sm-9 col-sm-offset-3">
-            <input type="password" id="passwordConfirmation" name="passwordConfirmation" value="" class="form-control <%= (errors.passwordConfirmation)?'is-invalid':'' %>"> <!-- 1, 2 -->
+            <input type="password" id="passwordConfirmation" name="passwordConfirmation" value="" class="form-control <%= (errors.passwordConfirmation)?'is-invalid':'' %>" onkeydown="initiateError('passwordConfirmation')"> <!-- 1, 2 -->
             <% if(errors.passwordConfirmation){ %> <!-- 3 -->
               <span class="invalid-feedback"><%= errors.passwordConfirmation.message %></span>
             <% } %>
           </div>
         </div>
-        <p>
-          <small>*Required</small>
-        </p>
+        <div class="form-group row">
+          <label for="name" class="col-sm-3 col-form-label">Nickname</label>
+          <div class="col-sm-9">
+            <input type="text" id="name" name="name" value="<%= user.name %>" class="form-control <%= (errors.name)?'is-invalid':'' %>" onkeydown="initiateError('name')"> <!-- 1, 2 -->
+            <% if(errors.name ){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.name.message %></span>
+            <% } %>
+          </div>
+        </div>
+        <!-- 만들기 시작한 곳 -->
+        <div class="form-group row">
+          <label for="company" class="col-sm-3 col-form-label">Company</label>
+          <div class="col-sm-9">
+            <input type="text" id="company" name="company" value="<%= user.company %>" class="form-control <%= (errors.company)?'is-invalid':'' %>" onkeydown="initiateError('company')"> <!-- 1, 2 -->
+            <% if(errors.company){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.company.message %></span>
+            <% } %>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="contactnumber" class="col-sm-3 col-form-label">Contact Number</label>
+          <div class="col-sm-2" style="margin-right:0">
+            <select class="form-control" name="countrycode" id="countrycode">
+              <option value="">Country Code</option>
+              <option value="86">+86(CN)</option>
+              <option value="82">+82(KR)</option>
+            </select>
+          </div>
+          <div class="col-sm-7">
+            <input type="text" id="contactnumber" name="contactnumber" value="<%= user.contactnumber %>" class="form-control <%= (errors.contactnumber)?'is-invalid':'' %>" onkeydown="initiateError('contactnumber')"> <!-- 1, 2 -->
+            <% if(errors.contactnumber){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.contactnumber.message %></span>
+            <% } %>
+          </div>
+        </div>
+        <!--/-->
+        <div class="form-group row">
+          <label for="email" class="col-sm-3 col-form-label">Email</label>
+          <div class="col-sm-9">
+            <input type="text" id="email" name="email" value="<%= user.email %>" class="form-control <%= (errors.email)?'is-invalid':'' %>" onkeydown="initiateError('email')"> <!-- 1, 2 -->
+            <% if(errors.email){ %>
+              <span class="invalid-feedback"><%= errors.email.message %></span>
+            <% } %>
+          </div>
+        </div>
+        
 
         <% if(errors.unhandled){ %> <!-- 4 -->
           <div class="alert alert-danger">

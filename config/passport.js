@@ -17,12 +17,12 @@ passport.deserializeUser(function(id, done) {
 // local strategy // 3
 passport.use('local-login',
   new LocalStrategy({
-      usernameField : 'username', // 3-1
+      usernameField : 'userid', // 3-1
       passwordField : 'password', // 3-1
       passReqToCallback : true
     },
-    function(req, username, password, done) { // 3-2
-      User.findOne({username:username})
+    function(req, userid, password, done) { // 3-2
+      User.findOne({userid:userid})
         .select({password:1})
         .exec(function(err, user) {
           if (err) return done(err);
@@ -31,8 +31,8 @@ passport.use('local-login',
             return done(null, user);
           }
           else {
-            req.flash('username', username);
-            req.flash('errors', {login:'The username or password is incorrect.'});
+            req.flash('userid', userid);
+            req.flash('errors', {login:'The userid or password is incorrect.'});
             return done(null, false);
           }
         });

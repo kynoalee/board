@@ -13,11 +13,11 @@
       <form class="user-form" action="/login" method="post">
 
         <div class="form-group row">
-          <label for="username" class="col-sm-3 col-form-label">Username</label>
+          <label for="userid" class="col-sm-3 col-form-label">ID</label>
           <div class="col-sm-9">
-            <input type="text" id="username" name="username" value="<%= username %>" class="form-control <%= (errors.username)?'is-invalid':'' %>">
-            <% if(errors.username){ %>
-              <span class="invalid-feedback"><%= errors.username %></span>
+            <input type="text" id="userid" name="userid" value="<%= userid %>" class="form-control <%= (errors.userid)?'is-invalid':'' %>">
+            <% if(errors.userid){ %>
+              <span class="invalid-feedback"><%= errors.userid %></span>
             <% } %>
           </div>
         </div>
