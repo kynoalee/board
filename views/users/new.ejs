@@ -9,10 +9,24 @@
     <%- include('../partials/nav') %>
 
     <div class="container mb-3">
-
       <h3 class="contentBoxTop mb-3">New User</h3>
-
       <form action="/users" method="post">
+        <div class="radio row">
+          <label for="userclass" class="col-sm-3 col-form-label">User Classification</label>
+          <div class="col-sm-9 align-self-center">
+            <label for="userclassnormal" class="cursor-pointer">
+              <input type="radio" id="userclassnormal" name="userclass" class="cursor-pointer" value="normal" checked>
+              normal
+            </label>
+            <label for="userclassvender" class="cursor-pointer">
+              <input type="radio" id="userclassvender" name="userclass" class="cursor-pointer" value="vender">
+              Vender
+            </label>
+          <% if(errors.userclass){ %> <!-- 3 -->
+            <span class="red"><%= errors.userclass.message %></span>
+          <% } %>
+          </div>
+        </div>
         <div class="form-group row">
           <label for="userid" class="col-sm-3 col-form-label">ID</label>
           <div class="col-sm-9">
@@ -61,7 +75,14 @@
         </div>
         <div class="form-group row">
           <label for="contactnumber" class="col-sm-3 col-form-label">Contact Number</label>
-          <div class="col-sm-9">
+          <div class="col-sm-2" style="margin-right:0">
+            <select class="form-control" name="countrycode" id="countrycode">
+              <option value="">Country Code</option>
+              <option value="86">+86(CN)</option>
+              <option value="82">+82(KR)</option>
+            </select>
+          </div>
+          <div class="col-sm-7">
             <input type="text" id="contactnumber" name="contactnumber" value="<%= user.contactnumber %>" class="form-control <%= (errors.contactnumber)?'is-invalid':'' %>" onkeydown="initiateError('contactnumber')"> <!-- 1, 2 -->
             <% if(errors.contactnumber){ %> <!-- 3 -->
               <span class="invalid-feedback"><%= errors.contactnumber.message %></span>

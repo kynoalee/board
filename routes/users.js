@@ -18,7 +18,7 @@ router.post('/', function(req, res){
       req.flash('errors', util.parseError(err)); // 1
       return res.redirect('/users/new');
     }
-    res.redirect('/users');
+    res.redirect('/');
   });
 });
 

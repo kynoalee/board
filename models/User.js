@@ -7,6 +7,12 @@ var validationJSON = fs.readFileSync("public/json/validation.json");
 var validation = JSON.parse(validationJSON);
 // schema //1
 var userSchema = mongoose.Schema({
+  userclass:{
+    type:String,
+    required:[true,'User classification is required'],
+    match:[RegExp(validation.userclass),'Invalid value detected. Please resubmit'],
+    trim:true
+  },
   userid:{
     type:String,
     required:[true,'Should be 4-12 English letters or numbers'],
@@ -29,6 +35,11 @@ var userSchema = mongoose.Schema({
   company:{
     type:String,
     required:[true,'Company is required'],
+    trim:true
+  },
+  countrycode:{
+    type:Number,
+    required:[true,'Country code is required'],
     trim:true
   },
   contactnumber:{
@@ -65,7 +76,7 @@ userSchema.virtual('newPassword')
   .set(function(value){ this._newPassword=value; });
 
 // password validation // 2
-var passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/;
+var passwordRegex = RegExp(validation.password);
 var passwordRegexErrorMessage = 'Should be minimum 8 characters of alphabet and number combination';
 userSchema.path('password').validate(function(v) {
   var user = this;

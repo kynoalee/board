@@ -44,8 +44,8 @@ router.post('/login',
     }
   },
   passport.authenticate('local-login', {
-    successRedirect : '/posts',
-    failureRedirect : '/login'
+    successRedirect : '/',
+    failureRedirect : '/users/new'
   }
 ));
 
