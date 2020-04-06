@@ -56,6 +56,13 @@ var userSchema = mongoose.Schema({
     trim:true,
     unique:true
   },
+  verified:{
+    type:Boolean,
+    default:false
+  },
+  verifytoken:{
+    type:String
+  },
   wdate:{
     type:Date,
     default:Date()

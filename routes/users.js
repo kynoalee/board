@@ -28,7 +28,16 @@ router.get('/:userid', util.isLoggedin, checkPermission, function(req, res){
   User.findOne({userid:req.params.userid}, function(err, user){
     var wdateFormated = moment(user.wdate).format("YYYY-MM-DD");
     if(err) return res.json(err);
-    res.render('users/show', {user:user,wdateFormated:wdateFormated});
+    if(user.userclass == 'normal'){
+      res.render('users/show', {user:user,wdateFormated:wdateFormated});
+    } else if (user.userclass == 'vender'){
+      // 벤더 마이 페이지
+      res.render('users/show', {user:user,wdateFormated:wdateFormated});
+    } else if (user.userclass == 'pd'){
+      // pd my page
+    } else{
+      // 이외 클래스로 접근시 보낼 것
+    }
   });
 });
 
@@ -73,6 +82,9 @@ router.put("/:userid", util.isLoggedin, checkPermission, function(req, res, next
   });
 });
 
+router.get('/management',util.isLoggedin,checkPermission,function(req,res){
+  // pd 권한자 회원 관리
+});
 
 module.exports = router;
 

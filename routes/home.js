@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('../config/passport');
+var authToken = require('../models/auth');
 
 // Home
 router.get('/', function(req, res){
@@ -17,6 +18,27 @@ router.get('/login', function (req,res) {
   res.render('home/login', {
     userid:userid,
     errors:errors
+  });
+});
+
+// auth Token
+router.get('/auth',function (req,res){
+  let email = req.query.email;
+  let token = req.query.token;
+  html = {content1:'',content2:'',pageUrl:''};
+  if(authToken.verifyToken(email,token)){
+    // 성공
+    html.content1 = '인증되었습니다. 재로그인해주세요.';
+    html.pageUrl = '/login';
+    html.content2 = '로그인하러가기';
+  } else {
+    // 실패
+    html.content1 = '인증실패했습니다. 재시도하거나 문의해주세요.';
+    html.pageUrl = '/';
+    html.content2 = '홈으로가기';
+  }
+  res.render('home/confirm',{
+    html : html
   });
 });
 
@@ -45,7 +67,7 @@ router.post('/login',
   },
   passport.authenticate('local-login', {
     successRedirect : '/',
-    failureRedirect : '/users/new'
+    failureRedirect : '/login'
   }
 ));
 
