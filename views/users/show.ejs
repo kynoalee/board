@@ -51,7 +51,7 @@
 
       <div>
         <% if(isAuthenticated && currentUser.id == user.id){ %> <!-- 1 -->
-          <a class="btn btn-primary" href="/users/<%= user.userid %>/edit">Edit</a>
+          <a class="btn btn-primary" href="/users/<%= user.userid %>/relogin">Edit</a>
         <% } %>
         
         <% if(isAuthenticated && currentUser.userclass == 'pd'){ %>

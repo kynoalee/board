@@ -50,4 +50,25 @@ passport.use('local-login',
   )
 );
 
+// relogin
+passport.use('relogin',
+    new LocalStrategy({
+      usernameField : 'userid', // 3-1
+      passwordField : 'password', // 3-1
+      passReqToCallback : true
+    },function(req,userid,password,done){
+      User.findOne({userid:userid})
+        .select({password:1,userid:1})
+        .exec(function(err, user) {
+          if (err) return done(err);
+          if (!user || !user.authenticate(password)){ // 3-3
+            req.flash('userid', userid);
+            req.flash('errors', {login:'password is incorrect.'});
+            return done(null, false);
+          }
+          return done(null,user);
+        });
+    })
+);
+
 module.exports = passport;

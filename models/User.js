@@ -71,6 +71,10 @@ var userSchema = mongoose.Schema({
     type:Date,
     default:Date()
   },
+  msubject:{
+    type:String,
+    trim:true
+  },
   edate:{
     type:Date
   },

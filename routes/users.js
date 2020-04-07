@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/User');
+var passport = require('../config/passport');
 var util = require('../util'); // 1
 var moment = require('moment');
 
@@ -39,6 +40,29 @@ router.get('/:userid', util.isLoggedin, checkPermission, function(req, res){
       // 이외 클래스로 접근시 보낼 것
     }
   });
+});
+
+//relogin new 
+router.get("/:userid/relogin",function(req,res){
+  let userid = req.params.userid;
+  let errors = req.flash('errors')[0] || {};
+
+  res.render('users/relogin',{
+    userid : userid,
+    errors : errors
+  });
+});
+
+//relogin try
+router.post("/relogin",function(req, res, next) {
+  passport.authenticate('relogin', function(err, user, info) {
+    if (err) { return next(err); }
+    if (!user) { return res.redirect(req.body.userid+'/relogin'); }
+    req.logIn(user, function(err) {
+      if (err) { return next(err); }
+      return res.redirect(user.userid+'/edit');
+    });
+  })(req, res, next);
 });
 
 // edit
