@@ -3,8 +3,8 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy; // 1
 var User = require('../models/User');
-var nodeMailer = require('../models/Mail');
-var authToken = require('../models/auth');
+var nodeMailer = require('../modules/Mail');
+var authToken = require('../modules/auth');
 var config = require('./config');
 
 // serialize & deserialize User // 2
