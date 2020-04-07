@@ -5,6 +5,7 @@ var LocalStrategy = require('passport-local').Strategy; // 1
 var User = require('../models/User');
 var nodeMailer = require('../models/Mail');
 var authToken = require('../models/auth');
+var config = require('./config');
 
 // serialize & deserialize User // 2
 passport.serializeUser(function(user, done) {
@@ -39,7 +40,7 @@ passport.use('local-login',
             var keyForVerify=authToken.generateToken();
             authToken.updateToken(user.email,keyForVerify);
             var veriUrl = 'var url = "http://' + req.get('host')+'/?email'+'&token='+keyForVerify;
-            nodeMailer.mailVerification('인증',user.email,'인증 메일입니다.', "<a href='http://localhost:3000/auth?email="+ user.email +"&token="+keyForVerify+"'>인증하기</a>");
+            nodeMailer.mailVerification('인증',user.email,'인증 메일입니다.', "<html><body><a href='"+config.serverUrl+"/auth?email="+ user.email +"&token="+keyForVerify+"'>인증하기</a></body></html>");
             req.flash('userid',userid);
             req.flash('errors',{login:'메일 인증해야합니다.메일을 확인해주세요. your mail address is '+user.email});
             return done(err);

@@ -7,6 +7,7 @@ var methodOverride = require('method-override');
 var flash = require('connect-flash'); // 1
 var session = require('express-session'); // 1
 var passport = require('./config/passport'); //1
+var config = require('./config/config')
 var app = express();
 
 // DB setting
@@ -14,7 +15,7 @@ mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
-mongoose.connect('mongodb+srv://kynoa:1004kyno@cluster0-onkr1.mongodb.net/test?retryWrites=true&w=majority');
+mongoose.connect(config.db.mongo.test);
 var db = mongoose.connection;
 db.once('open', function(){
   console.log('DB connected');

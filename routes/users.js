@@ -83,17 +83,51 @@ router.get("/:userid/edit", util.isLoggedin, checkPermission, function(req, res)
 // update
 router.put("/:userid", util.isLoggedin, checkPermission, function(req, res, next){ 
   User.findOne({userid:req.params.userid})
-    .select('password')
     .exec(function(err, user){
       if(err) return res.json(err);
+      let changed = false;
+      let mailChanged = false;
+      // get param to post request
+      req.body.userid = req.params.userid;
 
-      // update user object
-      user.originalPassword = user.password;
-      user.password = req.body.newPassword? req.body.newPassword : user.password;
-      for(var p in req.body){
-        user[p] = req.body[p];
+      // password current and new check
+      if(req.body.password){
+        user.password = req.body.password;
+        user.passwordConfirmation = req.body.passwordConfirmation;
+        changed = true;
+      }      
+      // name change check
+      if(req.body.name && req.body.name != user.name){
+        user.name = req.body.name;
+        changed = true;
+      }
+      // company change check
+      if(req.body.company && req.body.company != user.company){
+        user.company = req.body.company;
+        changed = true;
+      }
+      // country code change check
+      if(req.body.countrycode && req.body.countrycode != user.countrycode){
+        user.countrycode = req.body.countrycode;
+        changed = true;
+      }
+      // contact number change check
+      if(req.body.contactnumber && req.body.contactnumber != user.contactnumber){
+        user.contactnumber = req.body.contactnumber;
+        changed = true;
+      }
+      // email change check
+      if(req.body.email && req.body.email != user.email){
+        user.email = req.body.email;
+        user.verified = false;
+        changed = true;
+        mailChanged = true;
       }
 
+      if(changed){
+        user.mdate = Date();
+        user.msubject = req.user.userid;
+      }
       // save updated user
       user.save(function(err, user){
         if(err){
@@ -101,7 +135,12 @@ router.put("/:userid", util.isLoggedin, checkPermission, function(req, res, next
           req.flash('errors', util.parseError(err));
           return res.redirect('/users/'+req.params.userid+'/edit'); // 1
         }
-        res.redirect('/users/'+user.userid);
+        if(mailChanged){
+          req.logout();
+          res.redirect('/login');
+        }else{
+          res.redirect('/users/'+user.userid);
+        }
       });
   });
 });
