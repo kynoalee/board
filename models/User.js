@@ -71,6 +71,10 @@ var userSchema = mongoose.Schema({
     type:Date,
     default:Date()
   },
+  msubject:{
+    type:String,
+    trim:true
+  },
   edate:{
     type:Date
   },
@@ -104,36 +108,18 @@ var passwordRegexErrorMessage = 'Should be minimum 8 characters of alphabet and 
 userSchema.path('password').validate(function(v) {
   var user = this;
 
-  // create user
-  if(user.isNew){
-    if(!user.passwordConfirmation){
-      user.invalidate('passwordConfirmation', 'Password Confirmation is required.');
-    }
-
-    if(!passwordRegex.test(user.password)){
-      user.invalidate('password', passwordRegexErrorMessage);
-    }
-    else if(user.password !== user.passwordConfirmation) {
-      user.invalidate('passwordConfirmation', 'Password Confirmation does not matched!');
-    }
+  if(!user.passwordConfirmation){
+    user.invalidate('passwordConfirmation', 'Password Confirmation is required.');
   }
 
-  // update user
-  if(!user.isNew){
-    if(!user.currentPassword){
-      user.invalidate('currentPassword', 'Current Password is required!');
-    }
-    else if(!bcrypt.compareSync(user.currentPassword, user.originalPassword)){
-      user.invalidate('currentPassword', 'Current Password is invalid!');
-    }
-
-    if(user.newPassword && !passwordRegex.test(user.newPassword)){
-      user.invalidate("newPassword", passwordRegexErrorMessage);
-    }
-    else if(user.newPassword !== user.passwordConfirmation) {
-      user.invalidate('passwordConfirmation', 'Password Confirmation does not matched!');
-    }
+  if(!passwordRegex.test(user.password)){
+    user.invalidate('password', passwordRegexErrorMessage);
   }
+  else if(user.password !== user.passwordConfirmation) {
+    console.log('take this');
+    user.invalidate('passwordConfirmation', 'Password Confirmation does not matched!');
+  }
+  
 });
 
 // hash password // 3
