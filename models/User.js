@@ -2,7 +2,7 @@
 var fs = require("fs");
 var mongoose = require('mongoose');
 var bcrypt = require('bcryptjs'); // 1
-var validationJSON = fs.readFileSync("../config/validation.json");
+var validationJSON = fs.readFileSync("config/validation.json");
 var validation = JSON.parse(validationJSON);
 
 

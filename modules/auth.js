@@ -1,4 +1,4 @@
-var User = require('./User');
+var User = require('../models/User');
 var crypto = require('crypto');
 
 // 토큰 생성
