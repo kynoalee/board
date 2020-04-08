@@ -62,7 +62,7 @@
         <div class="form-group">
           <label for="deadline">deadline</label>
           <!-- 날짜 api -->
-          <input type="text" id="deadline" name="deadline" value="<%= order.deadline %>" class="form-control <%= (errors.deadline)?'is-invalid':'' %>">
+          <input type="text" id="endDate" name="deadline">
           <% if(errors.deadline){ %>
             <span class="invalid-feedback"><%= errors.deadline.message %></span>
           <% } %>
