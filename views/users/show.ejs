@@ -43,6 +43,12 @@
         </div>
       </div>
       <div class="form-group row">
+        <label class="col-sm-3 col-form-label">Address</label>
+        <div class="col-sm-9">
+          <label class="col-form-label"><%= user.address1 %> <%= user.address2 %>, <%= user.province %>, <%= user.city %>, <%= user.country %> (<%=user.zipcode%>) </label>
+        </div>
+      </div>
+      <div class="form-group row">
         <label class="col-sm-3 col-form-label">Contact Number</label>
         <div class="col-sm-9">
           <label class="col-form-label">+<%=user.countrycode%>&nbsp;<%= user.contactnumber %></label>

@@ -13,12 +13,12 @@
         <h1 class="display-4 font-weight-normal">여러분의 상상을 만들어보세요</h1>
         <p class="lead font-weight-normal">담당 PD들이 최고의 업체를 찾아 완벽한 부품을 만들어드립니다</p>
         <div class="form-group">
-          <input type="file" name="img[]" class="file">
-          <div class="input-group col-xs-12">
+          <!--input type="file" name="img[]" class="file"-->
+          <div class="input-group col-xs-12 justify-content-center">
             <span class="input-group-addon"><i class="glyphicon glyphicon-picture"></i></span>
-            <input type="text" class="form-control input-lg" disabled placeholder="Upload Image">
+            <!--input type="text" class="form-control input-lg" disabled placeholder="Upload Image"-->
             <span class="input-group-btn">
-              <button class="browse btn btn-primary input-lg" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
+              <button class="browse btn btn-primary input-lg" type="button" onclick="goPage('<%=isAuthenticated?`upload`:`login`%>')"><!--i class="glyphicon glyphicon-search"></i-->Upload Now</button>
             </span>
           </div>
         </div>

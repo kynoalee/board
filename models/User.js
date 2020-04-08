@@ -2,7 +2,7 @@
 var fs = require("fs");
 var mongoose = require('mongoose');
 var bcrypt = require('bcryptjs'); // 1
-var validationJSON = fs.readFileSync("public/json/validation.json");
+var validationJSON = fs.readFileSync("config/validation.json");
 var validation = JSON.parse(validationJSON);
 
 
@@ -79,8 +79,38 @@ var userSchema = mongoose.Schema({
     type:Date
   },
   disabled:{
-    type:Boolean
-  }
+    type:Boolean,
+    default:false
+  },
+  address1:{
+    type:String,
+    trim:true,
+    required:[true,"Address is required"]
+  },
+  address2:{
+    type:String,
+    trim:true
+  },
+  city:{
+    type:String,
+    trim:true,
+    required:[true,"city is required"]
+  },
+  province:{
+    type:String,
+    trim:true
+  },
+  country:{
+    type:String,
+    trim:true,
+    required:[true,"city is required"]
+  },
+  zipcode:{
+    type:String,
+    trim:true,
+    required:[true,"zipcode is required"]
+  },
+  
 },{
   toObject:{virtuals:true}
 });

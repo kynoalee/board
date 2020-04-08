@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('../config/passport');
-var authToken = require('../models/auth');
+var authToken = require('../modules/auth');
 
 // Home
 router.get('/', function(req, res){
