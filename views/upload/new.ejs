@@ -1,0 +1,96 @@
+<!-- views/home/welcome.ejs -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../partials/head') %>
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+    <div class="container mb-3">
+      <form action="/upload" method="post">
+        <div class="form-group">
+          <h2>Upload</h2>
+        </div>
+        <div class="form-group">
+          <label for="file">File Upload</label> 
+          <!-- 여러파일 넣고 빼기 되도록 , 넣는파일 설명-->
+          <div>
+            <input type="file" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="size">size</label>
+          <input type="text" id="size" name="size" value="<%= order.size %>" class="form-control <%= (errors.size)?'is-invalid':'' %>">
+          <% if(errors.size){ %>
+            <span class="invalid-feedback"><%= errors.size.message %></span>
+          <% } %>
+        </div>
+        <div class="form-group">
+          <label for="color">color</label>
+          <input type="text" id="color" name="color" value="<%= order.color %>" class="form-control <%= (errors.color)?'is-invalid':'' %>">
+          <% if(errors.color){ %>
+            <span class="invalid-feedback"><%= errors.color.message %></span>
+          <% } %>
+        </div>
+        <div class="form-group">
+          <label for="material">material</label>
+          <input type="text" id="material" name="material" value="<%= order.material %>" class="form-control <%= (errors.material)?'is-invalid':'' %>">
+          <% if(errors.material){ %>
+            <span class="invalid-feedback"><%= errors.material.message %></span>
+          <% } %>
+        </div>
+        <div class="form-group">
+          <label for="prototype">prototype quantity <input type="checkbox" id='prototype-need'> <label for='prototype-need' class='red'>if you need prototype, check this box</label for='prototype-need'></label>
+          <!-- 체크박스 필요한지 여부 , 시제품 수량 -->
+          <input type="hidden" id="prototype" name="prototype" value="<%= order.prototype %>" class="form-control <%= (errors.prototype)?'is-invalid':'' %>">
+          <% if(errors.prototype){ %>
+            <span class="invalid-feedback"><%= errors.prototype.message %></span>
+          <% } %>
+        </div>
+        
+        <div class="form-group">
+          <label for="quantity">quantity</label>
+          <input type="text" id="quantity" name="quantity" value="<%= order.quantity %>" class="form-control <%= (errors.quantity)?'is-invalid':'' %>">
+          <% if(errors.quantity){ %>
+            <span class="invalid-feedback"><%= errors.quantity.message %></span>
+          <% } %>
+        </div>
+        <div class="form-group">
+          <label for="deadline">deadline</label>
+          <!-- 날짜 api -->
+          <input type="text" id="deadline" name="deadline" value="<%= order.deadline %>" class="form-control <%= (errors.deadline)?'is-invalid':'' %>">
+          <% if(errors.deadline){ %>
+            <span class="invalid-feedback"><%= errors.deadline.message %></span>
+          <% } %>
+        </div>
+        <div class="form-group">
+          <label for="summary">summary *</label>
+          <input type="text" id="summary" name="summary" value="<%= order.summary %>" class="form-control <%= (errors.summary)?'is-invalid':'' %>">
+          <% if(errors.summary){ %>
+            <span class="invalid-feedback"><%= errors.summary.message %></span>
+          <% } %>
+        </div>
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea id="description" name="description" rows="5" class="form-control <%= (errors.description)?'is-invalid':'' %>"><%= order.description %></textarea>
+          <% if(errors.description){ %>
+            <span class="invalid-feedback"><%= errors.description.message %></span>
+          <% } %>
+        </div>
+
+        <% if(errors.unhandled){ %>
+          <div class="invalid-feedback d-block">
+            <%= errors.unhandled %>
+          </div>
+        <% } %>
+
+        <div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+
+      </form>
+    </div>
+  </body>
+</html>
+

@@ -45,3 +45,11 @@ function initiateError(id){
   var target = $("#"+id);
   target.removeClass("is-invalid");
 }
+
+function goPage(des){
+  if(des == 'login'){
+    window.location.replace('/login');
+  } else if(des == 'upload'){
+    window.location.replace('/upload');
+  }
+}

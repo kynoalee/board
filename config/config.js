@@ -2,6 +2,9 @@ var config = {
     server:{
         local:"http://localhost:3000"
     },
+    file:{
+        local:"/"  
+    },
     db:{
         mongo:{
             test:"mongodb+srv://kynoa:1004kyno@cluster0-onkr1.mongodb.net/test?retryWrites=true&w=majority",
@@ -19,3 +22,4 @@ var config = {
 
 module.exports = config;
 module.exports.serverUrl = config.server.local;
+module.exports.fileUrl = config.file.local;
