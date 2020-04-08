@@ -123,7 +123,36 @@ router.put("/:userid", util.isLoggedin, checkPermission, function(req, res, next
         changed = true;
         mailChanged = true;
       }
-
+      // address1 change check
+      if(req.body.address1 && req.body.address1 != user.address1){
+        user.address1 = req.body.address1;
+        changed = true;
+      }
+      // address2 change check
+      if(req.body.address2 && req.body.address2 != user.address2){
+        user.address2 = req.body.address2;
+        changed = true;
+      }
+      // country change check
+      if(req.body.country && req.body.country != user.country){
+        user.country = req.body.country;
+        changed = true;
+      }
+      // province change check
+      if(req.body.province && req.body.province != user.province){
+        user.province = req.body.province;
+        changed = true;
+      }
+      // city change check
+      if(req.body.city && req.body.city != user.city){
+        user.city = req.body.city;
+        changed = true;
+      }
+      // zipcode change check
+      if(req.body.zipcode && req.body.zipcode != user.zipcode){
+        user.zipcode = req.body.zipcode;
+        changed = true;
+      }
       if(changed){
         user.mdate = Date();
         user.msubject = req.user.userid;

@@ -61,8 +61,8 @@
           <div class="col-sm-2" style="margin-right:0">
             <select class="form-control" name="countrycode" id="countrycode">
               <option value="">Country Code</option>
-              <option value="86" <%=user.countrycode=='86'?"selected":""%>>+86(CN)</option>
-              <option value="82" <%=user.countrycode=='82'?"selected":""%></option>>+82(KR)</option>
+              <option value="86" <%=user.countrycode=='86'?"selected default":""%>>+86(CN)</option>
+              <option value="82" <%=user.countrycode=='82'?"selected default":""%></option>>+82(KR)</option>
             </select>
           </div>
           <div class="col-sm-7">
@@ -81,7 +81,60 @@
             <% } %>
           </div>
         </div>
-
+        <div class="form-group row">
+          <label for="address1" class="col-sm-3 col-form-label">Address1</label>
+          <div class="col-sm-9">
+            <input type="text" id="address1" name="address1" value="<%= user.address1 %>" class="form-control <%= (errors.address1)?'is-invalid':'' %>" onkeydown="initiateError('address1')"> <!-- 1, 2 -->
+            <% if(errors.address1){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.address1.message %></span>
+            <% } %>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="address2" class="col-sm-3 col-form-label">Address2</label>
+          <div class="col-sm-9">
+            <input type="text" id="address2" name="address2" value="<%= user.address2 %>" class="form-control <%= (errors.address2)?'is-invalid':'' %>" onkeydown="initiateError('address2')"> <!-- 1, 2 -->
+            <% if(errors.address2){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.address2.message %></span>
+            <% } %>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="city" class="col-sm-3 col-form-label">City</label>
+          <div class="col-sm-9">
+            <input type="text" id="city" name="city" value="<%= user.city %>" class="form-control <%= (errors.city)?'is-invalid':'' %>" onkeydown="initiateError('city')"> <!-- 1, 2 -->
+            <% if(errors.city){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.city.message %></span>
+            <% } %>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="country" class="col-sm-3 col-form-label">Country</label>
+          <div class="col-sm-9">
+            <input type="text" id="country" name="country" value="<%= user.country %>" class="form-control <%= (errors.country)?'is-invalid':'' %>" onkeydown="initiateError('country')"> <!-- 1, 2 -->
+            <% if(errors.country){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.country.message %></span>
+            <% } %>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="province" class="col-sm-3 col-form-label">Province</label>
+          <div class="col-sm-9">
+            <input type="text" id="province" name="province" value="<%= user.province %>" class="form-control <%= (errors.province)?'is-invalid':'' %>" onkeydown="initiateError('province')"> <!-- 1, 2 -->
+            <% if(errors.province){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.province.message %></span>
+            <% } %>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="zipcode" class="col-sm-3 col-form-label">Zipcode</label>
+          <div class="col-sm-9">
+            <input type="text" id="zipcode" name="zipcode" value="<%= user.zipcode %>" class="form-control <%= (errors.zipcode)?'is-invalid':'' %>" onkeydown="initiateError('zipcode')"> <!-- 1, 2 -->
+            <% if(errors.zipcode){ %> <!-- 3 -->
+              <span class="invalid-feedback"><%= errors.zipcode.message %></span>
+            <% } %>
+          </div>
+        </div>
         <% if(errors.unhandled){ %> <!-- 4 -->
           <div class="alert alert-danger">
             <%= errors.unhandled %>

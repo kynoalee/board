@@ -79,8 +79,38 @@ var userSchema = mongoose.Schema({
     type:Date
   },
   disabled:{
-    type:Boolean
-  }
+    type:Boolean,
+    default:false
+  },
+  address1:{
+    type:String,
+    trim:true,
+    required:[true,"Address is required"]
+  },
+  address2:{
+    type:String,
+    trim:true
+  },
+  city:{
+    type:String,
+    trim:true,
+    required:[true,"city is required"]
+  },
+  province:{
+    type:String,
+    trim:true
+  },
+  country:{
+    type:String,
+    trim:true,
+    required:[true,"city is required"]
+  },
+  zipcode:{
+    type:String,
+    trim:true,
+    required:[true,"zipcode is required"]
+  },
+  
 },{
   toObject:{virtuals:true}
 });

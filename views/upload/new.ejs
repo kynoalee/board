@@ -8,7 +8,7 @@
   <body>
     <%- include('../partials/nav') %>
     <div class="container mb-3">
-      <form action="/upload" method="post">
+      <form action="/upload" method="post" enctype="multipart/form-data"> 
         <div class="form-group">
           <h2>Upload</h2>
         </div>
@@ -16,7 +16,10 @@
           <label for="file">File Upload</label> 
           <!-- 여러파일 넣고 빼기 되도록 , 넣는파일 설명-->
           <div>
-            <input type="file" />
+            <input type="file" id='file' onchange="listFiles('file','fileList')" multiple />       
+          </div>
+          <div id="fileList">
+            <div>파일 모음</div>
           </div>
         </div>
         <div class="form-group">
@@ -41,7 +44,7 @@
           <% } %>
         </div>
         <div class="form-group">
-          <label for="prototype">prototype quantity <input type="checkbox" id='prototype-need'> <label for='prototype-need' class='red'>if you need prototype, check this box</label for='prototype-need'></label>
+          <label for="prototype">prototype quantity <input type="checkbox" value='check' id='prototype-need' onchange="displayByCheckbox('prototype-need','prototype')"> <label for='prototype-need' class='red'>if you need prototype, check this box</label for='prototype-need'></label>
           <!-- 체크박스 필요한지 여부 , 시제품 수량 -->
           <input type="hidden" id="prototype" name="prototype" value="<%= order.prototype %>" class="form-control <%= (errors.prototype)?'is-invalid':'' %>">
           <% if(errors.prototype){ %>
