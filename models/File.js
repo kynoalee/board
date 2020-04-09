@@ -7,7 +7,7 @@ var fileSchema = mongoose.Schema({
         type:String,
         trim:true
     },
-    filename:{
+    filepath:{
         type:String,
         trim:true,
         unique:true

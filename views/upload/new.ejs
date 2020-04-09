@@ -16,7 +16,7 @@
           <label for="file">File Upload</label> 
           <!-- 여러파일 넣고 빼기 되도록 , 넣는파일 설명-->
           <div>
-            <input type="file" id='file' onchange="listFiles('file','fileList')" multiple />       
+            <input type="file" id='file' onchange="listFiles('file','fileList')" name='file' multiple/>       
           </div>
           <div id="fileList">
             <div>파일 모음</div>
@@ -62,7 +62,7 @@
         <div class="form-group">
           <label for="deadline">deadline</label>
           <!-- 날짜 api -->
-          <input type="text" id="deadline" name="deadline" value="<%= order.deadline %>" class="form-control <%= (errors.deadline)?'is-invalid':'' %>">
+          <input type="text" id="endDate" name="deadline" class = "form-control">
           <% if(errors.deadline){ %>
             <span class="invalid-feedback"><%= errors.deadline.message %></span>
           <% } %>

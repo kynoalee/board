@@ -3,7 +3,7 @@ var config = {
         local:"http://localhost:3000"
     },
     file:{
-        local:"/"  
+        local:"../files/"  
     },
     db:{
         mongo:{
