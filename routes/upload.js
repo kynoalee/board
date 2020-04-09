@@ -3,10 +3,11 @@ var router = express.Router();
 var multer = require('multer');
 var moment = require('moment');
 var config = require('../config/config')
+var util = require('../util'); // 1
 var File = require('../models/File');
 
-// Index 
-router.get('/', function(req, res){
+// Index  util.isLoggedin, 
+router.get('/',function(req, res){
     res.render('upload/new',{
         errors:'',
         order:''
@@ -25,16 +26,31 @@ var storage = multer.diskStorage({
 })
 var upload = multer({ storage: storage })
 
-router.post('/',upload.array('file'),function(req,res){
-    console.log(req.files); 
+// create
+router.post('/',upload.array('file'), function(req,res){
+    // File create
+    console.log(req.user)
+    req.files.forEach(function(fileInfo,index){
+        let createObj = {originname : fileInfo.originalname,filepath:'',uploadid:'',update:Date()};
+        console.log(createObj)        
+    })
+
+    // order_detail create
+    // File.create(req.body, function(err, file){
+    //     if(err){
+    //       req.flash('order', req.body);
+    //       req.flash('errors', util.parseError(err)); // 1
+    //       return res.redirect('/upload');
+    //     }
     res.redirect('/upload');
+    // });    
 });
 
 function createServerName(origin){
     let originSplitName = origin.split('.');
     let extension = originSplitName.pop();
     let serverName = originSplitName.join('.');
-    let newServerName =moment().format('YYMMDDHHmmssS_')+serverName+'.'+extension;
+    let newServerName =moment().format('YYMMDDHHmmss_')+serverName+'.'+extension;
     let addPath = 'etc/';
     if(/(txt|text)/.test(extension)) {
         addPath = 'texts/';
