@@ -9,7 +9,7 @@ var config = require('./config');
 
 // serialize & deserialize User // 2
 passport.serializeUser(function(user, done) {
-  done(null, user.id);
+  done(null, user);
 });
 passport.deserializeUser(function(id, done) {
   User.findOne({_id:id}, function(err, user) {

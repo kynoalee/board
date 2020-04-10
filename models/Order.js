@@ -6,6 +6,12 @@ var orderSummarySchema = mongoose.Schema({
   });
 
 var orderDetailSchema = mongoose.Schema({
+    ordernum:{
+      type:Number,
+      unique:true,
+      required:[true],
+      trim:true
+    },
     
   });
 

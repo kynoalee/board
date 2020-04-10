@@ -6,8 +6,8 @@ var config = require('../config/config')
 var util = require('../util'); // 1
 var File = require('../models/File');
 
-// Index  util.isLoggedin, 
-router.get('/',function(req, res){
+// Index   
+router.get('/',util.isLoggedin,function(req, res){
     res.render('upload/new',{
         errors:'',
         order:''
@@ -27,12 +27,23 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage })
 
 // create
-router.post('/',upload.array('file'), function(req,res){
+router.post('/',upload.array('file'),util.isLoggedin, function(req,res){
     // File create
-    console.log(req.user)
     req.files.forEach(function(fileInfo,index){
-        let createObj = {originname : fileInfo.originalname,filepath:'',uploadid:'',update:Date()};
+        let createObj = {originname : fileInfo.originalname,filepath:fileInfo.path.replace('../',''),uploadid:req.user.userid,filetype:fileInfo.mimetype};
+        createObj.new = 'test'
         console.log(createObj)        
+        File.create(createObj, function(err, file){
+            console.log('file DB create...')
+            console.log(file)
+            if(err){
+                console.log('file DB create error!')
+                req.flash('errors', util.parseError(err)); // 1
+                return res.redirect('/upload');
+            }
+            console.log('file DB create done!')
+            res.redirect('/upload')
+        })
     })
 
     // order_detail create
@@ -42,7 +53,7 @@ router.post('/',upload.array('file'), function(req,res){
     //       req.flash('errors', util.parseError(err)); // 1
     //       return res.redirect('/upload');
     //     }
-    res.redirect('/upload');
+    //res.redirect('/upload');
     // });    
 });
 
