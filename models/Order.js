@@ -6,13 +6,48 @@ var orderSummarySchema = mongoose.Schema({
   });
 
 var orderDetailSchema = mongoose.Schema({
-    ordernum:{
+    order_detailnum:{
       type:Number,
       unique:true,
       required:[true],
       trim:true
     },
+    orderlink:String,
+    filelink:String,
+    summary:{
+      type:String,
+      required:[true,'summary is required!']
+    },
+    description:{
+      type:String,
+      required:[true,'description is required']
+    },
+    wdate:{
+      type:Date,
+      default:Date()
+    },
+    userid : String,
     
+    // customer side
+    size:String,
+    color:String,
+    material:String,
+    prototypeB:Boolean,
+    proto_quantity:String,
+    quantity:String,
+    deadline:String,
+
+    // vender side
+    invoice:String,
+    destination:String,
+    deliverycom:String,
+
+    //pd side
+    accepted : {
+      type:Boolean,
+      default : false
+    },
+    acceptid : String
   });
 
 var orderLastSchema = mongoose.Schema({

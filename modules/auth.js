@@ -1,4 +1,5 @@
 var User = require('../models/User');
+var File = require('../models/File');
 var crypto = require('crypto');
 
 // 토큰 생성
@@ -41,6 +42,21 @@ var verifyToken = async function(email,token){
     });
 }
 
+async function generateFileKey(){
+    let hex = '0';
+    await File.find().sort('-filekey').findOne()
+    .exec(function(err,file){
+        console.log(file.filekey + " test")
+        let lastHex = file.filekey.substr(1);
+        let dec = parseInt(lastHex,16)
+        dec+=1;
+        hex = dec.toString(16);
+    })
+    return 'F'+hex;
+}
+
 module.exports.generateToken = generateToken;
 module.exports.updateToken = updateToken;
 module.exports.verifyToken = verifyToken;
+
+module.exports.generateFileKey = generateFileKey;

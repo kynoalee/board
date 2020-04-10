@@ -21,6 +21,10 @@ var fileSchema = mongoose.Schema({
     udate:{
         type:Date,
         default:Date()
+    },
+    filekey:{
+        type:String,
+        unique:true
     }
 });
   
