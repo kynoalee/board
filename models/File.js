@@ -19,9 +19,14 @@ var fileSchema = mongoose.Schema({
         type:String
     },
     udate:{
-        type:Date
+        type:Date,
+        default:Date()
+    },
+    filekey:{
+        type:String,
+        unique:true
     }
-  });
+});
   
   // model & export
   var File = mongoose.model('file', fileSchema);
