@@ -30,48 +30,48 @@ var upload = multer({ storage: storage })
 
 // create
 router.post('/',upload.array('file'),util.isLoggedin, function(req,res){
-    req.body.filelink = new Array();
-    let num = 0;
-    // File create
-    (async()=>{
+    // req.body.filelink = new Array();
+    // let num = 0;
+    // // File create
+    // (async()=>{
 
-    req.files.forEach(function(fileInfo,index){
+    // req.files.forEach(function(fileInfo,index){
 
-            let createObj = {originname : fileInfo.originalname,filepath:fileInfo.path.replace('../',''),uploadid:req.user.userid,filetype:fileInfo.mimetype};
+    //         let createObj = {originname : fileInfo.originalname,filepath:fileInfo.path.replace('../',''),uploadid:req.user.userid,filetype:fileInfo.mimetype};
             
-            // file unique key
-            console.log('generate unique file key....')
-            auth.generateFileKey().then(filKey =>{
-                req.body.filelink[num] = createObj.filekey;
-                num+=1;
+    //         // file unique key
+    //         console.log('generate unique file key....')
+    //         auth.generateFileKey().then(filKey =>{
+    //             req.body.filelink[num] = createObj.filekey;
+    //             num+=1;
     
-                File.create(createObj, function(err, file){
-                    console.log('create File Document...')
-                    if(err){
-                        console.log('create file Document error!')
-                        req.flash('errors', util.parseError(err)); // 1
-                        return res.redirect('/upload');
-                    }
-                    console.log('create file Document done!')
-                })
-            });
+    //             File.create(createObj, function(err, file){
+    //                 console.log('create File Document...')
+    //                 if(err){
+    //                     console.log('create file Document error!')
+    //                     req.flash('errors', util.parseError(err)); // 1
+    //                     return res.redirect('/upload');
+    //                 }
+    //                 console.log('create file Document done!')
+    //             })
+    //         });
            
             
-        })
-    })().then(v=>{
-        // order_detail create
-        Order.Detail.create(req.body, function(err, file){
-            console.log('create Order Detail Document...')
-            if(err){
-                console.log('create order document error')
-                req.flash('order', req.body);
-                req.flash('errors', util.parseError(err)); // 1
-                return res.redirect('/upload');
-            }
-            console.log('create order document done!')
-        res.redirect('/upload');
-        });    
-    })
+    //     })
+    // })().then(v=>{
+    //     // order_detail create
+    //     Order.Detail.create(req.body, function(err, file){
+    //         console.log('create Order Detail Document...')
+    //         if(err){
+    //             console.log('create order document error')
+    //             req.flash('order', req.body);
+    //             req.flash('errors', util.parseError(err)); // 1
+    //             return res.redirect('/upload');
+    //         }
+    //         console.log('create order document done!')
+    //     res.redirect('/upload');
+    //     });    
+    // })
 });
 
 function createServerName(origin){
