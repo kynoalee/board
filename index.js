@@ -26,6 +26,7 @@ db.on('error', function(err){
 // Other settings
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname+'/public'));
+app.use(express.static("../files"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(methodOverride('_method'));
@@ -47,7 +48,7 @@ app.use(function(req,res,next){
 app.use('/', require('./routes/home'));
 app.use('/posts', require('./routes/posts'));
 app.use('/users', require('./routes/users'));
-app.use('/upload',require('./routes/upload'));
+app.use('/order',require('./routes/order'));
 
 // Port setting
 var port = 3000;

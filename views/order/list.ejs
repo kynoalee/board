@@ -1,0 +1,131 @@
+<!-- views/home/welcome.ejs -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../partials/head') %>
+    <script src="/js/order.js"></script>
+    <link rel="stylesheet" href="/css/order.css">
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+
+    <div class="container container-per mb-3">
+        <h3 class="contentBoxTop mb-3">주문통계</h3>
+        <table class='table table-bordered'>
+            <thead>
+                <tr>
+                    <th scope="col">주문</th>
+                    <th scope="col">PT제작</th>
+                    <th scope="col">PT배송</th>
+                    <th scope="col">제작</th>
+                    <th scope="col">배송</th>
+                    <th scope="col">확정</th>
+                    <th scope="col">총주문수</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td scope="row"><%=summaryNum.order%></td>
+                    <td><%=summaryNum.ptWork%></td>
+                    <td><%=summaryNum.ptDeli%></td>
+                    <td><%=summaryNum.work%></td>
+                    <td><%=summaryNum.deli%></td>
+                    <td><%=summaryNum.done%></td>
+                    <td><%=summaryNum.all%></td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- 라스트오더 -->
+        <h3>주문 상세</h3>
+        <table class='table'>
+            <thead id="lastOrder" data-toggle="collapse" data-target="#orderDetail">
+                <tr>
+                    <th width=10 class="align-middle">1</th>
+                    <th scope="col">
+                        <div>
+                            <img src="/images/example.jpg" width=100>
+                        </div>    
+                    </th>
+                    <th scope="col">
+                        <div>
+                            <img src="/gifs/unnamed.gif" width=100 alt="">
+                        </div>
+                    </th>
+                    <th scope="col">
+                        <div>
+                            <video src="/videos/20190405_125246.mp4" width=200 controls loop></video>
+                        </div>
+                    </th>
+                    <th scope="col">제작</th>
+                    <th scope="col">배송</th>
+                    <th scope="col">확정</th>
+                    <th scope="col">총주문수</th>
+                </tr>
+            </thead>
+            <!-- 주문 상세 -->
+            <tbody id="orderDetail" class="collapse" data-parent="#lastOrder">
+                <tr>
+                    <td><!--빈공간--></td>
+                    <td scope="row">
+                        C:파일업로드<br>
+                        - 새로운 부품을 제작
+                        <div>V: 하기싫음</div>
+                        <div>C: 해줘</div>
+                        <div>V: ㅇㅋ</div>
+                    </td>
+                    <td>
+                        C:파일업로드<br>
+                        - 새로운 부품을 제작
+                    </td>
+                    <td>
+                        C:파일업로드<br>
+                        - 새로운 부품을 제작
+                    </td>
+                    <td>
+                        C:파일업로드<br>
+                        - 새로운 부품을 제작
+                    </td>
+                    <td>
+                        C:파일업로드<br>
+                        - 새로운 부품을 제작
+                    </td>
+                    <td>
+                        C:파일업로드<br>
+                        - 새로운 부품을 제작
+                    </td>
+                    <td>
+                        C:파일업로드<br>
+                        - 새로운 부품을 제작
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- 주문 간략리스트 -->
+        <h3>주문 목록</h3>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>주문번호</th>
+                    <th>주문일시</th>
+                    <th>마지막작업일시</th>
+                    <th>상태</th>
+                    <th>주문 메모</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%for(var obj of summary){%>
+                    <tr>
+                        <td><%=obj.ordernum%></td>
+                        <td><%=obj.orderdateD%><br /><%=obj.orderdateH%></td>
+                        <td><%=obj.modidateD%><br /><%=obj.modidateH%></td>
+                        <td><%=obj.status%></td>
+                        <td><input type="text" value="<%=obj.memo%>"></td>
+                    </tr>
+                <%}%>             
+            </tbody>
+        </table>
+    </div>
+  </body>
+</html>
+

@@ -42,17 +42,33 @@ var verifyToken = async function(email,token){
     });
 }
 
-async function generateFileKey(){
+var generateFileKey = async function(num,obj){
     let hex = '0';
     await File.find().sort('-filekey').findOne()
-    .exec(function(err,file){
-        console.log(file.filekey + " test")
+    .exec(async function(err,file){
+        console.log(num+" before : "+file.filekey);
         let lastHex = file.filekey.substr(1);
-        let dec = parseInt(lastHex,16)
+        let dec = parseInt(lastHex,16);
         dec+=1;
         hex = dec.toString(16);
-    })
-    return 'F'+hex;
+        console.log(num + ': F'+hex);
+
+        obj.filekey = "F"+hex;
+
+        await createFile(obj,function(err,file){
+            if(err){
+                return err;
+            }
+            console.log("ff"+num);
+            return file;
+        });
+    });
+}
+
+var createFile = async function(obj,callback){
+    await File.create(obj,function(err,file){
+        callback(err,file);
+    });
 }
 
 module.exports.generateToken = generateToken;
