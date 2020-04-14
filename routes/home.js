@@ -3,8 +3,16 @@ var router = express.Router();
 var passport = require('../config/passport');
 var authToken = require('../modules/auth');
 
+var File = require('../models/File');
+
 // Home
 router.get('/', function(req, res){
+  
+  File.find({},['filekey'],{sort:{filekey:-1},limit:1},function(err,arr){
+      console.log(arr[0].filekey);
+      console.log(parseInt((arr[0].filekey.replace('F','')),16));
+  });
+
   res.render('home/welcome');
 });
 router.get('/about', function(req, res){

@@ -13,7 +13,8 @@ router.get('/',util.isLoggedin,function(req, res){
     res.render('order/new',{
         errors:'',
         order:''
-    });    
+    });
+     
 });
 
 // list get
@@ -30,7 +31,9 @@ router.get('/list',function(req,res){
     //     }
     //     res.redirect('/');
     //   });
-    Order.Summary.find({},function(err,arr){
+
+    // test 이후 req.user.userid 
+    Order.Summary.find({orderid : "imgcom"},function(err,arr){
         var summary = [];
         var summaryNum = {
             order : 0,
@@ -89,12 +92,16 @@ router.get('/list',function(req,res){
             }
             summary.push(contents);
         }
+        // 주문 번호 순 정렬 
+        summary.sort(function(a,b){
+            return a.ordernum < b.ordernum ? -1 : a.ordernum > b. ordernum ? 1 : 0;
+        });
 
         res.render('order/list',{
             summary : summary,
             summaryNum : summaryNum
         });
-    })
+    });
    
 });
 
@@ -115,8 +122,10 @@ router.post('/',order.array('file'),util.isLoggedin, function(req,res){
     req.body.filelink = new Array();
     let num = 0;
     // File create
-
-    // req.files.forEach(function(fileInfo,index){
+    processArray(req.files,req.user.userid);
+  
+    res.redirect('order');
+    // req.files.fo∫rEach(function(fileInfo,index){
 
     //         let createObj = {originname : fileInfo.originalname,filepath:fileInfo.path.replace('../',''),orderid:req.user.userid,filetype:fileInfo.mimetype};
             
@@ -153,7 +162,16 @@ router.post('/',order.array('file'),util.isLoggedin, function(req,res){
     //     });    
     
 });
-
+async function processArray(array,userid) {
+    let num = 0;
+    for(item of array){
+        let createObj = {originname : item.originalname,filepath:item.path.replace('../',''),orderid:userid,filetype:item.mimetype};
+        let result = await auth.generateFileKey(num,createObj);
+        console.log(result);
+        num+=1;
+        console.log('sibal'+num);
+    }
+}
 function createServerName(origin){
     let originSplitName = origin.split('.');
     let extension = originSplitName.pop();

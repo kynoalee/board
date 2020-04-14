@@ -19,6 +19,7 @@ var orderDetailSchema = mongoose.Schema({
       required:[true],
       trim:true
     },
+    orderid:String,
     orderlink:String,
     filelink:String,
     summary:{
