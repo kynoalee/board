@@ -98,7 +98,7 @@ function initiateError(id){
 function goPage(des){
   if(des == 'login'){
     window.location.replace('/login');
-  } else if(des == 'upload'){
-    window.location.replace('/upload');
+  } else if(des == 'order'){
+    window.location.replace('/order');
   }
 }

@@ -10,10 +10,17 @@ var auth = require('../modules/auth');
 
 // Index   
 router.get('/',util.isLoggedin,function(req, res){
-    res.render('upload/new',{
+    res.render('order/new',{
         errors:'',
         order:''
     });    
+});
+
+// list get
+router.get('/list',function(req,res){
+    res.render('order/list',{
+        
+    });
 });
 
 var storage = multer.diskStorage({
@@ -26,10 +33,10 @@ var storage = multer.diskStorage({
         cb(null, newName.serverName)
     }
 })
-var upload = multer({ storage: storage })
+var order = multer({ storage: storage })
 
 // create
-router.post('/',upload.array('file'),util.isLoggedin, function(req,res){
+router.post('/',order.array('file'),util.isLoggedin, function(req,res){
     // req.body.filelink = new Array();
     // let num = 0;
     // // File create
@@ -37,7 +44,7 @@ router.post('/',upload.array('file'),util.isLoggedin, function(req,res){
 
     // req.files.forEach(function(fileInfo,index){
 
-    //         let createObj = {originname : fileInfo.originalname,filepath:fileInfo.path.replace('../',''),uploadid:req.user.userid,filetype:fileInfo.mimetype};
+    //         let createObj = {originname : fileInfo.originalname,filepath:fileInfo.path.replace('../',''),orderid:req.user.userid,filetype:fileInfo.mimetype};
             
     //         // file unique key
     //         console.log('generate unique file key....')
@@ -50,7 +57,7 @@ router.post('/',upload.array('file'),util.isLoggedin, function(req,res){
     //                 if(err){
     //                     console.log('create file Document error!')
     //                     req.flash('errors', util.parseError(err)); // 1
-    //                     return res.redirect('/upload');
+    //                     return res.redirect('/order');
     //                 }
     //                 console.log('create file Document done!')
     //             })
@@ -66,10 +73,10 @@ router.post('/',upload.array('file'),util.isLoggedin, function(req,res){
     //             console.log('create order document error')
     //             req.flash('order', req.body);
     //             req.flash('errors', util.parseError(err)); // 1
-    //             return res.redirect('/upload');
+    //             return res.redirect('/order');
     //         }
     //         console.log('create order document done!')
-    //     res.redirect('/upload');
+    //     res.redirect('/order');
     //     });    
     // })
 });

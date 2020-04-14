@@ -1,0 +1,76 @@
+<!-- views/home/welcome.ejs -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../partials/head') %>
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+
+    <div class="container mb-3">
+        <h3 class="contentBoxTop mb-3">주문목록</h3>
+        <table class='table table-bordered'>
+            <thead>
+                <tr>
+                    <th scope="col">주문</th>
+                    <th scope="col">PT제작</th>
+                    <th scope="col">PT배송</th>
+                    <th scope="col">제작</th>
+                    <th scope="col">배송</th>
+                    <th scope="col">확정</th>
+                    <th scope="col">총주문수</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td scope="row">7</td>
+                    <td>0</td>
+                    <td>2</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>10</td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- 라스트오더 -->
+        
+        <table class='table'>
+            <thead id="lastOrder" data-toggle="collapse" data-target="#orderDetail">
+                <tr>
+                    <th scope="col">주문<br />ㅇㅇㅇㅇㅇ</th>
+                    <th scope="col">PT제작</th>
+                    <th scope="col">PT배송</th>
+                    <th scope="col">제작</th>
+                    <th scope="col">배송</th>
+                    <th scope="col">확정</th>
+                    <th scope="col">총주문수</th>
+                </tr>
+            </thead>
+            <!-- 주문 상세 -->
+            <tbody id="orderDetail" class="collapse" data-parent="#lastOrder">
+                <tr>
+                    <td scope="row">상세내역</td>
+                    <td>0</td>
+                    <td>2</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>10</td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- 주문 간략리스트 -->
+        <table>
+            <thead>
+                <th></th>
+            </thead>
+            <tbody>
+                <tr></tr>
+            </tbody>
+        </table>
+    </div>
+  </body>
+</html>
+
