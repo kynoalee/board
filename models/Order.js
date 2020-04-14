@@ -2,7 +2,14 @@ var mongoose = require('mongoose');
 
 // schema
 var orderSummarySchema = mongoose.Schema({
-    
+    ordernum:{
+      type:Number,
+      unique:true
+    },
+    orderdate:Date,
+    mdate:Date,
+    status:Number,
+    customermemo:String
   });
 
 var orderDetailSchema = mongoose.Schema({
