@@ -21,7 +21,7 @@ var orderDetailSchema = mongoose.Schema({
     },
     orderid:String,
     orderlink:String,
-    filelink:String,
+    filelink:Array,
     summary:{
       type:String,
       required:[true,'summary is required!']
