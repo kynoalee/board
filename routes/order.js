@@ -124,6 +124,7 @@ function (req,res){
         console.log(req.body.order_detailnum);
         Order.Detail.create(req.body,function(err,detail){
             if(err){
+                console.log(err);
                 req.flash('order', req.body);
                 req.flash('errors', util.parseError(err)); // 1
                 return res.redirect('order');
