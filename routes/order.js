@@ -10,28 +10,17 @@ var auth = require('../modules/auth');
 
 // Index   
 router.get('/',util.isLoggedin,function(req, res){
+    var order = req.flash('order')[0] || {};
+    var errors = req.flash('errors')[0] || {};
     res.render('order/new',{
-        errors:'',
-        order:''
+        errors:errors,
+        order:order
     });
      
 });
 
 // list get
 router.get('/list',function(req,res){
-    // Order.Summary.create({
-    //     ordernum:5,
-    //     orderdate:Date(),
-    //     mdate:Date(),
-    //     status:3,
-    //     customermemo:""
-    // }, function(err, user){
-    //     if(err){
-    //       return res.redirect('/');
-    //     }
-    //     res.redirect('/');
-    //   });
-
     // test 이후 req.user.userid 
     Order.Summary.find({orderid : "imgcom"},function(err,arr){
         var summary = [];
@@ -118,65 +107,69 @@ var storage = multer.diskStorage({
 var order = multer({ storage: storage })
 
 // create
-router.post('/',order.array('file'),util.isLoggedin, function(req,res){
-    req.body.filelink = new Array();
-    let num = 0;
+router.post('/',order.array('file'),util.isLoggedin, function(req,res,next){
     // File create
-    processArray(req.files,req.user.userid);
-  
-    res.redirect('order');
-    // req.files.fo∫rEach(function(fileInfo,index){
-
-    //         let createObj = {originname : fileInfo.originalname,filepath:fileInfo.path.replace('../',''),orderid:req.user.userid,filetype:fileInfo.mimetype};
-            
-    //         // file unique key
-    //         console.log('generate unique file key....')
-    //         auth.generateFileKey().then(filKey =>{
-    //             req.body.filelink[num] = createObj.filekey;
-    //             num+=1;
-    
-    //             File.create(createObj, function(err, file){
-    //                 console.log('create File Document...')
-    //                 if(err){
-    //                     console.log('create file Document error!')
-    //                     req.flash('errors', util.parseError(err)); // 1
-    //                     return res.redirect('/order');
-    //                 }
-    //                 console.log('create file Document done!')
-    //             })
-    //         });
-           
-            
-    //     })
-    //     // order_detail create
-    //     Order.Detail.create(req.body, function(err, file){
-    //         console.log('create Order Detail Document...')
-    //         if(err){
-    //             console.log('create order document error')
-    //             req.flash('order', req.body);
-    //             req.flash('errors', util.parseError(err)); // 1
-    //             return res.redirect('/order');
-    //         }
-    //         console.log('create order document done!')
-    //     res.redirect('/order');
-    //     });    
-    
-});
-async function processArray(array,userid) {
-    let num = 0;
-    for(item of array){
-        let createObj = {originname : item.originalname,filepath:item.path.replace('../',''),orderid:userid,filetype:item.mimetype};
-        let result = await auth.generateFileKey(num,createObj);
-        console.log(result);
-        num+=1;
-        console.log('sibal'+num);
+    if(req.files.length){
+        createFiles(req.files,req,next);
+    } else{
+        console.log("upload nothing");
+        req.body.filelink = null;
+        next();
     }
+},
+function (req,res){
+    // OrderDetail create
+    Order.Detail.find({}).sort({order_detailnum:-1}).findOne().select("order_detailnum").exec(function(err,detail){
+        req.body.order_detailnum = detail.order_detailnum+1;
+        console.log(req.body.order_detailnum);
+        Order.Detail.create(req.body,function(err,detail){
+            if(err){
+                req.flash('order', req.body);
+                req.flash('errors', util.parseError(err)); // 1
+                return res.redirect('order');
+            }
+            res.redirect('order');
+        });
+    });
+});
+
+function delayFileCreate(creatObj) {
+    return new Promise(resolve => 
+             setTimeout(() => { 
+                File.create(creatObj,function(err,file){
+                    console.log(creatObj);
+                    if(err){
+                        console.log(err);
+                    }
+                    console.log("done");
+                });                    
+                resolve(); }, 1000) ); 
 }
+
+async function createFiles(array,req,next) {
+    var fileLink =[];
+    for(const fileInfo of array){
+        let creatObj ={
+            originname:fileInfo.originalname,
+            servername:fileInfo.filename,
+            filepath:fileInfo.path.replace("../",""),
+            uploadid:req.user.userid,
+            filetype:fileInfo.mimetype,
+            udate:Date()
+        };
+        await delayFileCreate(creatObj);
+        fileLink[fileLink.length] = fileInfo.filename;
+  }
+  req.body.filelink = fileLink;
+  next();
+}
+
+// 업로드 파일 서버 저장용 이름 설정
 function createServerName(origin){
     let originSplitName = origin.split('.');
     let extension = originSplitName.pop();
-    let serverName = originSplitName.join('.');
-    let newServerName =moment().format('YYMMDDHHmmss_')+serverName+'.'+extension;
+    let serverName = "file";
+    let newServerName =moment().format('YYMMDDHHmmssSSS_')+serverName+'.'+extension;
     let addPath = 'etc/';
     if(/(txt|text)/.test(extension)) {
         addPath = 'texts/';
@@ -189,6 +182,9 @@ function createServerName(origin){
     }
     else if(/(gif)/.test(extension)) {
         addPath = 'gif/';
+    }
+    else if(/(pdf)/.test(extension)) {
+        addPath = 'pdf/';
     }
     return {serverName : newServerName, extension : extension,addPath : addPath};
 }
