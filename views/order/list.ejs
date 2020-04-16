@@ -6,6 +6,11 @@
     <%- include('../partials/head') %>
     <script src="/js/order.js"></script>
     <link rel="stylesheet" href="/css/order.css">
+    <script>
+        if(<%=alertT%>){
+            alert("test");
+        }
+    </script>
   </head>
   <body>
     <%- include('../partials/nav') %>
@@ -41,26 +46,26 @@
         <table class='table'>
             <thead id="lastOrder" data-toggle="collapse" data-target="#orderDetail">
                 <tr>
-                    <th width=10 class="align-middle">1</th>
-                    <th scope="col">
+                    <td width=10 class="align-middle"><%=lastOrderNum%></td>
+                    <%for(status of lastOrder){%>
+                    <td scope="col" class="align-middle">
+                        <div class="last"><%=status.title%></div>
                         <div>
-                            <img src="/images/example.jpg" width=100>
-                        </div>    
-                    </th>
-                    <th scope="col">
+                            <%if(status.type == 'images' ||status.type == 'gifs'){%>
+                            <img width = 150 height = 150 src= "<%=status.path%>" />
+                            <%} else if(status.type == 'videos'){%>
+                            <video width = 150 height = 150 src="<%=status.path%>" controls loop></video>
+                            <%} else if(status.type == 'not'){%>
+                            <img width = 150 height = 150 src="/img/<%=status.filename%>.png" alt="">
+                            <%} else {%>
+                            <img src="/img/Unknown.png" width = 150 height = 150>
+                            <%}%>
+                        </div>  
                         <div>
-                            <img src="/gifs/unnamed.gif" width=100 alt="">
-                        </div>
-                    </th>
-                    <th scope="col">
-                        <div>
-                            <video src="/videos/20190405_125246.mp4" width=200 controls loop></video>
-                        </div>
-                    </th>
-                    <th scope="col">제작</th>
-                    <th scope="col">배송</th>
-                    <th scope="col">확정</th>
-                    <th scope="col">총주문수</th>
+                            <%=status.summary%>
+                        </div>  
+                    </td>
+                    <%}%>
                 </tr>
             </thead>
             <!-- 주문 상세 -->
@@ -73,10 +78,6 @@
                         <div>V: 하기싫음</div>
                         <div>C: 해줘</div>
                         <div>V: ㅇㅋ</div>
-                    </td>
-                    <td>
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
                     </td>
                     <td>
                         C:파일업로드<br>
@@ -115,7 +116,7 @@
             </thead>
             <tbody>
                 <%for(var obj of summary){%>
-                    <tr>
+                    <tr onclick="goNaver('<%=obj.ordernum%>')">
                         <td><%=obj.ordernum%></td>
                         <td><%=obj.orderdateD%><br /><%=obj.orderdateH%></td>
                         <td><%=obj.modidateD%><br /><%=obj.modidateH%></td>

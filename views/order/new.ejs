@@ -25,6 +25,15 @@
             <span class="invalid-feedback"><%= JSON.stringify(errors) %></span>
           <% } %>
         </div>
+        <% if(order.orderlink){%>
+        <div class="form-group">
+          <label for="orderlink">Linked Order Number</label>
+          <input type="text" id="orderlink" name="orderlink" value="<%= order.orderlink %>" class="form-control <%= (errors.orderlink)?'is-invalid':'' %>">
+          <% if(errors.orderlink){ %>
+            <span class="invalid-feedback"><%= errors.orderlink.message %></span>
+          <% } %>
+        </div>
+        <%}%>
         <div class="form-group">
           <label for="size">size</label>
           <input type="text" id="size" name="size" value="<%= order.size %>" class="form-control <%= (errors.size)?'is-invalid':'' %>">

@@ -24,8 +24,7 @@ var fileSchema = mongoose.Schema({
         type:String
     },
     udate:{
-        type:Date,
-        default:Date()
+        type:Date
     }
 });
   

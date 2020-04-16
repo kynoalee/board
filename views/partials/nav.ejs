@@ -12,10 +12,10 @@
       </ul>
       <ul class="navbar-nav ml-auto">
         <% if(isAuthenticated){ %>
+          <li class="nav-item"><a href="/order/list" class="nav-link">Order list</a></li>
           <li class="nav-item"><a href="/users/<%= currentUser.userid %>" class="nav-link">My Account</a></li>
           <li class="nav-item"><a href="/logout" class="nav-link">Logout</a></li>
         <% } else { %>
-          <li class="nav-item"><a href="/order/list" class="nav-link">Order list</a></li>
           <li class="nav-item"><a href="/users/new" class="nav-link">Sign Up</a></li>
           <li class="nav-item"><a href="/login" class="nav-link">Login</a></li>
         <% } %>

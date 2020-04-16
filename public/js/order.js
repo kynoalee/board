@@ -2,3 +2,6 @@
 function alertTest(){
     alert('test');
 }
+function goNaver(num){
+    window.location.href ="/order/list?ordernum="+num;
+}
