@@ -20,7 +20,7 @@ var orderDetailSchema = mongoose.Schema({
       required:[true],
       trim:true
     },
-    orderlink:String,
+    orderlink:Number,
     filelink:Array,
     summary:{
       type:String,
@@ -35,6 +35,7 @@ var orderDetailSchema = mongoose.Schema({
       default:Date()
     },
     userid : String,
+    userclass : String,
     status : Number,
     
     // customer side

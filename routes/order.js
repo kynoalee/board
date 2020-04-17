@@ -107,7 +107,7 @@ router.get('/list',util.isLoggedin,function(req,res){
                 console.log(err1);
                 return res.redirect('/');
             }
-            Order.Detail.find({ordernum:initialOrdernum},function(err2,detail){
+            Order.Detail.find({orderlink:initialOrdernum},function(err2,detail){
                 if(err2){
                     console.log(err2);
                     return res.redirect('/');
@@ -156,8 +156,12 @@ router.get('/list',util.isLoggedin,function(req,res){
                     };
                 }
                 if(last[0].summary4){
-                    let routerPath =last[0].filepath4.replace("../files","");
-                    let fileType = routerPath.split('/');
+                    let routerPath ='';
+                    let fileType = 'not';
+                    if(routerPath){
+                        routerPath =last[0].filepath4.replace("../files","");
+                        fileType = routerPath.split('/');
+                    } 
                     lastOrder[3] = { 
                         summary : last[0].summary4,
                         type : fileType[1],
@@ -201,11 +205,83 @@ router.get('/list',util.isLoggedin,function(req,res){
                     }
                 }
                 // 디테일 링크 설정
-                var orderDetail = [];
+                var orderDetail = {
+                    status1 : [],
+                    status2 : [],
+                    status3 : [],
+                    status4 : [],
+                    status5 : [],
+                    status6 : []
+                };
                 for(var detailInfo of detail){
+                    switch(detailInfo.userclass){
+                        case "normal" : detailInfo.userclass = "C"; 
+                            break;
+                        case "vender" : detailInfo.userclass = "V";
+                            break;
+                        default : detailInfo.userclass = "PD";
+                            break;  
+                    }
                     //FIXME:
+                    if(detailInfo.status == 1){
+                        let newObj = {
+                            detailnum : detailInfo.order_detailnum,
+                            summary : detailInfo.summary,
+                            wdate : detailInfo.wdate,
+                            userclass : detailInfo.userclass
+                        };
+                        orderDetail.status1[orderDetail.status1.length] = newObj;
+                    }
+                    if(detailInfo.status == 2){
+                        let newObj = {
+                            detailnum : detailInfo.order_detailnum,
+                            summary : detailInfo.summary,
+                            wdate : detailInfo.wdate,
+                            userclass : detailInfo.userclass
+                        };
+                        orderDetail.status2[orderDetail.status2.length] = newObj;
+                    }
+                    if(detailInfo.status == 3){
+                        let newObj = {
+                            detailnum : detailInfo.order_detailnum,
+                            summary : detailInfo.summary,
+                            wdate : detailInfo.wdate,
+                            userclass : detailInfo.userclass
+                        };
+                        orderDetail.status3[orderDetail.status3.length] = newObj;
+                    }
+                    if(detailInfo.status == 4){
+                        let newObj = {
+                            detailnum : detailInfo.order_detailnum,
+                            summary : detailInfo.summary,
+                            wdate : detailInfo.wdate,
+                            userclass : detailInfo.userclass
+                        };
+                        orderDetail.status4[orderDetail.status4.length] = newObj;
+                    }
+                    if(detailInfo.status == 5){
+                        let newObj = {
+                            detailnum : detailInfo.order_detailnum,
+                            summary : detailInfo.summary,
+                            wdate : detailInfo.wdate,
+                            userclass : detailInfo.userclass
+                        };
+                        orderDetail.status5[orderDetail.status5.length] = newObj;
+                    }
+                    if(detailInfo.status == 6){
+                        let newObj = {
+                            detailnum : detailInfo.order_detailnum,
+                            summary : detailInfo.summary,
+                            wdate : detailInfo.wdate,
+                            userclass : detailInfo.userclass
+                        };
+                        orderDetail.status6[orderDetail.status6.length] = newObj;
+                    }
                 }
-
+                // 각 상태 정렬 필요.
+                for(let i = 1; i < 7 ; i++){
+                    sortArray(orderDetail['status'+i]);
+                }
                 res.render('order/list',{
                     summary : summary,
                     lastOrder : lastOrder,
@@ -245,6 +321,7 @@ router.post('/',order.array('file'),util.isLoggedin, function(req,res,next){
 function (req,res,next){
     // OrderDetail create
     req.body.userid = req.user.userid;
+    req.body.userclass = req.user.userclass;
     req.body.wdate = Date();
     Order.Detail.find({}).sort({order_detailnum:-1}).findOne().select("order_detailnum").exec(function(err,detail){
         req.body.order_detailnum = detail.order_detailnum+1;
@@ -252,7 +329,9 @@ function (req,res,next){
         // 첫 주문일시
         req.body.status = 1;
         Order.Summary.find({}).sort({ordernum:-1}).findOne().select("ordernum").exec(function(err,summary){
+            req.body.orderlink = summary.ordernum + 1;
             req.body.ordernum = summary.ordernum + 1;
+            req.body.prototypeB = req.body.prototypeB == "true" ?true:false;
             console.log(req.body);
             Order.Detail.create(req.body,function(err,detail){
                 if(err){
@@ -328,6 +407,19 @@ async function createFiles(array,req,next) {
   }
   req.body.filelink = fileLink;
   next();
+}
+
+// 어레이 내 시간 차로 정렬
+function sortArray(array){
+    array.sort(function(a,b){
+        if(moment.duration(moment(a.wdate).diff(moment(b.wdate))).asMilliseconds() > 0){
+            return 1;
+        } else if(moment.duration(moment(a.wdate).diff(moment(b.wdate))).asMilliseconds() < 0){
+            return -1;
+        } else {
+            return 0;
+        }
+    });
 }
 
 // 업로드 파일 서버 저장용 이름 설정
