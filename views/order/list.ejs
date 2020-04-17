@@ -68,34 +68,34 @@
                 <tr>
                     <td><!--빈공간--></td>
 
-                    <td scope="row">
+                    <td scope="row" onclick="goPopup('<%=lastOrderNum%>','1')">
                         <%for(details of orderDetail.status1){%>
-                        <div><a href="goPage('<%=details.detailnum%>')"><%=details.userclass%> : <%=details.summary%></a></div>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>
                     <td>
                         <%for(details of orderDetail.status2){%>
-                        <div><a href="goPage('<%=details.detailnum%>')"><%=details.userclass%> : <%=details.summary%></a></div>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>
                     <td>
                         <%for(details of orderDetail.status3){%>
-                        <div><a href="goPage('<%=details.detailnum%>')"><%=details.userclass%> : <%=details.summary%></a></div>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>
                     <td>
                         <%for(details of orderDetail.status4){%>
-                        <div><a href="goPage('<%=details.detailnum%>')"><%=details.userclass%> : <%=details.summary%></a></div>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>
                     <td>
                         <%for(details of orderDetail.status5){%>
-                        <div><a href="goPage('<%=details.detailnum%>')"><%=details.userclass%> : <%=details.summary%></a></div>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>
                     <td>
                         <%for(details of orderDetail.status6){%>
-                        <div><a href="goPage('<%=details.detailnum%>')"><%=details.userclass%> : <%=details.summary%></a></div>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>
                 </tr>
@@ -115,7 +115,7 @@
             </thead>
             <tbody>
                 <%for(var obj of summary){%>
-                    <tr onclick="goNaver('<%=obj.ordernum%>')">
+                    <tr onclick="goLastOrder('<%=obj.ordernum%>')">
                         <td><%=obj.ordernum%></td>
                         <td><%=obj.orderdateD%><br /><%=obj.orderdateH%></td>
                         <td><%=obj.modidateD%><br /><%=obj.modidateH%></td>
