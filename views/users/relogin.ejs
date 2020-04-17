@@ -8,17 +8,15 @@
 
     <div class="container">
 
-      <h3 class="mb-3">Login</h3>
+      <h3 class="mb-3">Relogin</h3>
 
-      <form class="user-form" action="/login" method="post">
+      <form class="user-form" action="/users/relogin" method="post">
 
         <div class="form-group row">
           <label for="userid" class="col-sm-3 col-form-label">ID</label>
+          <input type="hidden" name = 'userid' value="<%=userid%>">
           <div class="col-sm-9">
-            <input type="text" id="userid" name="userid" value="<%= userid %>" class="form-control <%= (errors.userid)?'is-invalid':'' %>">
-            <% if(errors.userid){ %>
-              <span class="invalid-feedback"><%= errors.userid %></span>
-            <% } %>
+            <span><%= userid %></span>
           </div>
         </div>
 

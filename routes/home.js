@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('../config/passport');
+var authToken = require('../modules/auth');
+
+var File = require('../models/File');
 
 // Home
 router.get('/', function(req, res){
@@ -12,11 +15,32 @@ router.get('/about', function(req, res){
 
 // Login
 router.get('/login', function (req,res) {
-  var username = req.flash('username')[0];
+  var userid = req.flash('userid')[0];
   var errors = req.flash('errors')[0] || {};
   res.render('home/login', {
-    username:username,
+    userid:userid,
     errors:errors
+  });
+});
+
+// auth Token
+router.get('/auth',function (req,res){
+  let email = req.query.email;
+  let token = req.query.token;
+  html = {content1:'',content2:'',pageUrl:''};
+  if(authToken.verifyToken(email,token)){
+    // 성공
+    html.content1 = '인증되었습니다. 재로그인해주세요.';
+    html.pageUrl = '/login';
+    html.content2 = '로그인하러가기';
+  } else {
+    // 실패
+    html.content1 = '인증실패했습니다. 재시도하거나 문의해주세요.';
+    html.pageUrl = '/';
+    html.content2 = '홈으로가기';
+  }
+  res.render('home/confirm',{
+    html : html
   });
 });
 
@@ -26,9 +50,9 @@ router.post('/login',
     var errors = {};
     var isValid = true;
 
-    if(!req.body.username){
+    if(!req.body.userid){
       isValid = false;
-      errors.username = 'Username is required!';
+      errors.userid = 'Userid is required!';
     }
     if(!req.body.password){
       isValid = false;
@@ -44,7 +68,7 @@ router.post('/login',
     }
   },
   passport.authenticate('local-login', {
-    successRedirect : '/posts',
+    successRedirect : '/',
     failureRedirect : '/login'
   }
 ));

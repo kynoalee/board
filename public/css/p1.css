@@ -88,3 +88,9 @@
       border-color: lighten($purple, 5%);
     }
   }
+  .red {
+    color : red;
+  }
+  .cursor-pointer {
+    cursor:pointer;
+  }
