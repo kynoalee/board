@@ -6,11 +6,6 @@
     <%- include('../partials/head') %>
     <script src="/js/order.js"></script>
     <link rel="stylesheet" href="/css/order.css">
-    <script>
-        if(<%=alertT%>){
-            alert("test");
-        }
-    </script>
   </head>
   <body>
     <%- include('../partials/nav') %>
@@ -72,32 +67,36 @@
             <tbody id="orderDetail" class="collapse" data-parent="#lastOrder">
                 <tr>
                     <td><!--빈공간--></td>
+
                     <td scope="row">
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
-                        <div>V: 하기싫음</div>
-                        <div>C: 해줘</div>
-                        <div>V: ㅇㅋ</div>
+                        <%for(details of orderDetail.status1){%>
+                        <div><a href="goPage('<%=details.detailnum%>')"><%=details.userclass%> : <%=details.summary%></a></div>
+                        <%}%>
                     </td>
                     <td>
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
+                        <%for(details of orderDetail.status2){%>
+                        <div><a href="goPage('<%=details.detailnum%>')"><%=details.userclass%> : <%=details.summary%></a></div>
+                        <%}%>
                     </td>
                     <td>
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
+                        <%for(details of orderDetail.status3){%>
+                        <div><a href="goPage('<%=details.detailnum%>')"><%=details.userclass%> : <%=details.summary%></a></div>
+                        <%}%>
                     </td>
                     <td>
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
+                        <%for(details of orderDetail.status4){%>
+                        <div><a href="goPage('<%=details.detailnum%>')"><%=details.userclass%> : <%=details.summary%></a></div>
+                        <%}%>
                     </td>
                     <td>
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
+                        <%for(details of orderDetail.status5){%>
+                        <div><a href="goPage('<%=details.detailnum%>')"><%=details.userclass%> : <%=details.summary%></a></div>
+                        <%}%>
                     </td>
                     <td>
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
+                        <%for(details of orderDetail.status6){%>
+                        <div><a href="goPage('<%=details.detailnum%>')"><%=details.userclass%> : <%=details.summary%></a></div>
+                        <%}%>
                     </td>
                 </tr>
             </tbody>
