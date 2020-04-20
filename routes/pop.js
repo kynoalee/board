@@ -1,5 +1,6 @@
 var express  = require('express');
 var router = express.Router();
+var fs = require('fs');
 var nameSetting = require('../config/nameSetting');
 var File = require('../models/File');
 var Order = require('../models/Order');
@@ -24,17 +25,26 @@ router.get('/detail',function(req, res){
 
         File.find({$or:files},function(err,file){
             if(err) console.log(err);
-            console.log(detail);
-            console.log(file);
             filesInfo[filesInfo.length] = file;
 
             // 시각화 파일 정리
-            var visualFiles  = [];
-            for(files of file){
-                let filetype = files.filetype.split('/');
-                if(filetype[0] == 'image' || filetype[0] == 'video'){
-                    visualFiles.push(files);
+            var visualFiles  = {
+                images : [],
+                videos : [],
+                gifs :[]
+            };
+
+            for(let fileInfo of file){ 
+                let filetype = fileInfo.filetype.split('/');
+                if(filetype[0] == 'image' && filetype[1] != 'gif'){
+                    visualfileInfo.images.push(fileInfo);
+                } else if(filetype[0] == 'image' && filetype[1] == 'gif'){
+                    visualfileInfo.gifs.push(fileInfo);
                 }
+                 else if(filetype[0] == 'video'){
+                    visualfileInfo.videos.push(fileInfo);
+                }
+                
             }
 
             // 해당 상태값 입력한 정보 최신화
@@ -43,18 +53,19 @@ router.get('/detail',function(req, res){
             });
 
             // 상태 값 시각화
+            var statusName;
             switch(request.status){
-                case '1' : detail[0].status = nameSetting.statusName.status1; 
+                case '1' : statusName = nameSetting.statusName.status1; 
                     break;
-                case '2' : detail[0].status = nameSetting.statusName.status2; 
+                case '2' : statusName = nameSetting.statusName.status2; 
                     break;
-                case '3' : detail[0].status = nameSetting.statusName.status3; 
+                case '3' : statusName = nameSetting.statusName.status3; 
                     break;
-                case '4' : detail[0].status = nameSetting.statusName.status4; 
+                case '4' : statusName = nameSetting.statusName.status4; 
                     break;
-                case '5' : detail[0].status = nameSetting.statusName.status5; 
+                case '5' : statusName = nameSetting.statusName.status5; 
                     break;
-                case '6' : detail[0].status = nameSetting.statusName.status6; 
+                case '6' : statusName = nameSetting.statusName.status6; 
                     break;
                 default : break;
             }
@@ -65,7 +76,8 @@ router.get('/detail',function(req, res){
             res.render('pop/detail',{
                 filesInfo:filesInfo,
                 details:detail[0],
-                visualFiles : visualFiles
+                visualFiles : visualFiles,
+                statusName : statusName
             }); 
         });
         

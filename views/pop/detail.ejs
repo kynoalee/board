@@ -10,11 +10,25 @@
         <div>
             <!-- info -->
             
-            <div>ordernum:<%=detail.orderlink%></div>
+            <div>ordernum:<%=details.orderlink%></div>
             <div>summary:<%=details.summary%></div>
-            <div>status:<%=details.status%></div>
+            <div>status:<%=statusName%></div>
             <div>subject : [<%=details.userclass%>]</div>
-            <div>uploadfiles</div>
+            <div>
+              uploadfiles
+              <%for(let imageInfo of visualFiles.images){%>
+              <!-- file visualizing -->
+              <img src='/images/<%=imageInfo.servername%>' width = 350 />
+              <%}%>
+              <%for(let gifInfo of visualFiles.gifs){%>
+                <!-- file visualizing -->
+                <img src='/gifs/<%=gifInfo.servername%>' width = 350 />
+                <%}%>
+              <%for(let videoInfo of visualFiles.videos){%>
+              <video src='/video/<%=videoInfo.servername%>' width = 350 loop control></video>
+              <%}%>
+              <!-- file download -->
+            </div>
             <div>size : <%=details.size%></div>
             <div>color : <%=details.color%></div>
             <div>material : <%=details.material%></div>

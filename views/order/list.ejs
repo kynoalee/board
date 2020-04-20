@@ -42,7 +42,7 @@
             <thead id="lastOrder" data-toggle="collapse" data-target="#orderDetail">
                 <tr>
                     <td width=10 class="align-middle"><%=lastOrderNum%></td>
-                    <%for(status of lastOrder){%>
+                    <%for(let status of lastOrder){%>
                     <td scope="col" class="align-middle">
                         <div class="last"><%=status.title%></div>
                         <div>
@@ -69,32 +69,32 @@
                     <td><!--빈공간--></td>
 
                     <td scope="row" onclick="goPopup('<%=lastOrderNum%>','1')">
-                        <%for(details of orderDetail.status1){%>
+                        <%for(let details of orderDetail.status1){%>
                         <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>
-                    <td>
-                        <%for(details of orderDetail.status2){%>
+                    <td onclick="goPopup('<%=lastOrderNum%>','2')">
+                        <%for(let details of orderDetail.status2){%>
                         <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>
-                    <td>
-                        <%for(details of orderDetail.status3){%>
+                    <td onclick="goPopup('<%=lastOrderNum%>','3')">
+                        <%for(let details of orderDetail.status3){%>
                         <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>
-                    <td>
-                        <%for(details of orderDetail.status4){%>
+                    <td onclick="goPopup('<%=lastOrderNum%>','4')">
+                        <%for(let details of orderDetail.status4){%>
                         <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>
-                    <td>
-                        <%for(details of orderDetail.status5){%>
+                    <td onclick="goPopup('<%=lastOrderNum%>','5')">
+                        <%for(let details of orderDetail.status5){%>
                         <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>
-                    <td>
-                        <%for(details of orderDetail.status6){%>
+                    <td onclick="goPopup('<%=lastOrderNum%>','6')">
+                        <%for(let details of orderDetail.status6){%>
                         <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>
@@ -114,7 +114,7 @@
                 </tr>
             </thead>
             <tbody>
-                <%for(var obj of summary){%>
+                <%for(let obj of summary){%>
                     <tr onclick="goLastOrder('<%=obj.ordernum%>')">
                         <td><%=obj.ordernum%></td>
                         <td><%=obj.orderdateD%><br /><%=obj.orderdateH%></td>
