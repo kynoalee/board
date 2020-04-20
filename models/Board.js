@@ -1,9 +1,9 @@
-// models/Post.js
+// models/board.js
 
 var mongoose = require('mongoose');
 
 // schema
-var postSchema = mongoose.Schema({
+var boardSchema = mongoose.Schema({
   title:{type:String, required:[true,'Title is required!']},
   body:{type:String, required:[true,'Body is required!']},
   author:{type:mongoose.Schema.Types.ObjectId, ref:'user', required:true}, // 1
@@ -12,5 +12,5 @@ var postSchema = mongoose.Schema({
 });
 
 // model & export
-var Post = mongoose.model('post', postSchema);
-module.exports = Post;
+var Board = mongoose.model('board', boardSchema);
+module.exports = Board;

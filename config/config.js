@@ -18,8 +18,6 @@ var config = {
           pass: '12qwaszx!'          // gmail 계정의 비밀번호를 입력
         }
     }
-}
+};
 
 module.exports = config;
-module.exports.serverUrl = config.server.local;
-module.exports.fileUrl = config.file.local;
