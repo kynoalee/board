@@ -28,6 +28,11 @@
               <video src='/video/<%=videoInfo.servername%>' width = 350 loop control></video>
               <%}%>
               <!-- file download -->
+              <div>
+                <%for(let downloadFile of filesInfo){%>
+                <div><a>name</a> (Byte)</div>
+                <%}%>
+              </div>
             </div>
             <div>size : <%=details.size%></div>
             <div>color : <%=details.color%></div>
