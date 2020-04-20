@@ -56,7 +56,7 @@
           <% } %>
         </div>
         <div class="form-group">
-          <label for="proto_quantity">prototype quantity <input type="checkbox" value='check' id='prototypeB' name='prototypeB' onchange="displayByCheckbox('prototypeB','proto_quantity')"> </label><label for='prototypeB' class='red'>if you need prototype, check this box</label>
+          <label for="proto_quantity">prototype quantity <input type="checkbox" value='check' id='prototypeB' name='prototypeB' value="true" onchange="displayByCheckbox('prototypeB','proto_quantity')"> </label><label for='prototypeB' class='red'>if you need prototype, check this box</label>
           <!-- 체크박스 필요한지 여부 , 시제품 수량 -->
           <input type="hidden" id="proto_quantity" name="proto_quantity" value="<%= order.proto_quantity %>" class="form-control <%= (errors.proto_quantity)?'is-invalid':'' %>">
           <% if(errors.proto_quantity){ %>

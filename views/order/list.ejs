@@ -6,11 +6,6 @@
     <%- include('../partials/head') %>
     <script src="/js/order.js"></script>
     <link rel="stylesheet" href="/css/order.css">
-    <script>
-        if(<%=alertT%>){
-            alert("test");
-        }
-    </script>
   </head>
   <body>
     <%- include('../partials/nav') %>
@@ -20,12 +15,12 @@
         <table class='table table-bordered'>
             <thead>
                 <tr>
-                    <th scope="col">주문</th>
-                    <th scope="col">PT제작</th>
-                    <th scope="col">PT배송</th>
-                    <th scope="col">제작</th>
-                    <th scope="col">배송</th>
-                    <th scope="col">확정</th>
+                    <th scope="col"><%=statusName.status1%></th>
+                    <th scope="col"><%=statusName.status2%></th>
+                    <th scope="col"><%=statusName.status3%></th>
+                    <th scope="col"><%=statusName.status4%></th>
+                    <th scope="col"><%=statusName.status5%></th>
+                    <th scope="col"><%=statusName.status6%></th>
                     <th scope="col">총주문수</th>
                 </tr>
             </thead>
@@ -47,7 +42,7 @@
             <thead id="lastOrder" data-toggle="collapse" data-target="#orderDetail">
                 <tr>
                     <td width=10 class="align-middle"><%=lastOrderNum%></td>
-                    <%for(status of lastOrder){%>
+                    <%for(let status of lastOrder){%>
                     <td scope="col" class="align-middle">
                         <div class="last"><%=status.title%></div>
                         <div>
@@ -72,32 +67,36 @@
             <tbody id="orderDetail" class="collapse" data-parent="#lastOrder">
                 <tr>
                     <td><!--빈공간--></td>
-                    <td scope="row">
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
-                        <div>V: 하기싫음</div>
-                        <div>C: 해줘</div>
-                        <div>V: ㅇㅋ</div>
+
+                    <td scope="row" onclick="goPopup('<%=lastOrderNum%>','1')">
+                        <%for(let details of orderDetail.status1){%>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
+                        <%}%>
                     </td>
-                    <td>
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
+                    <td onclick="goPopup('<%=lastOrderNum%>','2')">
+                        <%for(let details of orderDetail.status2){%>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
+                        <%}%>
                     </td>
-                    <td>
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
+                    <td onclick="goPopup('<%=lastOrderNum%>','3')">
+                        <%for(let details of orderDetail.status3){%>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
+                        <%}%>
                     </td>
-                    <td>
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
+                    <td onclick="goPopup('<%=lastOrderNum%>','4')">
+                        <%for(let details of orderDetail.status4){%>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
+                        <%}%>
                     </td>
-                    <td>
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
+                    <td onclick="goPopup('<%=lastOrderNum%>','5')">
+                        <%for(let details of orderDetail.status5){%>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
+                        <%}%>
                     </td>
-                    <td>
-                        C:파일업로드<br>
-                        - 새로운 부품을 제작
+                    <td onclick="goPopup('<%=lastOrderNum%>','6')">
+                        <%for(let details of orderDetail.status6){%>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
+                        <%}%>
                     </td>
                 </tr>
             </tbody>
@@ -115,8 +114,8 @@
                 </tr>
             </thead>
             <tbody>
-                <%for(var obj of summary){%>
-                    <tr onclick="goNaver('<%=obj.ordernum%>')">
+                <%for(let obj of summary){%>
+                    <tr onclick="goLastOrder('<%=obj.ordernum%>')">
                         <td><%=obj.ordernum%></td>
                         <td><%=obj.orderdateD%><br /><%=obj.orderdateH%></td>
                         <td><%=obj.modidateD%><br /><%=obj.modidateH%></td>
