@@ -10,5 +10,5 @@ function goPopup(ordernum,status){
 }
 
 function downloadFile(fileName){
-    window.open("/download/:originname","_blank");
+    window.open("/download/"+fileName,"_blank");
 }

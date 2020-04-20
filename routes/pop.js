@@ -37,12 +37,12 @@ router.get('/detail',function(req, res){
             for(let fileInfo of file){ 
                 let filetype = fileInfo.filetype.split('/');
                 if(filetype[0] == 'image' && filetype[1] != 'gif'){
-                    visualfileInfo.images.push(fileInfo);
+                    visualFiles.images.push(fileInfo);
                 } else if(filetype[0] == 'image' && filetype[1] == 'gif'){
-                    visualfileInfo.gifs.push(fileInfo);
+                    visualFiles.gifs.push(fileInfo);
                 }
                  else if(filetype[0] == 'video'){
-                    visualfileInfo.videos.push(fileInfo);
+                    visualFiles.videos.push(fileInfo);
                 }
                 
             }
