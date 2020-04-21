@@ -14,6 +14,7 @@ router.get('/detail',function(req, res){
     var request = req.query;
     var filesInfo = [];
 
+    //TODO: 아이디 관련 연결 주의 같은 주문서에 2명이상의 접근자가 있음.
     Order.Detail.find({orderlink:request.ordernum,status:request.status},function(err,detail){
         // 관련 업로드된 파일정보 모두 가져오기
         let files = [];
@@ -25,8 +26,6 @@ router.get('/detail',function(req, res){
 
         File.find({$or:files},function(err,file){
             if(err) console.log(err);
-            filesInfo[filesInfo.length] = file;
-
             // 시각화 파일 정리
             var visualFiles  = {
                 images : [],
@@ -44,7 +43,11 @@ router.get('/detail',function(req, res){
                  else if(filetype[0] == 'video'){
                     visualFiles.videos.push(fileInfo);
                 }
-                
+                filesInfo[filesInfo.length] = {
+                    'origin' : fileInfo.originname,
+                    'server' : fileInfo.servername,
+                    'byte' : calculateByte(fileInfo.size)
+                };
             }
 
             // 해당 상태값 입력한 정보 최신화
@@ -72,7 +75,6 @@ router.get('/detail',function(req, res){
 
             // qna 설정
 
-
             res.render('pop/detail',{
                 filesInfo:filesInfo,
                 details:detail[0],
@@ -80,11 +82,33 @@ router.get('/detail',function(req, res){
                 statusName : statusName
             }); 
         });
-        
-        
-    });
-   
-    
+    });  
 });
+
+router.get("/detail/:servername",function(req,res){
+    let fileName = req.params.servername;
+    File.find({servername:fileName},function(err,file){
+        console.log(file[0]);
+        res.setHeader('Content-disposition','attachment;filename='+file[0].originname);
+        res.setHeader('Content-type',file[0].filetype);
+        var filestream = fs.createReadStream(__dirname+"/../../"+file[0].filepath);
+        filestream.pipe(res);
+    });
+});
+
+function calculateByte(byte){
+    let calByte = 0;
+    let stringByte = 'Byte';
+    if(byte>=1000 && byte < 1000000){
+        calByte = (byte / 1000).toFixed(2);
+        stringByte = "KB";
+    } else if(byte >1000000){
+        calByte = (byte / 1000000).toFixed(2);
+        stringByte = "MB";
+    } else {
+        calByte = byte;
+    }
+    return calByte+stringByte;
+}
 
 module.exports = router;

@@ -299,7 +299,7 @@ router.get('/list',util.isLoggedin,function(req,res){
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         let newName = createServerName(file.originalname);
-        cb(null, config.fileUrl+newName.addPath)
+        cb(null, config.file.local+newName.addPath)
     },
     filename: function (req, file, cb) {
         let newName = createServerName(file.originalname);
@@ -395,13 +395,14 @@ function delayFileCreate(creatObj) {
 
 async function createFiles(array,req,next) {
     var fileLink =[];
-    for(const fileInfo of array){
+    for(let fileInfo of array){
         let creatObj ={
             originname:fileInfo.originalname,
             servername:fileInfo.filename,
             filepath:fileInfo.path.replace("../",""),
             uploadid:req.user.userid,
             filetype:fileInfo.mimetype,
+            size:fileInfo.size,
             udate:Date()
         };
         await delayFileCreate(creatObj);

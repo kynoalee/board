@@ -24,13 +24,13 @@
                 <!-- file visualizing -->
                 <img src='/gifs/<%=gifInfo.servername%>' width = 350 />
                 <%}%>
-              <%for(let videoInfo of visualFiles.videos){%>
+              <%for(let videoInfo of visualFiles.videos){%>      
               <video src='/video/<%=videoInfo.servername%>' width = 350 loop control></video>
               <%}%>
               <!-- file download -->
               <div>
                 <%for(let downloadFile of filesInfo){%>
-                <div><a>name</a> (Byte)</div>
+                <div><a href="/pop/detail/<%=downloadFile.server%>"><%=downloadFile.origin%></a> (<%=downloadFile.byte%>)</div>
                 <%}%>
               </div>
             </div>

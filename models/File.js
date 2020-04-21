@@ -23,6 +23,7 @@ var fileSchema = mongoose.Schema({
     filetype:{
         type:String
     },
+    size:Number,
     udate:{
         type:Date
     }
