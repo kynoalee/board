@@ -9,7 +9,7 @@ var File = require('../models/File');
 var Order = require('../models/Order');
 var auth = require('../modules/auth');
 
-// Index   
+// order new   
 router.get('/',util.isLoggedin,function(req, res){
     var order = req.flash('order')[0] || {};
     var errors = req.flash('errors')[0] || {};
@@ -20,286 +20,10 @@ router.get('/',util.isLoggedin,function(req, res){
      
 });
 
-// list get
-router.get('/list',util.isLoggedin,function(req,res){
-    // test 이후 req.user.userid 
-    Order.Summary.find({orderid : req.user.userid},function(err,arr){
-        if(!arr.length){
-            // 주문없을시 처리해야함.TODO:
-            return res.redirect('/');
-        }
-        var summary = [];
-        var summaryNum = {
-            order : 0,
-            ptWork : 0,
-            ptDeli : 0,
-            work : 0,
-            deli : 0,
-            done : 0,
-            all : 0
-        };
-        for(var ob of arr){      
-            let dateOb ={
-                orderD : moment(ob.orderdate).format("YYYY-MM-DD"),
-                orderH : moment(ob.orderdate).format("HH:mm:ss"),
-                modiD : moment(ob.mdate).format("YYYY-MM-DD"),
-                modiH : moment(ob.mdate).format("HH:mm:ss")
-            }
-
-            let stat = '';
-            switch(ob.status){
-                case 1 : stat = nameSetting.statusName.status1;
-                    summaryNum.order += 1;
-                    summaryNum.all +=1;
-                    break;
-                case 2 : stat = nameSetting.statusName.status2;
-                    summaryNum.ptWork += 1;      
-                    summaryNum.all +=1;
-                    break;
-                case 3 : stat = nameSetting.statusName.status3;
-                    summaryNum.ptDeli += 1;
-                    summaryNum.all +=1;
-                    break;
-                case 4 : stat = nameSetting.statusName.status4;
-                    summaryNum.work += 1;
-                    summaryNum.all +=1;
-                    break;
-                case 5 : stat = nameSetting.statusName.status5;
-                    summaryNum.deli += 1;
-                    summaryNum.all +=1;
-                    break;
-                case 6 : stat = nameSetting.statusName.status6;
-                    summaryNum.done += 1;
-                    summaryNum.all +=1;
-                    break;
-                    default:break;
-            }
-
-            let contents = {
-                ordernum : ob.ordernum,
-                orderdateD : dateOb.orderD,
-                orderdateH : dateOb.orderH,
-                modidateD : dateOb.modiD,
-                modidateH : dateOb.modiH,
-                modidate : ob.mdate,
-                status : stat,
-                memo : ob.customermemo
-            }
-            summary.push(contents);
-        }
-        // 주문 번호 순 정렬 
-       summary.sort(function(a,b){
-            if(moment.duration(moment(a.modidate).diff(moment(b.modidate))).asMilliseconds() < 0){
-                return 1;
-            } else if(moment.duration(moment(a.modidate).diff(moment(b.modidate))).asMilliseconds() > 0){
-                return -1;
-            } else {
-                return 0;
-            }
-        });
-
-        var initialOrdernum = req.query.ordernum?req.query.ordernum :summary[0].ordernum;
-        summary.sort(function(a,b){
-            return a.ordernum < b.ordernum ? -1 : a.ordernum > b. ordernum ? 1 : 0;
-        });
-
-        Order.Last.find({ordernum:initialOrdernum},function(err1,last){
-            if(err1){
-                console.log(err1);
-                return res.redirect('/');
-            }
-            Order.Detail.find({orderlink:initialOrdernum},function(err2,detail){
-                if(err2){
-                    console.log(err2);
-                    return res.redirect('/');
-                }
-                var lastOrderNum = initialOrdernum;
-                var lastOrder = [];
-                if(last[0].summary1){
-                    let routerPath =last[0].filepath1.replace("../files","");
-                    let fileType = routerPath.split('/');
-                    lastOrder[0] = { 
-                        summary : last[0].summary1,
-                        type : fileType[1],
-                        path : routerPath,
-                        title : nameSetting.statusName.status1,
-                        filename : ''
-                    };
-                }
-                if(last[0].summary2){
-                    let routerPath =last[0].filepath2.replace("../files","");
-                    let fileType = routerPath.split('/');
-                    lastOrder[1] = { 
-                        summary : last[0].summary2,
-                        type : fileType[1],
-                        path : routerPath,
-                        title : nameSetting.statusName.status2
-                    };
-                } else {
-                    lastOrder[1] ={
-                        type : "not",
-                        filename : 'ptmaking'
-                    };
-                }
-                if(last[0].summary3){
-                    let routerPath =last[0].filepath3.replace("../files","");
-                    let fileType = routerPath.split('/');
-                    lastOrder[2] = { 
-                        summary : last[0].summary3,
-                        type : fileType[1],
-                        path : routerPath,
-                        title : nameSetting.statusName.status3
-                    };
-                } else {
-                    lastOrder[2] ={
-                        type : "not",
-                        filename : 'ptdeli'
-                    };
-                }
-                if(last[0].summary4){
-                    let routerPath ='';
-                    let fileType = 'not';
-                    if(routerPath){
-                        routerPath =last[0].filepath4.replace("../files","");
-                        fileType = routerPath.split('/');
-                    } 
-                    lastOrder[3] = { 
-                        summary : last[0].summary4,
-                        type : fileType[1],
-                        path : routerPath,
-                        title : nameSetting.statusName.status4
-                    };
-                } else {
-                    lastOrder[3] ={
-                        type : "not",
-                        filename : 'making'
-                    };
-                }
-                if(last[0].summary5){
-                    let routerPath =last[0].filepath5.replace("../files","");
-                    let fileType = routerPath.split('/');
-                    lastOrder[4] = { 
-                        summary : last[0].summary5,
-                        type : fileType[1],
-                        path : routerPath,
-                        title : nameSetting.statusName.status5
-                    };
-                } else {
-                    lastOrder[4] ={
-                        type : "not",
-                        filename : 'deli'
-                    };
-                }
-                if(last[0].summary6){
-                    let routerPath =last[0].filepath6.replace("../files","");
-                    let fileType = routerPath.split('/');
-                    lastOrder[5] = { 
-                        summary : last[0].summary6,
-                        type : fileType[1],
-                        path : routerPath,
-                        title : nameSetting.statusName.status6
-                    };
-                }  else {
-                    lastOrder[5] ={
-                        type : "not",
-                        filename : 'done'
-                    }
-                }
-                // 디테일 링크 설정
-                var orderDetail = {
-                    status1 : [],
-                    status2 : [],
-                    status3 : [],
-                    status4 : [],
-                    status5 : [],
-                    status6 : []
-                };
-                for(var detailInfo of detail){
-                    switch(detailInfo.userclass){
-                        case "normal" : detailInfo.userclass = "C"; 
-                            break;
-                        case "vender" : detailInfo.userclass = "V";
-                            break;
-                        default : detailInfo.userclass = "PD";
-                            break;  
-                    }
-                    //FIXME:
-                    if(detailInfo.status == 1){
-                        let newObj = {
-                            detailnum : detailInfo.order_detailnum,
-                            summary : detailInfo.summary,
-                            wdate : detailInfo.wdate,
-                            userclass : detailInfo.userclass
-                        };
-                        orderDetail.status1[orderDetail.status1.length] = newObj;
-                    }
-                    if(detailInfo.status == 2){
-                        let newObj = {
-                            detailnum : detailInfo.order_detailnum,
-                            summary : detailInfo.summary,
-                            wdate : detailInfo.wdate,
-                            userclass : detailInfo.userclass
-                        };
-                        orderDetail.status2[orderDetail.status2.length] = newObj;
-                    }
-                    if(detailInfo.status == 3){
-                        let newObj = {
-                            detailnum : detailInfo.order_detailnum,
-                            summary : detailInfo.summary,
-                            wdate : detailInfo.wdate,
-                            userclass : detailInfo.userclass
-                        };
-                        orderDetail.status3[orderDetail.status3.length] = newObj;
-                    }
-                    if(detailInfo.status == 4){
-                        let newObj = {
-                            detailnum : detailInfo.order_detailnum,
-                            summary : detailInfo.summary,
-                            wdate : detailInfo.wdate,
-                            userclass : detailInfo.userclass
-                        };
-                        orderDetail.status4[orderDetail.status4.length] = newObj;
-                    }
-                    if(detailInfo.status == 5){
-                        let newObj = {
-                            detailnum : detailInfo.order_detailnum,
-                            summary : detailInfo.summary,
-                            wdate : detailInfo.wdate,
-                            userclass : detailInfo.userclass
-                        };
-                        orderDetail.status5[orderDetail.status5.length] = newObj;
-                    }
-                    if(detailInfo.status == 6){
-                        let newObj = {
-                            detailnum : detailInfo.order_detailnum,
-                            summary : detailInfo.summary,
-                            wdate : detailInfo.wdate,
-                            userclass : detailInfo.userclass
-                        };
-                        orderDetail.status6[orderDetail.status6.length] = newObj;
-                    }
-                }
-                // 각 상태 정렬 필요.
-                for(let i = 1; i < 7 ; i++){
-                    sortArray(orderDetail['status'+i]);
-                }
-                res.render('order/list',{
-                    summary : summary,
-                    lastOrder : lastOrder,
-                    lastOrderNum : lastOrderNum,
-                    orderDetail : orderDetail,
-                    summaryNum : summaryNum,
-                    statusName : nameSetting.statusName
-                });
-            });
-        });
-    });   
-});
-
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         let newName = createServerName(file.originalname);
-        cb(null, config.fileUrl+newName.addPath)
+        cb(null, config.file.local+newName.addPath)
     },
     filename: function (req, file, cb) {
         let newName = createServerName(file.originalname);
@@ -308,7 +32,7 @@ var storage = multer.diskStorage({
 })
 var order = multer({ storage: storage })
 
-// create
+// new order create
 router.post('/',order.array('file'),util.isLoggedin, function(req,res,next){
     // File create
     if(req.files.length){
@@ -380,6 +104,204 @@ function(req,res){
     });
 });
 
+// my order list get
+router.get('/list',util.isLoggedin,function(req,res){
+    // 주문 리스트 상태 값 정의
+    var summaryNum = {all : 0};
+    var orderDetail = {};
+    for(let keyVal in nameSetting.statusName){
+        orderDetail["status"+nameSetting.statusName[keyVal].status] = [];
+        summaryNum[keyVal] = 0; 
+    }
+
+        // test 이후 req.user.userid 
+    Order.Summary.find({$or:[{orderid : req.user.userid},{vender : req.user.userid}]},function(err,arr){
+        if(!arr.length){
+            req.flash("errors",[{message : "주문이 없습니다."}]);
+            return res.redirect('/');
+        }
+        var summary = [];
+        for(var ob of arr){      
+            let dateOb ={
+                orderD : moment(ob.orderdate).format("YYYY-MM-DD"),
+                orderH : moment(ob.orderdate).format("HH:mm:ss"),
+                modiD : moment(ob.mdate).format("YYYY-MM-DD"),
+                modiH : moment(ob.mdate).format("HH:mm:ss")
+            };
+
+            let stat = '';
+            numberCheck :for(let keyVal in nameSetting.statusName){
+                if(ob.status == nameSetting.statusName[keyVal].status){
+                    stat = nameSetting.statusName[keyVal].value;
+                    console.log(keyVal);
+                    summaryNum[keyVal] += 1;
+                    summaryNum.all +=1;
+                    console.log(summaryNum);
+                    break numberCheck;
+                }
+            }
+            
+            let contents = {
+                ordernum : ob.ordernum,
+                orderdateD : dateOb.orderD,
+                orderdateH : dateOb.orderH,
+                modidateD : dateOb.modiD,
+                modidateH : dateOb.modiH,
+                modidate : ob.mdate,
+                status : stat,
+                memo : ob.customermemo
+            }
+            summary.push(contents);
+        }
+        // 주문 번호 순 정렬 
+       summary.sort(function(a,b){
+            if(moment.duration(moment(a.modidate).diff(moment(b.modidate))).asMilliseconds() < 0){
+                return 1;
+            } else if(moment.duration(moment(a.modidate).diff(moment(b.modidate))).asMilliseconds() > 0){
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+
+        var initialOrdernum = req.query.ordernum?req.query.ordernum :summary[0].ordernum;
+        summary.sort(function(a,b){
+            return a.ordernum < b.ordernum ? -1 : a.ordernum > b. ordernum ? 1 : 0;
+        });
+
+        // Last Order
+
+        Order.Last.find({ordernum:initialOrdernum},function(err1,last){
+            if(err1){
+                console.log(err1);
+                return res.redirect('/');
+            }
+            Order.Detail.find({orderlink:initialOrdernum},function(err2,detail){
+                if(err2){
+                    console.log(err2);
+                    return res.redirect('/');
+                }
+                var lastOrderNum = initialOrdernum;
+                var lastOrder = [
+                    {},
+                    {
+                        type : "not",
+                        filename : 'ptmaking'
+                    },
+                    {
+                        type : "not",
+                        filename : 'ptdeli'
+                    },
+                    {
+                        type : "not",
+                        filename : 'making'
+                    },
+                    {
+                        type : "not",
+                        filename : 'deli'
+                    },
+                    {
+                        type : "not",
+                        filename : 'done'
+                    }
+                ];
+                for(let keyVal in nameSetting.statusName){
+                    if(last[0]['summary'+nameSetting.statusName[keyVal].status]){
+                        let routerPath =last[0]['filepath'+nameSetting.statusName[keyVal].status].replace("../files","");
+                        let fileType = routerPath.split('/');
+                        lastOrder[0] = { 
+                            summary : last[0]['summary'+nameSetting.statusName[keyVal].status],
+                            type : fileType[1],
+                            path : routerPath,
+                            title : nameSetting.statusName[keyVal].value,
+                            filename : ''
+                        };
+                    }
+                }
+                // 디테일 링크 설정
+                
+                
+                for(var detailInfo of detail){
+                    switch(detailInfo.userclass){
+                        case "normal" : detailInfo.userclass = "C"; 
+                            break;
+                        case "vender" : detailInfo.userclass = "V";
+                            break;
+                        default : detailInfo.userclass = "PD";
+                            break;  
+                    }
+                    statusCheck : for(let keyVal in nameSetting.statusName){
+                        if(detailInfo.status == nameSetting.statusName[keyVal].status){
+                            let newObj = {
+                                detailnum : detailInfo.order_detailnum,
+                                summary : detailInfo.summary,
+                                wdate : detailInfo.wdate,
+                                userclass : detailInfo.userclass
+                            };
+                            orderDetail["status"+nameSetting.statusName[keyVal].status].push(newObj);
+                            
+                            break statusCheck;
+                        }
+                    }
+                }
+                // 각 상태 정렬 필요.
+                for(let keyVal in nameSetting.statusName){
+                    sortArray(orderDetail['status'+nameSetting.statusName[keyVal].status]);
+                }
+                res.render('order/list',{
+                    summary : summary,
+                    lastOrder : lastOrder,
+                    lastOrderNum : lastOrderNum,
+                    orderDetail : orderDetail,
+                    summaryNum : summaryNum,
+                    statusName : nameSetting.statusName
+                });
+            });
+        });
+    });   
+});
+
+// vender order check bid in util.isLoggedIn,
+router.get('/bidVenderIn',function(req,res){
+     
+    Order.Summary.find({vender:{$exists : false},status : 1},function(err,summary){
+        if(err){
+            console.log(err);
+            req.flash("errors",[{message : "DB error"}]);
+            return res.redirect("/");
+        }
+        console.log(summary);
+        let summaryList = [];
+        for(let obj of summary){
+            let dateOb ={
+                orderD : moment(obj.orderdate).format("YYYY-MM-DD"),
+                orderH : moment(obj.orderdate).format("HH:mm:ss"),
+                modiD : moment(obj.mdate).format("YYYY-MM-DD"),
+                modiH : moment(obj.mdate).format("HH:mm:ss")
+            };
+
+            let tmpSummary = {};
+            tmpSummary.ordernum = obj.ordernum;
+            tmpSummary.orderdateD = dateOb.orderD;
+            tmpSummary.orderdateH = dateOb.orderH;
+            tmpSummary.modidateD = dateOb.modiD;
+            tmpSummary.modidateH = dateOb.modiH;
+            tmpSummary.status = obj.status;
+            summaryList[summaryList.length] = tmpSummary;
+        }
+        console.log(summaryList);
+        res.render('order/bidVenderIn',{
+            summary : summaryList
+        });
+    });
+   
+    
+});
+
+module.exports = router;
+
+// private functions area
+
 function delayFileCreate(creatObj) {
     return new Promise(resolve => 
              setTimeout(() => { 
@@ -395,13 +317,14 @@ function delayFileCreate(creatObj) {
 
 async function createFiles(array,req,next) {
     var fileLink =[];
-    for(const fileInfo of array){
+    for(let fileInfo of array){
         let creatObj ={
             originname:fileInfo.originalname,
             servername:fileInfo.filename,
             filepath:fileInfo.path.replace("../",""),
             uploadid:req.user.userid,
             filetype:fileInfo.mimetype,
+            size:fileInfo.size,
             udate:Date()
         };
         await delayFileCreate(creatObj);
@@ -449,4 +372,3 @@ function createServerName(origin){
     return {serverName : newServerName, extension : extension,addPath : addPath};
 }
 
-module.exports = router;

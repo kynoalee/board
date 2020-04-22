@@ -7,7 +7,10 @@ var File = require('../models/File');
 
 // Home
 router.get('/', function(req, res){
-  res.render('home/welcome');
+  var errors = req.flash('errors')[0] ||{};
+  res.render('home/welcome',{
+    errors : errors
+  });
 });
 router.get('/about', function(req, res){
   res.render('home/about');
