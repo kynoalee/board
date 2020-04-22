@@ -106,22 +106,21 @@ function(req,res){
 
 // my order list get
 router.get('/list',util.isLoggedin,function(req,res){
-    // test 이후 req.user.userid 
+    // 주문 리스트 상태 값 정의
+    var summaryNum = {all : 0};
+    var orderDetail = {};
+    for(let keyVal in nameSetting.statusName){
+        orderDetail["status"+nameSetting.statusName[keyVal].status] = [];
+        summaryNum[keyVal] = 0; 
+    }
+
+        // test 이후 req.user.userid 
     Order.Summary.find({$or:[{orderid : req.user.userid},{vender : req.user.userid}]},function(err,arr){
         if(!arr.length){
             req.flash("errors",[{message : "주문이 없습니다."}]);
             return res.redirect('/');
         }
         var summary = [];
-        var summaryNum = {
-            order : 0,
-            ptWork : 0,
-            ptDeli : 0,
-            work : 0,
-            deli : 0,
-            done : 0,
-            all : 0
-        };
         for(var ob of arr){      
             let dateOb ={
                 orderD : moment(ob.orderdate).format("YYYY-MM-DD"),
@@ -131,34 +130,17 @@ router.get('/list',util.isLoggedin,function(req,res){
             };
 
             let stat = '';
-            switch(ob.status){
-                case 1 : stat = nameSetting.statusName.status1;
-                    summaryNum.order += 1;
+            numberCheck :for(let keyVal in nameSetting.statusName){
+                if(ob.status == nameSetting.statusName[keyVal].status){
+                    stat = nameSetting.statusName[keyVal].value;
+                    console.log(keyVal);
+                    summaryNum[keyVal] += 1;
                     summaryNum.all +=1;
-                    break;
-                case 2 : stat = nameSetting.statusName.status2;
-                    summaryNum.ptWork += 1;      
-                    summaryNum.all +=1;
-                    break;
-                case 3 : stat = nameSetting.statusName.status3;
-                    summaryNum.ptDeli += 1;
-                    summaryNum.all +=1;
-                    break;
-                case 4 : stat = nameSetting.statusName.status4;
-                    summaryNum.work += 1;
-                    summaryNum.all +=1;
-                    break;
-                case 5 : stat = nameSetting.statusName.status5;
-                    summaryNum.deli += 1;
-                    summaryNum.all +=1;
-                    break;
-                case 6 : stat = nameSetting.statusName.status6;
-                    summaryNum.done += 1;
-                    summaryNum.all +=1;
-                    break;
-                    default:break;
+                    console.log(summaryNum);
+                    break numberCheck;
+                }
             }
-
+            
             let contents = {
                 ordernum : ob.ordernum,
                 orderdateD : dateOb.orderD,
@@ -223,80 +205,22 @@ router.get('/list',util.isLoggedin,function(req,res){
                         filename : 'done'
                     }
                 ];
-                if(last[0].summary1){
-                    let routerPath =last[0].filepath1.replace("../files","");
-                    let fileType = routerPath.split('/');
-                    lastOrder[0] = { 
-                        summary : last[0].summary1,
-                        type : fileType[1],
-                        path : routerPath,
-                        title : nameSetting.statusName.status1,
-                        filename : ''
-                    };
+                for(let keyVal in nameSetting.statusName){
+                    if(last[0]['summary'+nameSetting.statusName[keyVal].status]){
+                        let routerPath =last[0]['filepath'+nameSetting.statusName[keyVal].status].replace("../files","");
+                        let fileType = routerPath.split('/');
+                        lastOrder[0] = { 
+                            summary : last[0]['summary'+nameSetting.statusName[keyVal].status],
+                            type : fileType[1],
+                            path : routerPath,
+                            title : nameSetting.statusName[keyVal].value,
+                            filename : ''
+                        };
+                    }
                 }
-                if(last[0].summary2){
-                    let routerPath =last[0].filepath2.replace("../files","");
-                    let fileType = routerPath.split('/');
-                    lastOrder[1] = { 
-                        summary : last[0].summary2,
-                        type : fileType[1],
-                        path : routerPath,
-                        title : nameSetting.statusName.status2
-                    };
-                } 
-                if(last[0].summary3){
-                    let routerPath =last[0].filepath3.replace("../files","");
-                    let fileType = routerPath.split('/');
-                    lastOrder[2] = { 
-                        summary : last[0].summary3,
-                        type : fileType[1],
-                        path : routerPath,
-                        title : nameSetting.statusName.status3
-                    };
-                } 
-                if(last[0].summary4){
-                    let routerPath ='';
-                    let fileType = 'not';
-                    if(routerPath){
-                        routerPath =last[0].filepath4.replace("../files","");
-                        fileType = routerPath.split('/');
-                    } 
-                    lastOrder[3] = { 
-                        summary : last[0].summary4,
-                        type : fileType[1],
-                        path : routerPath,
-                        title : nameSetting.statusName.status4
-                    };
-                } 
-                if(last[0].summary5){
-                    let routerPath =last[0].filepath5.replace("../files","");
-                    let fileType = routerPath.split('/');
-                    lastOrder[4] = { 
-                        summary : last[0].summary5,
-                        type : fileType[1],
-                        path : routerPath,
-                        title : nameSetting.statusName.status5
-                    };
-                } 
-                if(last[0].summary6){
-                    let routerPath =last[0].filepath6.replace("../files","");
-                    let fileType = routerPath.split('/');
-                    lastOrder[5] = { 
-                        summary : last[0].summary6,
-                        type : fileType[1],
-                        path : routerPath,
-                        title : nameSetting.statusName.status6
-                    };
-                }  
                 // 디테일 링크 설정
-                var orderDetail = {
-                    status1 : [],
-                    status2 : [],
-                    status3 : [],
-                    status4 : [],
-                    status5 : [],
-                    status6 : []
-                };
+                
+                
                 for(var detailInfo of detail){
                     switch(detailInfo.userclass){
                         case "normal" : detailInfo.userclass = "C"; 
@@ -306,65 +230,23 @@ router.get('/list',util.isLoggedin,function(req,res){
                         default : detailInfo.userclass = "PD";
                             break;  
                     }
-                    //FIXME:
-                    if(detailInfo.status == 1){
-                        let newObj = {
-                            detailnum : detailInfo.order_detailnum,
-                            summary : detailInfo.summary,
-                            wdate : detailInfo.wdate,
-                            userclass : detailInfo.userclass
-                        };
-                        orderDetail.status1[orderDetail.status1.length] = newObj;
-                    }
-                    if(detailInfo.status == 2){
-                        let newObj = {
-                            detailnum : detailInfo.order_detailnum,
-                            summary : detailInfo.summary,
-                            wdate : detailInfo.wdate,
-                            userclass : detailInfo.userclass
-                        };
-                        orderDetail.status2[orderDetail.status2.length] = newObj;
-                    }
-                    if(detailInfo.status == 3){
-                        let newObj = {
-                            detailnum : detailInfo.order_detailnum,
-                            summary : detailInfo.summary,
-                            wdate : detailInfo.wdate,
-                            userclass : detailInfo.userclass
-                        };
-                        orderDetail.status3[orderDetail.status3.length] = newObj;
-                    }
-                    if(detailInfo.status == 4){
-                        let newObj = {
-                            detailnum : detailInfo.order_detailnum,
-                            summary : detailInfo.summary,
-                            wdate : detailInfo.wdate,
-                            userclass : detailInfo.userclass
-                        };
-                        orderDetail.status4[orderDetail.status4.length] = newObj;
-                    }
-                    if(detailInfo.status == 5){
-                        let newObj = {
-                            detailnum : detailInfo.order_detailnum,
-                            summary : detailInfo.summary,
-                            wdate : detailInfo.wdate,
-                            userclass : detailInfo.userclass
-                        };
-                        orderDetail.status5[orderDetail.status5.length] = newObj;
-                    }
-                    if(detailInfo.status == 6){
-                        let newObj = {
-                            detailnum : detailInfo.order_detailnum,
-                            summary : detailInfo.summary,
-                            wdate : detailInfo.wdate,
-                            userclass : detailInfo.userclass
-                        };
-                        orderDetail.status6[orderDetail.status6.length] = newObj;
+                    statusCheck : for(let keyVal in nameSetting.statusName){
+                        if(detailInfo.status == nameSetting.statusName[keyVal].status){
+                            let newObj = {
+                                detailnum : detailInfo.order_detailnum,
+                                summary : detailInfo.summary,
+                                wdate : detailInfo.wdate,
+                                userclass : detailInfo.userclass
+                            };
+                            orderDetail["status"+nameSetting.statusName[keyVal].status].push(newObj);
+                            
+                            break statusCheck;
+                        }
                     }
                 }
                 // 각 상태 정렬 필요.
-                for(let i = 1; i < 7 ; i++){
-                    sortArray(orderDetail['status'+i]);
+                for(let keyVal in nameSetting.statusName){
+                    sortArray(orderDetail['status'+nameSetting.statusName[keyVal].status]);
                 }
                 res.render('order/list',{
                     summary : summary,
