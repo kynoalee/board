@@ -270,29 +270,42 @@ router.get('/bidVenderIn',function(req,res){
             req.flash("errors",[{message : "DB error"}]);
             return res.redirect("/");
         }
-        console.log(summary);
-        let summaryList = [];
-        for(let obj of summary){
+        var orderlinks = [];
+        var summaryList = {};
+        for(let value of summary){
             let dateOb ={
-                orderD : moment(obj.orderdate).format("YYYY-MM-DD"),
-                orderH : moment(obj.orderdate).format("HH:mm:ss"),
-                modiD : moment(obj.mdate).format("YYYY-MM-DD"),
-                modiH : moment(obj.mdate).format("HH:mm:ss")
+                orderD : moment(value.orderdate).format("YYYY-MM-DD"),
+                orderH : moment(value.orderdate).format("HH:mm:ss"),
+                modiD : moment(value.mdate).format("YYYY-MM-DD"),
+                modiH : moment(value.mdate).format("HH:mm:ss")
             };
 
             let tmpSummary = {};
-            tmpSummary.ordernum = obj.ordernum;
+            tmpSummary.ordernum = value.ordernum;
             tmpSummary.orderdateD = dateOb.orderD;
             tmpSummary.orderdateH = dateOb.orderH;
             tmpSummary.modidateD = dateOb.modiD;
             tmpSummary.modidateH = dateOb.modiH;
-            tmpSummary.status = obj.status;
-            summaryList[summaryList.length] = tmpSummary;
+            summaryList[value.ordernum] = tmpSummary;
+
+            orderlinks[orderlinks.length] = { orderlink : value.ordernum};
         }
-        console.log(summaryList);
-        res.render('order/bidVenderIn',{
-            summary : summaryList
+        Order.Detail.find({$or:orderlinks},function(err2,detail){
+            if(err2){
+                console.log(err2);
+                req.flash("errors",[{message : "DB error"}]);
+                return res.redirect("/");
+            }
+
+            for(let obj of detail){
+                summaryList[obj.orderlink].detail = obj;
+            }
+         
+            res.render('order/bidVenderIn',{
+                summary : summaryList
+            });
         });
+        
     });
    
     
