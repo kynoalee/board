@@ -9,7 +9,7 @@ var File = require('../models/File');
 var Order = require('../models/Order');
 var auth = require('../modules/auth');
 
-// Index   
+// order new   
 router.get('/',util.isLoggedin,function(req, res){
     var order = req.flash('order')[0] || {};
     var errors = req.flash('errors')[0] || {};
@@ -20,10 +20,94 @@ router.get('/',util.isLoggedin,function(req, res){
      
 });
 
-// list get
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let newName = createServerName(file.originalname);
+        cb(null, config.file.local+newName.addPath)
+    },
+    filename: function (req, file, cb) {
+        let newName = createServerName(file.originalname);
+        cb(null, newName.serverName)
+    }
+})
+var order = multer({ storage: storage })
+
+// new order create
+router.post('/',order.array('file'),util.isLoggedin, function(req,res,next){
+    // File create
+    if(req.files.length){
+        createFiles(req.files,req,next);
+    } else{
+        console.log("upload nothing");
+        req.body.filelink = null;
+        req.files = [''];
+        next();
+    }
+},
+function (req,res,next){
+    // OrderDetail create
+    req.body.userid = req.user.userid;
+    req.body.userclass = req.user.userclass;
+    req.body.wdate = Date();
+    Order.Detail.find({}).sort({order_detailnum:-1}).findOne().select("order_detailnum").exec(function(err,detail){
+        req.body.order_detailnum = detail.order_detailnum+1;
+
+        // 첫 주문일시
+        req.body.status = 1;
+        Order.Summary.find({}).sort({ordernum:-1}).findOne().select("ordernum").exec(function(err,summary){
+            req.body.orderlink = summary.ordernum + 1;
+            req.body.ordernum = summary.ordernum + 1;
+            req.body.prototypeB = req.body.prototypeB == "true" ?true:false;
+            console.log(req.body);
+            Order.Detail.create(req.body,function(err,detail){
+                if(err){
+                    console.log(err);
+                    req.flash('order', req.body);
+                    req.flash('errors', util.parseError(err)); // 1
+                    return res.redirect('order');
+                }
+                next();
+            });
+        });
+    });
+},
+function(req,res){
+    // Order Summary, Order last create
+    var summaryObj ={
+        ordernum : req.body.ordernum,
+        orderid : req.body.userid,
+        orderdate : req.body.wdate,
+        mdate :req.body.wdate,
+        status : req.body.status
+    };
+    var lastObj = {
+        ordernum : req.body.ordernum,
+        wdate : req.body.wdate,
+        mdate : req.body.wdate
+    };
+    lastObj['filepath'+req.body.status] = req.files[0].path;
+    lastObj['summary'+req.body.status] = req.body.summary;
+
+    Order.Summary.create(summaryObj,function(err,summary){
+        if(err){
+            req.flash('errors',{});
+            return res.redirect('order');
+        } else{
+            Order.Last.create(lastObj,function(err,last){
+                if(err){
+                    req.flash('errors',{});
+                    return res.redirect('order');
+                }
+                res.redirect('order/list');
+            });
+        }
+    });
+});
+
+// my order list get
 router.get('/list',util.isLoggedin,function(req,res){
     // test 이후 req.user.userid 
-    Order.Summary.find({orderid : req.user.userid},function(err,arr){
+    Order.Summary.find({$or:[{orderid : req.user.userid},{vender : req.user.userid}]},function(err,arr){
         if(!arr.length){
             // 주문없을시 처리해야함.TODO:
             return res.redirect('/');
@@ -296,89 +380,19 @@ router.get('/list',util.isLoggedin,function(req,res){
     });   
 });
 
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        let newName = createServerName(file.originalname);
-        cb(null, config.file.local+newName.addPath)
-    },
-    filename: function (req, file, cb) {
-        let newName = createServerName(file.originalname);
-        cb(null, newName.serverName)
-    }
-})
-var order = multer({ storage: storage })
-
-// create
-router.post('/',order.array('file'),util.isLoggedin, function(req,res,next){
-    // File create
-    if(req.files.length){
-        createFiles(req.files,req,next);
-    } else{
-        console.log("upload nothing");
-        req.body.filelink = null;
-        req.files = [''];
-        next();
-    }
-},
-function (req,res,next){
-    // OrderDetail create
-    req.body.userid = req.user.userid;
-    req.body.userclass = req.user.userclass;
-    req.body.wdate = Date();
-    Order.Detail.find({}).sort({order_detailnum:-1}).findOne().select("order_detailnum").exec(function(err,detail){
-        req.body.order_detailnum = detail.order_detailnum+1;
-
-        // 첫 주문일시
-        req.body.status = 1;
-        Order.Summary.find({}).sort({ordernum:-1}).findOne().select("ordernum").exec(function(err,summary){
-            req.body.orderlink = summary.ordernum + 1;
-            req.body.ordernum = summary.ordernum + 1;
-            req.body.prototypeB = req.body.prototypeB == "true" ?true:false;
-            console.log(req.body);
-            Order.Detail.create(req.body,function(err,detail){
-                if(err){
-                    console.log(err);
-                    req.flash('order', req.body);
-                    req.flash('errors', util.parseError(err)); // 1
-                    return res.redirect('order');
-                }
-                next();
-            });
-        });
-    });
-},
-function(req,res){
-    // Order Summary, Order last create
-    var summaryObj ={
-        ordernum : req.body.ordernum,
-        orderid : req.body.userid,
-        orderdate : req.body.wdate,
-        mdate :req.body.wdate,
-        status : req.body.status
-    };
-    var lastObj = {
-        ordernum : req.body.ordernum,
-        wdate : req.body.wdate,
-        mdate : req.body.wdate
-    };
-    lastObj['filepath'+req.body.status] = req.files[0].path;
-    lastObj['summary'+req.body.status] = req.body.summary;
-
-    Order.Summary.create(summaryObj,function(err,summary){
-        if(err){
-            req.flash('errors',{});
-            return res.redirect('order');
-        } else{
-            Order.Last.create(lastObj,function(err,last){
-                if(err){
-                    req.flash('errors',{});
-                    return res.redirect('order');
-                }
-                res.redirect('order/list');
-            });
-        }
+// vender order check bid in
+router.get('/bidVenderIn',function(req,res){
+    var order = req.flash('order')[0] || {};
+    var errors = req.flash('errors')[0] || {};
+    res.render('order/bidVenderIn',{
+        order : order,
+        errors : errors
     });
 });
+
+module.exports = router;
+
+// private functions area
 
 function delayFileCreate(creatObj) {
     return new Promise(resolve => 
@@ -450,4 +464,3 @@ function createServerName(origin){
     return {serverName : newServerName, extension : extension,addPath : addPath};
 }
 
-module.exports = router;

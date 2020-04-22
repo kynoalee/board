@@ -12,9 +12,9 @@ router.get('/detail',function(req, res){
     var venderid = 'imgcam';
     var request = req.query;
     var filesInfo = [];
-
-    Order.Summary.find({ordernum:request.ordernum,status:request.status,$or:[{userid:userid},{vender:venderid}]},function(err,summary){
-        Order.Detail.find({orderlink:request.ordernum},function(err,detail){
+    console.log(req.user);
+    Order.Summary.find({ordernum:request.ordernum,$or:[{userid:userid},{vender:venderid}]},function(err,summary){
+        Order.Detail.find({status:request.status,orderlink:request.ordernum},function(err,detail){
             // 관련 업로드된 파일정보 모두 가져오기
             let files = [];
             for(let details of detail){
