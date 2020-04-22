@@ -1,11 +1,33 @@
 var nameSetting = {
     statusName : {
-        'status1' : '주문',
-        'status2' : 'PT제작',
-        'status3' : 'PT배송',
-        'status4' : '제작',
-        'status5' : '배송',
-        'status6' : '확정'
+        order : {
+            value:'주문',
+            status : 1,
+        },
+        ptWork : {
+            value:'PT제작',
+            status : 2,
+        },
+        ptDeli : {
+            value:'PT배송',
+            status : 3,
+    
+        },
+        work : {
+            value:'제작',
+            status : 4,
+    
+        },  
+        deli : {
+            value:'배송',
+            status : 5,
+    
+        },
+        done : {
+            value:'확정',
+            status : 6,
+    
+        }
     }
 };
 
