@@ -8,7 +8,7 @@
       <ul class="navbar-nav">
         <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
         <li class="nav-item"><a href="/about" class="nav-link">About</a></li>
-        <%if(currentUser.userclass == 'normal'){%>
+        <%if(!currentUser || currentUser.userclass =="normal"){%>
         <li class="nav-item"><a href="/order" class="nav-link">Upload</a></li>
         <%}else{%>
         <li class="nav-item"><a href="/order/bidVenderIn" class="nav-link">BidInOrder</a></li>

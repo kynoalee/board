@@ -2,11 +2,32 @@
 <html>
   <head>
     <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/css/order.css">
   </head>
   <body>
     <%- include('../partials/nav') %>
     <div class="container mb-3">
-      
+      <h1>주문 현황</h1>
+      <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>주문번호</th>
+                <th>주문일시</th>
+                <th>마지막작업일시</th>
+                <th>상태</th>
+            </tr>
+        </thead>
+        <tbody>
+            <%for(let obj of summary){%>
+                <tr onclick="goLastOrder('<%=obj.ordernum%>')">
+                    <td><%=obj.ordernum%></td>
+                    <td><%=obj.orderdateD%><br /><%=obj.orderdateH%></td>
+                    <td><%=obj.modidateD%><br /><%=obj.modidateH%></td>
+                    <td><%=obj.status%></td>
+                </tr>
+            <%}%>             
+        </tbody>
+    </table>
     </div>
   </body>
 </html>
