@@ -14,16 +14,33 @@
                 <th>주문번호</th>
                 <th>주문일시</th>
                 <th>마지막작업일시</th>
-                <th>상태</th>
+                <th>요약</th>
             </tr>
         </thead>
         <tbody>
-            <%for(let obj of summary){%>
-                <tr onclick="goLastOrder('<%=obj.ordernum%>')">
-                    <td><%=obj.ordernum%></td>
-                    <td><%=obj.orderdateD%><br /><%=obj.orderdateH%></td>
-                    <td><%=obj.modidateD%><br /><%=obj.modidateH%></td>
-                    <td><%=obj.status%></td>
+            <%for(let keyVal in summary){%>
+                <tr onclick="goLastOrder('<%=summary[keyVal].ordernum%>')" data-toggle="collapse" data-target="#detailOrder<%=summary[keyVal].ordernum%>">
+                    <td><%=summary[keyVal].ordernum%></td>
+                    <td><%=summary[keyVal].orderdateD%><br /><%=summary[keyVal].orderdateH%></td>
+                    <td><%=summary[keyVal].modidateD%><br /><%=summary[keyVal].modidateH%></td>
+                    <td><%=summary[keyVal].detail.summary%></td>
+                </tr>
+                <tr id="detailOrder<%=summary[keyVal].ordernum%>" class="collapse" data-parent="#summaryOrder<%=summary[keyVal].ordernum%>">
+                  <td colspan=4>
+                    <div>color : </div> 
+                    <div>size</div>                
+                    <div>material</div>    
+                    <div>prototype quantity</div>
+                    <div>quantity</div>
+                    <div>summary</div>
+                    <div>description</div>
+                    <div>files : </div>
+                    <div>
+                      <%for(let downloadFile of summary[keyVal].detail.filelink){%>
+                      <div><a href="/pop/detail/<%=downloadFile.server%>"><%=downloadFile.origin%></a> (<%=downloadFile.byte%>)</div>
+                      <%}%>
+                    </div>
+                  </td>
                 </tr>
             <%}%>             
         </tbody>
