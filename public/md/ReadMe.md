@@ -1,4 +1,4 @@
-# js-
+# Javascript for Web Developers 
 책보고 기억에 남게 정리
 
 # 2020 04 13
@@ -199,3 +199,92 @@ console.log(person4.name);
 
 
 
+<h1>2020.04.23</h1>
+
+재귀함수 이용법
+
+```javascript
+function factorial(num){
+	if(num<=1){
+		return 1;
+	} else {
+		return num * arguments.callee(num-1);
+	}
+}
+
+var factorial = (function f(num){
+	if(num<=1){
+		return 1;
+	} else {
+		return num * f(num-1);
+	}
+});
+```
+
+함수 속에서 직접 호출하면, 함수 복제 시 문제가 생길수 있다. 
+arguments.callee 는 호출하는 함수에 포인터를 두므로, 어떠한 함수로 복제되도 작동한다.
+
+함수 선언의 방법은 두가지로
+
+```javascript
+console.log(f(10)); // 10
+console.log(g(20)); // error
+// 클래식 함수 선언
+function f(n){
+	 return n;
+} 
+
+// 함수 표현식
+var g = function(n){
+	return n;
+};
+```
+
+주의점은 자바스크립트 인터프리터는 function 키워드를 먼저 찾아 호이스트 하여 호출하기 때문에, 순서에 상관이 없지만, 함수 표현식의 경우, 다른 표현식과 같아서 호출전에 할당이 되어야합니다.
+
+
+
+함수표현식의 사용되는 익명함수(람다함수)는 클로저와 같다고 생각할 수 있으나, 스코프체인을 비교해보면 다른 것임을 알 수 있다.
+
+```javascript
+function createComparisonFunction(property){
+	return function(object1,object2){
+		var value1 = object1[property];
+		var value2 = object2[property];
+		
+		if(value1 < value2){
+			return -1;
+		} else if(value1 > value2){
+			return 1;
+		} else {
+			return 0;
+		}
+	};
+}
+
+var compares = createComparisonFunction('name');
+var result = compares({name:"Minsoo"},{name:"Chulsoo"});
+compares = null;
+```
+
+해당 내부 익명함수는 내부함수이지만 외부 함수의 변수에 접근이 가능하다는 점이 다르다. 또한 스코프체인 새로 생성되어, 외부 함수의 실행이 끝남에도 외부함수의 객체는 파괴되지 않으며, 내부함수의 실행이 끝날 때까지 기다린다.
+
+
+
+스코프체인의 문제점이 있는데 클로저는 항상 외부함수의 변수에 마지막값만 반환한다.
+
+```javascript
+function ex(num){
+	var result = [];
+	for(let i = 0 ; i < num; i++){
+		result[i] = (function(newI){
+			return function(){
+				 return newI;
+			};
+		}(i);
+	}
+	return result;
+}
+```
+
+그래서 클로저 내에서 익명함수를 정의하고 즉시 호출하면 고유한 값을 newI가 반환하므로, 상관이 없어짐.
