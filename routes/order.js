@@ -2,12 +2,13 @@ var express  = require('express');
 var router = express.Router();
 var multer = require('multer');
 var moment = require('moment');
+var common = require('../modules/common');
 var nameSetting = require('../config/nameSetting');
 var config = require('../config/config');
 var util = require('../util'); // 1
 var File = require('../models/File');
 var Order = require('../models/Order');
-var auth = require('../modules/auth');
+var download = require('../modules/download');
 
 // order new   
 router.get('/',util.isLoggedin,function(req, res){
@@ -133,10 +134,8 @@ router.get('/list',util.isLoggedin,function(req,res){
             numberCheck :for(let keyVal in nameSetting.statusName){
                 if(ob.status == nameSetting.statusName[keyVal].status){
                     stat = nameSetting.statusName[keyVal].value;
-                    console.log(keyVal);
                     summaryNum[keyVal] += 1;
                     summaryNum.all +=1;
-                    console.log(summaryNum);
                     break numberCheck;
                 }
             }
@@ -296,21 +295,54 @@ router.get('/bidVenderIn',function(req,res){
                 req.flash("errors",[{message : "DB error"}]);
                 return res.redirect("/");
             }
+            (async()=>{
+                let num = 0;
+                await (function(){
 
-            for(let obj of detail){
-                summaryList[obj.orderlink].detail = obj;
-            }
-         
-            res.render('order/bidVenderIn',{
-                summary : summaryList
-            });
+                    for(let obj of detail){
+                        // file 
+                        
+                        var filesInfo = [];
+                        var fileLinks = [];
+                        for(let fileVal of obj.filelink){
+                            console.log('test1');
+                            fileLinks.push({servername : fileVal});
+                        }
+                        File.find({$or:fileLinks},function(err3,file){
+                            console.log('TEs : '+file);
+                            for(let fileInfo of file){ 
+                                console.log(num);
+                                num+=1;
+                                filesInfo[filesInfo.length] = {
+                                    'origin' : fileInfo.originname,
+                                    'server' : fileInfo.servername,
+                                    'byte' : common.calculateByte(12394959)
+                                };
+                            }
+                            console.log("test2"+filesInfo);
+                        });
+                        console.log("test3"+filesInfo); 
+                        summaryList[obj.orderlink].fileList = filesInfo;
+                        summaryList[obj.orderlink].detail = obj;
+                    }
+                })();
+                await (function(){
+                    console.log("test4"+summaryList);
+                })();
+                await res.render('order/bidVenderIn',{
+                    summary : summaryList
+                });
+            })();
         });
         
     });
-   
-    
 });
 
+// file download
+router.get('/bidVenderIn/:servername',function(req,res){
+    var fileName = req.params.servername;
+    download.fileDownload(File,fileName,res);
+});
 module.exports = router;
 
 // private functions area

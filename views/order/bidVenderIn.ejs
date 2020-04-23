@@ -27,7 +27,19 @@
                 </tr>
                 <tr id="detailOrder<%=summary[keyVal].ordernum%>" class="collapse" data-parent="#summaryOrder<%=summary[keyVal].ordernum%>">
                   <td colspan=4>
-                    <div>color : </div>
+                    <div>color : </div> 
+                    <div>size</div>                
+                    <div>material</div>    
+                    <div>prototype quantity</div>
+                    <div>quantity</div>
+                    <div>summary</div>
+                    <div>description</div>
+                    <div>files : </div>
+                    <div>
+                      <%for(let downloadFile of summary[keyVal].detail.filelink){%>
+                      <div><a href="/pop/detail/<%=downloadFile.server%>"><%=downloadFile.origin%></a> (<%=downloadFile.byte%>)</div>
+                      <%}%>
+                    </div>
                   </td>
                 </tr>
             <%}%>             

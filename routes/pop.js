@@ -1,11 +1,11 @@
 var express  = require('express');
 var router = express.Router();
-var fs = require('fs');
 var nameSetting = require('../config/nameSetting');
 var File = require('../models/File');
 var Order = require('../models/Order');
 var Board = require('../models/Board');
 var util = require('../util'); // 1
+var download = require('../modules/download');
 
 router.get('/detail',function(req, res){
     var userid = 'imgcom';
@@ -88,13 +88,7 @@ router.get('/detail',function(req, res){
 
 router.get("/detail/:servername",function(req,res){
     let fileName = req.params.servername;
-    File.find({servername:fileName},function(err,file){
-        console.log(file[0]);
-        res.setHeader('Content-disposition','attachment;filename='+file[0].originname);
-        res.setHeader('Content-type',file[0].filetype);
-        var filestream = fs.createReadStream(__dirname+"/../../"+file[0].filepath);
-        filestream.pipe(res);
-    });
+    download.fileDownload(File,fileName,res);
 });
 
 function calculateByte(byte){
