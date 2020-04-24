@@ -3,6 +3,7 @@
   <head>
     <%- include('../partials/head') %>
     <link rel="stylesheet" href="/css/order.css">
+    <script src="/js/order.js"></script>
   </head>
   <body>
     <%- include('../partials/nav') %>
@@ -19,7 +20,7 @@
         </thead>
         <tbody>
             <%for(let keyVal in summary){%>
-                <tr onclick="goLastOrder('<%=summary[keyVal].ordernum%>')" data-toggle="collapse" data-target="#detailOrder<%=summary[keyVal].ordernum%>">
+                <tr class='test' data-toggle="collapse" data-target="#detailOrder<%=summary[keyVal].ordernum%>">
                     <td><%=summary[keyVal].ordernum%></td>
                     <td><%=summary[keyVal].orderdateD%><br /><%=summary[keyVal].orderdateH%></td>
                     <td><%=summary[keyVal].modidateD%><br /><%=summary[keyVal].modidateH%></td>
@@ -27,19 +28,14 @@
                 </tr>
                 <tr id="detailOrder<%=summary[keyVal].ordernum%>" class="collapse" data-parent="#summaryOrder<%=summary[keyVal].ordernum%>">
                   <td colspan=4>
-                    <div>color : </div> 
-                    <div>size</div>                
-                    <div>material</div>    
+                    <div>color : <%=summary[keyVal].detail.color%></div> 
+                    <div>size : <%=summary[keyVal].detail.size%></div>                
+                    <div>material : <%=summary[keyVal].detail.material%></div>    
                     <div>prototype quantity</div>
-                    <div>quantity</div>
-                    <div>summary</div>
-                    <div>description</div>
+                    <div>quantity : <%=summary[keyVal].detail.quantity%></div>
+                    <div>summary : <%=summary[keyVal].detail.summary%></div>
+                    <div>description : <%=summary[keyVal].detail.description%></div>
                     <div>files : </div>
-                    <div>
-                      <%for(let downloadFile of summary[keyVal].detail.filelink){%>
-                      <div><a href="/pop/detail/<%=downloadFile.server%>"><%=downloadFile.origin%></a> (<%=downloadFile.byte%>)</div>
-                      <%}%>
-                    </div>
                   </td>
                 </tr>
             <%}%>             

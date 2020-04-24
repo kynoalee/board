@@ -295,46 +295,14 @@ router.get('/bidVenderIn',function(req,res){
                 req.flash("errors",[{message : "DB error"}]);
                 return res.redirect("/");
             }
-            (async()=>{
-                let num = 0;
-                await (function(){
-
-                    for(let obj of detail){
-                        // file 
-                        
-                        var filesInfo = [];
-                        var fileLinks = [];
-                        for(let fileVal of obj.filelink){
-                            console.log('test1');
-                            fileLinks.push({servername : fileVal});
-                        }
-                        File.find({$or:fileLinks},function(err3,file){
-                            console.log('TEs : '+file);
-                            for(let fileInfo of file){ 
-                                console.log(num);
-                                num+=1;
-                                filesInfo[filesInfo.length] = {
-                                    'origin' : fileInfo.originname,
-                                    'server' : fileInfo.servername,
-                                    'byte' : common.calculateByte(12394959)
-                                };
-                            }
-                            console.log("test2"+filesInfo);
-                        });
-                        console.log("test3"+filesInfo); 
-                        summaryList[obj.orderlink].fileList = filesInfo;
-                        summaryList[obj.orderlink].detail = obj;
-                    }
-                })();
-                await (function(){
-                    console.log("test4"+summaryList);
-                })();
-                await res.render('order/bidVenderIn',{
-                    summary : summaryList
-                });
-            })();
-        });
-        
+            for(let obj of detail){
+                summaryList[obj.orderlink].detail = obj;
+            }
+            console.log(summaryList);
+            res.render('order/bidVenderIn',{
+                summary : summaryList
+            });                         
+        });        
     });
 });
 
