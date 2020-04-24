@@ -20,7 +20,7 @@
         </thead>
         <tbody>
             <%for(let keyVal in summary){%>
-                <tr class='test' data-toggle="collapse" data-target="#detailOrder<%=summary[keyVal].ordernum%>">
+                <tr onclick="test('<%=keyVal%>')" data-toggle="collapse" data-target="#detailOrder<%=summary[keyVal].ordernum%>">
                     <td><%=summary[keyVal].ordernum%></td>
                     <td><%=summary[keyVal].orderdateD%><br /><%=summary[keyVal].orderdateH%></td>
                     <td><%=summary[keyVal].modidateD%><br /><%=summary[keyVal].modidateH%></td>
