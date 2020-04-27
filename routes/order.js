@@ -30,8 +30,8 @@ var storage = multer.diskStorage({
         let newName = createServerName(file.originalname);
         cb(null, newName.serverName)
     }
-})
-var order = multer({ storage: storage })
+});
+var order = multer({ storage: storage });
 
 // new order create
 router.post('/',order.array('file'),util.isLoggedin, function(req,res,next){
@@ -185,6 +185,10 @@ router.get('/list',util.isLoggedin,function(req,res){
                     {},
                     {
                         type : "not",
+                        filename : 'bidding'
+                    },
+                    {
+                        type : "not",
                         filename : 'ptmaking'
                     },
                     {
@@ -263,7 +267,7 @@ router.get('/list',util.isLoggedin,function(req,res){
 // vender order check bid in util.isLoggedIn,
 router.get('/bidVenderIn',function(req,res){
      
-    Order.Summary.find({vender:{$exists : false},status : 1},function(err,summary){
+    Order.Summary.find({vender:{$exists : false},$or:[{status : 1},{status : 2}]},function(err,summary){
         if(err){
             console.log(err);
             req.flash("errors",[{message : "DB error"}]);
@@ -281,6 +285,7 @@ router.get('/bidVenderIn',function(req,res){
 
             let tmpSummary = {};
             tmpSummary.ordernum = value.ordernum;
+            tmpSummary.orderid = value.orderid;
             tmpSummary.orderdateD = dateOb.orderD;
             tmpSummary.orderdateH = dateOb.orderH;
             tmpSummary.modidateD = dateOb.modiD;
@@ -318,7 +323,6 @@ function delayFileCreate(creatObj) {
     return new Promise(resolve => 
              setTimeout(() => { 
                 File.create(creatObj,function(err,file){
-                    console.log(creatObj);
                     if(err){
                         console.log(err);
                     }

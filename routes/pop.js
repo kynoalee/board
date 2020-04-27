@@ -1,5 +1,6 @@
 var express  = require('express');
 var router = express.Router();
+var multer = require('multer');
 var nameSetting = require('../config/nameSetting');
 var File = require('../models/File');
 var Order = require('../models/Order');
@@ -12,7 +13,6 @@ router.get('/detail',function(req, res){
     var venderid = 'imgcam';
     var request = req.query;
     var filesInfo = [];
-    console.log(req.user);
     Order.Summary.find({ordernum:request.ordernum,$or:[{userid:userid},{vender:venderid}]},function(err,summary){
         Order.Detail.find({status:request.status,orderlink:request.ordernum},function(err,detail){
             // 관련 업로드된 파일정보 모두 가져오기
@@ -89,6 +89,31 @@ router.get('/detail',function(req, res){
 router.get("/detail/:servername",function(req,res){
     let fileName = req.params.servername;
     download.fileDownload(File,fileName,res);
+});
+
+router.get('/bid',function(req,res){
+    var errors = req.flash("errors")[0] || {};
+    var bid = req.flash("bid")[0] || {};
+    res.render('pop/bid',{
+        bid :bid,
+        errors : errors
+    });
+});
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let newName = createServerName(file.originalname);
+        cb(null, config.file.local+newName.addPath)
+    },
+    filename: function (req, file, cb) {
+        let newName = createServerName(file.originalname);
+        cb(null, newName.serverName)
+    }
+});
+var bid = multer({ storage: storage });
+
+router.post('/bid',function(req,res){
+
+
 });
 
 function calculateByte(byte){

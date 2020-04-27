@@ -16,6 +16,7 @@
             <thead>
                 <tr>
                     <th scope="col"><%=statusName.order.value%></th>
+                    <th scope="col"><%=statusName.bidding.value%></th>
                     <th scope="col"><%=statusName.ptWork.value%></th>
                     <th scope="col"><%=statusName.ptDeli.value%></th>
                     <th scope="col"><%=statusName.work.value%></th>
@@ -27,6 +28,7 @@
             <tbody>
                 <tr>
                     <td scope="row"><%=summaryNum.order%></td>
+                    <td><%=summaryNum.bidding%></td>
                     <td><%=summaryNum.ptWork%></td>
                     <td><%=summaryNum.ptDeli%></td>
                     <td><%=summaryNum.work%></td>
@@ -95,6 +97,11 @@
                     </td>
                     <td onclick="goPopup('<%=lastOrderNum%>','6')">
                         <%for(let details of orderDetail.status6){%>
+                        <div><%=details.userclass%> : <%=details.summary%></div>
+                        <%}%>
+                    </td>
+                    <td onclick="goPopup('<%=lastOrderNum%>','7')">
+                        <%for(let details of orderDetail.status7){%>
                         <div><%=details.userclass%> : <%=details.summary%></div>
                         <%}%>
                     </td>

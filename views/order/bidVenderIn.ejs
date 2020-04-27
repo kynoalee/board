@@ -13,21 +13,25 @@
         <thead>
             <tr>
                 <th>주문번호</th>
+                <th>주문자</th>
                 <th>주문일시</th>
-                <th>마지막작업일시</th>
+                <th>마감 희망일자</th>
                 <th>요약</th>
+                <th>상태</th>
             </tr>
         </thead>
         <tbody>
             <%for(let keyVal in summary){%>
                 <tr onclick="getDetailInfo('<%=keyVal%>','<%=summary[keyVal].detail.filelink%>')" data-toggle="collapse" data-target="#detailOrder<%=summary[keyVal].ordernum%>">
                     <td><%=summary[keyVal].ordernum%></td>
+                    <td><%=summary[keyVal].orderid%></td>
                     <td><%=summary[keyVal].orderdateD%><br /><%=summary[keyVal].orderdateH%></td>
-                    <td><%=summary[keyVal].modidateD%><br /><%=summary[keyVal].modidateH%></td>
+                    <td><%=summary[keyVal].detail.deadline%></td>
                     <td><%=summary[keyVal].detail.summary%></td>
+                    <td>입찰중</td>
                 </tr>
                 <tr id="detailOrder<%=summary[keyVal].ordernum%>" class="collapse" data-parent="#summaryOrder<%=summary[keyVal].ordernum%>">
-                  <td colspan=4>
+                  <td colspan=5>
                     <div class="waiting">
                       <span class="ouro ouro3">
                         <span class="left"><span class="anim"></span></span>
@@ -46,6 +50,7 @@
                       <div class="file-list"></div>
                     </div>
                   </td>
+                  <td><button type="button" onclick="bidIn('<%=keyVal%>')">입찰</button></td>
                 </tr>
             <%}%>             
         </tbody>
