@@ -30,8 +30,8 @@ var storage = multer.diskStorage({
         let newName = createServerName(file.originalname);
         cb(null, newName.serverName)
     }
-})
-var order = multer({ storage: storage })
+});
+var order = multer({ storage: storage });
 
 // new order create
 router.post('/',order.array('file'),util.isLoggedin, function(req,res,next){
@@ -114,9 +114,15 @@ router.get('/list',util.isLoggedin,function(req,res){
         orderDetail["status"+nameSetting.statusName[keyVal].status] = [];
         summaryNum[keyVal] = 0; 
     }
+    var findObj = {};
+    if(req.user.userclass == "vender"){
+        findObj.vender = req.user.userid;
+    } else if(req.user.userclass == "normal") {
+        fundObj.userid = req.user.userid;
+    }
 
-        // test 이후 req.user.userid 
-    Order.Summary.find({$or:[{orderid : req.user.userid},{vender : req.user.userid}]},function(err,arr){
+    // test 이후 req.user.userid 
+    Order.Summary.find(findObj,function(err,arr){
         if(!arr.length){
             req.flash("errors",[{message : "주문이 없습니다."}]);
             return res.redirect('/');
@@ -183,6 +189,10 @@ router.get('/list',util.isLoggedin,function(req,res){
                 var lastOrderNum = initialOrdernum;
                 var lastOrder = [
                     {},
+                    {
+                        type : "not",
+                        filename : 'bidding'
+                    },
                     {
                         type : "not",
                         filename : 'ptmaking'
@@ -261,9 +271,12 @@ router.get('/list',util.isLoggedin,function(req,res){
 });
 
 // vender order check bid in util.isLoggedIn,
-router.get('/bidVenderIn',function(req,res){
-     
-    Order.Summary.find({vender:{$exists : false},status : 1},function(err,summary){
+router.get('/bidVenderIn',util.isLoggedin,function(req,res){
+    if(req.user.userclass != "vender"){
+        req.flash("errors",{message : "NO Permission"});
+        return res.redirect('/');
+    }
+    Order.Summary.find({vender:{$exists : false},$or:[{status : 1},{status : 2}]},function(err,summary){
         if(err){
             console.log(err);
             req.flash("errors",[{message : "DB error"}]);
@@ -281,6 +294,7 @@ router.get('/bidVenderIn',function(req,res){
 
             let tmpSummary = {};
             tmpSummary.ordernum = value.ordernum;
+            tmpSummary.orderid = value.orderid;
             tmpSummary.orderdateD = dateOb.orderD;
             tmpSummary.orderdateH = dateOb.orderH;
             tmpSummary.modidateD = dateOb.modiD;
@@ -298,7 +312,6 @@ router.get('/bidVenderIn',function(req,res){
             for(let obj of detail){
                 summaryList[obj.orderlink].detail = obj;
             }
-            console.log(summaryList);
             res.render('order/bidVenderIn',{
                 summary : summaryList
             });                         
@@ -307,7 +320,7 @@ router.get('/bidVenderIn',function(req,res){
 });
 
 // file download
-router.get('/bidVenderIn/:servername',function(req,res){
+router.get('/bidVenderIn/:servername',util.isLoggedin,function(req,res){
     var fileName = req.params.servername;
     download.fileDownload(File,fileName,res);
 });
@@ -319,7 +332,6 @@ function delayFileCreate(creatObj) {
     return new Promise(resolve => 
              setTimeout(() => { 
                 File.create(creatObj,function(err,file){
-                    console.log(creatObj);
                     if(err){
                         console.log(err);
                     }
