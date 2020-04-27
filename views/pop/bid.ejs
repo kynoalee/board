@@ -5,13 +5,13 @@
     </head>
     <body>
         <div class="container mb-3">
-            <form action="/order" method="post" enctype="multipart/form-data"> 
+            <form action="/pop/bid" method="post" enctype="multipart/form-data"> 
               <div class="form-group">
                 <h2>입찰</h2>
               </div>
               <div class="form-group">
                 <label for="price">공정 가격</label>
-                <input type="text" id="price" name="price" value="<%= order.price %>" class="form-control <%= (errors.price)?'is-invalid':'' %>">
+                <input type="text" id="price" name="price" value="<%=bid.price %>" class="form-control <%= (errors.price)?'is-invalid':'' %>">
                 <% if(errors.price){ %>
                   <span class="invalid-feedback"><%= errors.price.message %></span>
                 <% } %>
@@ -39,14 +39,14 @@
               </div>
               <div class="form-group">
                 <label for="summary">summary *</label>
-                <input type="text" id="summary" name="summary" value="<%= order.summary %>" class="form-control <%= (errors.summary)?'is-invalid':'' %>">
+                <input type="text" id="summary" name="summary" value="<%=bid.summary %>" class="form-control <%= (errors.summary)?'is-invalid':'' %>">
                 <% if(errors.summary){ %>
                   <span class="invalid-feedback"><%= errors.summary.message %></span>
                 <% } %>
               </div>
               <div class="form-group">
                 <label for="description">Description *</label>
-                <textarea id="description" name="description" rows="5" class="form-control <%= (errors.description)?'is-invalid':'' %>"><%= order.description %></textarea>
+                <textarea id="description" name="description" rows="5" class="form-control <%= (errors.description)?'is-invalid':'' %>"><%=bid.description %></textarea>
                 <% if(errors.description){ %>
                   <span class="invalid-feedback"><%= errors.description.message %></span>
                 <% } %>
@@ -61,7 +61,7 @@
               <div>
                 <button type="submit" class="btn btn-primary">Submit</button>
               </div>
-      
+              <input type="hidden" name='ordernum' value='<%=ordernum%>'>
             </form>
           </div>
     </body>

@@ -114,9 +114,15 @@ router.get('/list',util.isLoggedin,function(req,res){
         orderDetail["status"+nameSetting.statusName[keyVal].status] = [];
         summaryNum[keyVal] = 0; 
     }
+    var findObj = {};
+    if(req.user.userclass == "vender"){
+        findObj.vender = req.user.userid;
+    } else if(req.user.userclass == "normal") {
+        fundObj.userid = req.user.userid;
+    }
 
-        // test 이후 req.user.userid 
-    Order.Summary.find({$or:[{orderid : req.user.userid},{vender : req.user.userid}]},function(err,arr){
+    // test 이후 req.user.userid 
+    Order.Summary.find(findObj,function(err,arr){
         if(!arr.length){
             req.flash("errors",[{message : "주문이 없습니다."}]);
             return res.redirect('/');
@@ -265,8 +271,11 @@ router.get('/list',util.isLoggedin,function(req,res){
 });
 
 // vender order check bid in util.isLoggedIn,
-router.get('/bidVenderIn',function(req,res){
-     
+router.get('/bidVenderIn',util.isLoggedin,function(req,res){
+    if(req.user.userclass != "vender"){
+        req.flash("errors",{message : "NO Permission"});
+        return res.redirect('/');
+    }
     Order.Summary.find({vender:{$exists : false},$or:[{status : 1},{status : 2}]},function(err,summary){
         if(err){
             console.log(err);
@@ -311,7 +320,7 @@ router.get('/bidVenderIn',function(req,res){
 });
 
 // file download
-router.get('/bidVenderIn/:servername',function(req,res){
+router.get('/bidVenderIn/:servername',util.isLoggedin,function(req,res){
     var fileName = req.params.servername;
     download.fileDownload(File,fileName,res);
 });
