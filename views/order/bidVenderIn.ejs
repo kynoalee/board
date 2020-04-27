@@ -20,7 +20,7 @@
         </thead>
         <tbody>
             <%for(let keyVal in summary){%>
-                <tr onclick="test('<%=keyVal%>')" data-toggle="collapse" data-target="#detailOrder<%=summary[keyVal].ordernum%>">
+                <tr onclick="getDetailInfo('<%=keyVal%>','<%=summary[keyVal].detail.filelink%>')" data-toggle="collapse" data-target="#detailOrder<%=summary[keyVal].ordernum%>">
                     <td><%=summary[keyVal].ordernum%></td>
                     <td><%=summary[keyVal].orderdateD%><br /><%=summary[keyVal].orderdateH%></td>
                     <td><%=summary[keyVal].modidateD%><br /><%=summary[keyVal].modidateH%></td>
@@ -28,14 +28,23 @@
                 </tr>
                 <tr id="detailOrder<%=summary[keyVal].ordernum%>" class="collapse" data-parent="#summaryOrder<%=summary[keyVal].ordernum%>">
                   <td colspan=4>
-                    <div>color : <%=summary[keyVal].detail.color%></div> 
-                    <div>size : <%=summary[keyVal].detail.size%></div>                
-                    <div>material : <%=summary[keyVal].detail.material%></div>    
-                    <div>prototype quantity</div>
-                    <div>quantity : <%=summary[keyVal].detail.quantity%></div>
-                    <div>summary : <%=summary[keyVal].detail.summary%></div>
-                    <div>description : <%=summary[keyVal].detail.description%></div>
-                    <div>files : </div>
+                    <div class="waiting">
+                      <span class="ouro ouro3">
+                        <span class="left"><span class="anim"></span></span>
+                        <span class="right"><span class="anim"></span></span>
+                      </span>
+                    </div>
+                    <div class="done">
+                      <div>color : <%=summary[keyVal].detail.color%></div> 
+                      <div>size : <%=summary[keyVal].detail.size%></div>                
+                      <div>material : <%=summary[keyVal].detail.material%></div>    
+                      <div>prototype quantity</div>
+                      <div>quantity : <%=summary[keyVal].detail.quantity%></div>
+                      <div>summary : <%=summary[keyVal].detail.summary%></div>
+                      <div>description : <%=summary[keyVal].detail.description%></div>
+                      <div>files : </div>
+                      <div class="file-list"></div>
+                    </div>
                   </td>
                 </tr>
             <%}%>             

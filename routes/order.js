@@ -298,7 +298,6 @@ router.get('/bidVenderIn',function(req,res){
             for(let obj of detail){
                 summaryList[obj.orderlink].detail = obj;
             }
-            console.log(summaryList);
             res.render('order/bidVenderIn',{
                 summary : summaryList
             });                         

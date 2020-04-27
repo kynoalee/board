@@ -50,6 +50,7 @@ app.use('/', require('./routes/home'));
 app.use('/users', require('./routes/users'));
 app.use('/order',require('./routes/order'));
 app.use('/pop',require('./routes/pop'));
+app.use('/ajax',require('./routes/ajax'));
 
 // Port setting
 var port = 3000;
