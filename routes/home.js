@@ -3,8 +3,6 @@ var router = express.Router();
 var passport = require('../config/passport');
 var authToken = require('../modules/auth');
 
-var File = require('../models/File');
-
 // Home
 router.get('/', function(req, res){
   var errors = req.flash('errors')[0] ||{};
