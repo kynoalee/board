@@ -7,8 +7,10 @@ var config = require('../config/config');
 var File = require('../models/File');
 var Order = require('../models/Order');
 var Bid = require('../models/Bid');
+var Log = require('../models/Log');
 var util = require('../util'); // 1
 var download = require('../modules/download');
+var common = require("../modules/common");
 
 router.get('/detail',util.isLoggedin,function(req, res){
     var findObj = {ordernum : req.query.ordernum};
@@ -19,7 +21,19 @@ router.get('/detail',util.isLoggedin,function(req, res){
     }
     var filesInfo = [];
     Order.Summary.find(findObj,function(err,summary){
-        Order.Detail.find({status:req.query.status,orderlink:req.query.ordernum},function(err,detail){
+        if(err){
+            Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"디테일 팝업 find DB에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
+        Order.Detail.find({status:req.query.status,orderlink:req.query.ordernum},function(err1,detail){
+            if(err1){
+                Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"디테일 팝업 디테일 find DB에러"},wdate:Date()});
+                console.log(err1);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }
             // 관련 업로드된 파일정보 모두 가져오기
             let files = [];
             for(let details of detail){
@@ -27,16 +41,18 @@ router.get('/detail',util.isLoggedin,function(req, res){
                     files[files.length] = {servername : val};
                 }
             }
-    
             File.find({$or:files},function(err,file){
-                if(err) console.log(err);
-                // 시각화 파일 정리
+                if(err){
+                    Log.create({document_name : "File",type:"error",contents:{error:err,content:"디테일 팝업 file find DB에러"},wdate:Date()});
+                    console.log(err);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }                // 시각화 파일 정리
                 var visualFiles  = {
                     images : [],
                     videos : [],
                     gifs :[]
                 };
-    
                 for(let fileInfo of file){ 
                     let filetype = fileInfo.filetype.split('/');
                     if(filetype[0] == 'image' && filetype[1] != 'gif'){
@@ -50,7 +66,7 @@ router.get('/detail',util.isLoggedin,function(req, res){
                     filesInfo[filesInfo.length] = {
                         'origin' : fileInfo.originname,
                         'server' : fileInfo.servername,
-                        'byte' : calculateByte(fileInfo.size)
+                        'byte' : common.calculateByte(fileInfo.size)
                     };
                 }
     
@@ -100,10 +116,12 @@ router.get('/bid',util.isLoggedin,function(req,res){
     var errors = req.flash("errors")[0] || {};
     var bid = req.flash("bid")[0] || {};
     var ordernum = req.query.ordernum;
+    var orderid = req.query.orderid;
     res.render('pop/bid',{
         bid :bid,
         errors : errors,
-        ordernum :ordernum
+        ordernum :ordernum,
+        orderid : orderid
     });
 });
 var storage = multer.diskStorage({
@@ -139,8 +157,8 @@ function(req,res){
     }
     var bidding = {
         ordernum : req.body.ordernum,
-        userid : req.user.userid,
-        userclass : req.user.userclass,
+        vender : req.user.userid,
+        userid : req.body.orderid,
         detail : {
             price : req.body.price,
             deadline : req.body.deadline,
@@ -150,10 +168,24 @@ function(req,res){
         },
         wdate : nowDate
     }
-    Order.Summary.updateOne({ordernum:req.body.ordernum},summary,{upsert:true},function(err,sum){
-        if(err) console.log(err);
-        Bid.create(bidding,function(err2,bid){
-            if(err2) console.log(err2);
+    Order.Summary.updateOne({ordernum:req.body.ordernum},summary,function(err,sum){
+        if(err) {
+            Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"입찰 시도 update DB에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message:"DB Error"});
+            return res.redirect('/');
+        }
+        console.log(sum);
+        bidding.userid = sum.userid;
+        Log.create({document_name : "Summary",type:"update",contents:{summary:sum,content:"입찰 시도 update"},wdate:Date()});
+        Bid.updateOne({ordernum:req.body.ordernum,userid : req.user.userid},bidding,{upsert:true},function(err2,bid){
+            if(err2) {
+                Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰 시도 upsert DB에러"},wdate:Date()});
+                console.log(err2);
+                req.flash("errors",{message:"DB Error"});
+                return res.redirect('/');
+            }
+            Log.create({document_name : "Bid",type:"upsert",contents:{error:err,content:"입찰 시도 upsert"},wdate:Date()});
             res.redirect('/pop/close');
         });
 
@@ -170,6 +202,7 @@ function delayFileCreate(creatObj) {
              setTimeout(() => { 
                 File.create(creatObj,function(err,file){
                     if(err){
+                        Log.create({document_name : "File",type:"error",contents:{error:err,content:"파일정보 find DB에러"},wdate:Date()});
                         console.log(err);
                     }
                     console.log("done");
