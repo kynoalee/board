@@ -1,6 +1,8 @@
 var express  = require('express');
 var router = express.Router();
 var File = require("../models/File");
+var Log = require("../models/Log");
+var common = require("../modules/common");
 
 router.post('/getFiles',function(req,res){
     if(req.body.fileLinks){
@@ -11,6 +13,7 @@ router.post('/getFiles',function(req,res){
         }
         File.find({$or:files},function(err,file){
             if(err){
+                Log.create({document_name : "File",type:"error",contents:{error:err,content:"입찰목록의 주문 파일 데이터 추출 중 DB 에러"},wdate:Date()});
                 console.log(err);
                 return res.send({result:"mongo error"});
             }
@@ -19,7 +22,7 @@ router.post('/getFiles',function(req,res){
                 filesInfo[filesInfo.length] = {
                     'origin' : fileInfo.originname,
                     'server' : fileInfo.servername,
-                    'byte' : calculateByte(fileInfo.size)
+                    'byte' : common.calculateByte(fileInfo.size)
                 };
             }
             return res.send({result:"success",data:filesInfo});
@@ -28,18 +31,5 @@ router.post('/getFiles',function(req,res){
         return res.send({result:"noFiles"});
     }
 });
-function calculateByte(byte){
-    let calByte = 0;
-    let stringByte = 'Byte';
-    if(byte>=1000 && byte < 1000000){
-        calByte = (byte / 1000).toFixed(2);
-        stringByte = "KB";
-    } else if(byte >1000000){
-        calByte = (byte / 1000000).toFixed(2);
-        stringByte = "MB";
-    } else {
-        calByte = byte;
-    }
-    return calByte+stringByte;
-}
+
 module.exports = router;
