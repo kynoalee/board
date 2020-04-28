@@ -17,7 +17,6 @@ router.post('/getFiles',function(req,res){
                 console.log(err);
                 return res.send({result:"mongo error"});
             }
-            Log.create({document_name : "File",type:"find",contents:{file:file,content:"입찰목록의 주문 파일 데이터 find"},wdate:Date()});
             var filesInfo = [];
             for(let fileInfo of file){ 
                 filesInfo[filesInfo.length] = {

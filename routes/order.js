@@ -59,7 +59,6 @@ function (req,res,next){
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
         }
-        Log.create({document_name : "Detail",type:"find",contents:{new_detailnum:detail.order_detailnum+1,content:"마지막 order detail num find"},wdate:Date()});
         req.body.order_detailnum = detail.order_detailnum+1;
 
         // 첫 주문일시
@@ -73,7 +72,6 @@ function (req,res,next){
             }
             req.body.orderlink = summary.ordernum + 1;
             req.body.ordernum = summary.ordernum + 1;
-            Log.create({document_name : "Summary",type:"find",contents:{new_ordernum:summary.ordernum+1,content:"마지막 order num find"},wdate:Date()});
             req.body.prototypeB = req.body.prototypeB == "true" ?true:false;
             console.log(req.body);
             Order.Detail.create(req.body,function(err,detail){
@@ -201,7 +199,6 @@ router.get('/list',util.isLoggedin,function(req,res){
         summary.sort(function(a,b){
             return a.ordernum < b.ordernum ? -1 : a.ordernum > b. ordernum ? 1 : 0;
         });
-        Log.create({document_name : "Summary",type:"find",contents:{summary:summary,content:"주문 summary find"},wdate:Date()});
         // Last Order
 
         Order.Last.find({ordernum:initialOrdernum},function(err1,last){
@@ -211,7 +208,6 @@ router.get('/list',util.isLoggedin,function(req,res){
                 req.flash("errors",{message : "DB ERROR"});
                 return res.redirect('/');
             }
-            Log.create({document_name : "Last",type:"find",contents:{last:last,content:"주문 last find"},wdate:Date()});
             Order.Detail.find({orderlink:initialOrdernum},function(err2,detail){
                 if(err2){
                     Log.create({document_name : "Detail",type:"error",contents:{error:err2,content:""},wdate:Date()});
@@ -219,7 +215,6 @@ router.get('/list',util.isLoggedin,function(req,res){
                     req.flash("errors",{message : "DB ERROR"});
                     return res.redirect('/');
                 }
-                Log.create({document_name : "Detail",type:"find",contents:{detail:detail,content:"주문 deatail find"},wdate:Date()});
                 var lastOrderNum = initialOrdernum;
                 var lastOrder = [
                     {},
@@ -317,7 +312,6 @@ router.get('/bidVenderIn',util.isLoggedin,function(req,res){
             req.flash("errors",[{message : "DB error"}]);
             return res.redirect("/");
         }
-        Log.create({document_name : "Summary",type:"find",contents:{summary:summary,content:"입찰목록 주문 find"},wdate:Date()});
         var num = 0;
         Bid.find({userid:req.user.userid},function(err,bid){
             if(err){
@@ -326,7 +320,6 @@ router.get('/bidVenderIn',util.isLoggedin,function(req,res){
                 req.flash("errors",{message : "DB ERROR"});
                 return res.redirect('/');
             }
-            Log.create({document_name : "Bid",type:"find",contents:{bid:bid,content:"입찰 내역 find"},wdate:Date()});
             var orderlinks = [];
             var summaryList = {};
             for(let check of bid){
@@ -359,7 +352,6 @@ router.get('/bidVenderIn',util.isLoggedin,function(req,res){
                     req.flash("errors",[{message : "DB error"}]);
                     return res.redirect("/");
                 }
-                Log.create({document_name : "Detail",type:"find",contents:{detail:detail,content:"입찰목록 detail find"},wdate:Date()});
                 for(let obj of detail){
                     summaryList[obj.orderlink].detail = obj;
                 }

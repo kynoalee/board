@@ -35,7 +35,6 @@ router.get('/:userid', util.isLoggedin, checkPermission, function(req, res){
       Log.create({document_name : "User",type:"error",contents:{error : err,content:"회원정보 접근 중 DB findOne 오류"},wdate:Date()});
       return res.json(err);
     }
-    Log.create({document_name : "User",type:"find",contents:{user : user,content:"회원정보 호출"},wdate:Date()});
     if(user.userclass == 'normal'){
       res.render('users/show', {user:user,wdateFormated:wdateFormated});
     } else if (user.userclass == 'vender'){
@@ -92,7 +91,6 @@ router.get("/:userid/edit", util.isLoggedin, checkPermission, function(req, res)
         Log.create({document_name : "User",type:"error",contents:{error : err,content:"회원정보수정 접근 중 DB에러"},wdate:Date()});
         return res.json(err);
       }
-      Log.create({document_name : "User",type:"find",contents:{user : user,content:"회원정보수정 호출"},wdate:Date()});
       res.render('users/edit', { userid:req.params.userid, user:user, errors:errors });
     });
   }

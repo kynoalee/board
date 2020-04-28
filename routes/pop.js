@@ -27,7 +27,6 @@ router.get('/detail',util.isLoggedin,function(req, res){
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
         }
-        Log.create({document_name : "Summary",type:"find",contents:{summary:summary,content:"디테일 팝업 summary find"},wdate:Date()});
         Order.Detail.find({status:req.query.status,orderlink:req.query.ordernum},function(err1,detail){
             if(err1){
                 Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"디테일 팝업 디테일 find DB에러"},wdate:Date()});
@@ -42,7 +41,6 @@ router.get('/detail',util.isLoggedin,function(req, res){
                     files[files.length] = {servername : val};
                 }
             }
-            Log.create({document_name : "Detail",type:"find",contents:{detail:detail,content:"디테일 팝업 detail find"},wdate:Date()});
             File.find({$or:files},function(err,file){
                 if(err){
                     Log.create({document_name : "File",type:"error",contents:{error:err,content:"디테일 팝업 file find DB에러"},wdate:Date()});
@@ -55,7 +53,6 @@ router.get('/detail',util.isLoggedin,function(req, res){
                     videos : [],
                     gifs :[]
                 };
-                Log.create({document_name : "File",type:"find",contents:{file:file,content:"디테일 팝업 file find"},wdate:Date()});
                 for(let fileInfo of file){ 
                     let filetype = fileInfo.filetype.split('/');
                     if(filetype[0] == 'image' && filetype[1] != 'gif'){
