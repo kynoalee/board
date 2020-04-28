@@ -19,7 +19,17 @@ router.get('/detail',util.isLoggedin,function(req, res){
     }
     var filesInfo = [];
     Order.Summary.find(findObj,function(err,summary){
-        Order.Detail.find({status:req.query.status,orderlink:req.query.ordernum},function(err,detail){
+        if(err){
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
+        Order.Detail.find({status:req.query.status,orderlink:req.query.ordernum},function(err1,detail){
+            if(err1){
+                console.log(err1);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }
             // 관련 업로드된 파일정보 모두 가져오기
             let files = [];
             for(let details of detail){
@@ -29,8 +39,11 @@ router.get('/detail',util.isLoggedin,function(req, res){
             }
     
             File.find({$or:files},function(err,file){
-                if(err) console.log(err);
-                // 시각화 파일 정리
+                if(err){
+                    console.log(err);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }                // 시각화 파일 정리
                 var visualFiles  = {
                     images : [],
                     videos : [],
@@ -100,10 +113,12 @@ router.get('/bid',util.isLoggedin,function(req,res){
     var errors = req.flash("errors")[0] || {};
     var bid = req.flash("bid")[0] || {};
     var ordernum = req.query.ordernum;
+    var orderid = req.query.orderid;
     res.render('pop/bid',{
         bid :bid,
         errors : errors,
-        ordernum :ordernum
+        ordernum :ordernum,
+        orderid : orderid
     });
 });
 var storage = multer.diskStorage({
@@ -139,8 +154,8 @@ function(req,res){
     }
     var bidding = {
         ordernum : req.body.ordernum,
-        userid : req.user.userid,
-        userclass : req.user.userclass,
+        vender : req.user.userid,
+        userid : req.body.orderid,
         detail : {
             price : req.body.price,
             deadline : req.body.deadline,
@@ -150,9 +165,11 @@ function(req,res){
         },
         wdate : nowDate
     }
-    Order.Summary.updateOne({ordernum:req.body.ordernum},summary,{upsert:true},function(err,sum){
+    Order.Summary.updateOne({ordernum:req.body.ordernum},summary,function(err,sum){
         if(err) console.log(err);
-        Bid.create(bidding,function(err2,bid){
+        console.log(sum);
+        bidding.userid = sum.userid;
+        Bid.updateOne({ordernum:req.body.ordernum,userid : req.user.userid},bidding,{upsert:true},function(err2,bid){
             if(err2) console.log(err2);
             res.redirect('/pop/close');
         });

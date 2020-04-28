@@ -7,6 +7,7 @@ var nameSetting = require('../config/nameSetting');
 var config = require('../config/config');
 var util = require('../util'); // 1
 var File = require('../models/File');
+var Bid = require('../models/Bid');
 var Order = require('../models/Order');
 var download = require('../modules/download');
 
@@ -51,6 +52,11 @@ function (req,res,next){
     req.body.userclass = req.user.userclass;
     req.body.wdate = Date();
     Order.Detail.find({}).sort({order_detailnum:-1}).findOne().select("order_detailnum").exec(function(err,detail){
+        if(err){
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
         req.body.order_detailnum = detail.order_detailnum+1;
 
         // 첫 주문일시
@@ -123,6 +129,11 @@ router.get('/list',util.isLoggedin,function(req,res){
 
     // test 이후 req.user.userid 
     Order.Summary.find(findObj,function(err,arr){
+        if(err){
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
         if(!arr.length){
             req.flash("errors",[{message : "주문이 없습니다."}]);
             return res.redirect('/');
@@ -179,11 +190,13 @@ router.get('/list',util.isLoggedin,function(req,res){
         Order.Last.find({ordernum:initialOrdernum},function(err1,last){
             if(err1){
                 console.log(err1);
+                req.flash("errors",{message : "DB ERROR"});
                 return res.redirect('/');
             }
             Order.Detail.find({orderlink:initialOrdernum},function(err2,detail){
                 if(err2){
                     console.log(err2);
+                    req.flash("errors",{message : "DB ERROR"});
                     return res.redirect('/');
                 }
                 var lastOrderNum = initialOrdernum;
@@ -282,40 +295,53 @@ router.get('/bidVenderIn',util.isLoggedin,function(req,res){
             req.flash("errors",[{message : "DB error"}]);
             return res.redirect("/");
         }
-        var orderlinks = [];
-        var summaryList = {};
-        for(let value of summary){
-            let dateOb ={
-                orderD : moment(value.orderdate).format("YYYY-MM-DD"),
-                orderH : moment(value.orderdate).format("HH:mm:ss"),
-                modiD : moment(value.mdate).format("YYYY-MM-DD"),
-                modiH : moment(value.mdate).format("HH:mm:ss")
-            };
-
-            let tmpSummary = {};
-            tmpSummary.ordernum = value.ordernum;
-            tmpSummary.orderid = value.orderid;
-            tmpSummary.orderdateD = dateOb.orderD;
-            tmpSummary.orderdateH = dateOb.orderH;
-            tmpSummary.modidateD = dateOb.modiD;
-            tmpSummary.modidateH = dateOb.modiH;
-            summaryList[value.ordernum] = tmpSummary;
-
-            orderlinks[orderlinks.length] = { orderlink : value.ordernum};
-        }
-        Order.Detail.find({$or:orderlinks},function(err2,detail){
-            if(err2){
-                console.log(err2);
-                req.flash("errors",[{message : "DB error"}]);
-                return res.redirect("/");
+        var num = 0;
+        Bid.find({userid:req.user.userid},function(err,bid){
+            if(err){
+                console.log(err);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
             }
-            for(let obj of detail){
-                summaryList[obj.orderlink].detail = obj;
+            var orderlinks = [];
+            var summaryList = {};
+            for(let check of bid){
+                for(let value of summary){
+                    if(check.ordernum != value.ordernum){
+                        let dateOb ={
+                            orderD : moment(value.orderdate).format("YYYY-MM-DD"),
+                            orderH : moment(value.orderdate).format("HH:mm:ss"),
+                            modiD : moment(value.mdate).format("YYYY-MM-DD"),
+                            modiH : moment(value.mdate).format("HH:mm:ss")
+                        };
+            
+                        let tmpSummary = {};
+                        tmpSummary.ordernum = value.ordernum;
+                        tmpSummary.orderid = value.orderid;
+                        tmpSummary.orderdateD = dateOb.orderD;
+                        tmpSummary.orderdateH = dateOb.orderH;
+                        tmpSummary.modidateD = dateOb.modiD;
+                        tmpSummary.modidateH = dateOb.modiH;
+                        summaryList[value.ordernum] = tmpSummary;
+            
+                        orderlinks[orderlinks.length] = { orderlink : value.ordernum};
+                    } 
+                } 
             }
-            res.render('order/bidVenderIn',{
-                summary : summaryList
-            });                         
-        });        
+            Order.Detail.find({$or:orderlinks},function(err2,detail){
+                if(err2){
+                    console.log(err2);
+                    req.flash("errors",[{message : "DB error"}]);
+                    return res.redirect("/");
+                }
+                for(let obj of detail){
+                    summaryList[obj.orderlink].detail = obj;
+                }
+                res.render('order/bidVenderIn',{
+                    summary : summaryList
+                });                         
+            });  
+        });
+              
     });
 });
 
@@ -339,6 +365,29 @@ function delayFileCreate(creatObj) {
                 });                    
                 resolve(); }, 300) ); 
 }
+
+router.get('/bidList',function(req,res){
+    var userid = 'imgcom';
+    var userclass = 'normal'; // req.user.userclass;
+    if(userclass == 'normal'){
+        Bid.find({userid:userid},function(err,bid){
+            if(err){
+                console.log(err);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }
+        });
+    } else if(userclass == 'vender'){
+        Bid.find({vender:userid},function(err,bid){
+            if(err){
+                console.log(err);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }
+        });
+    }
+    res.render('order/bidList');
+});
 
 async function createFiles(array,req,next) {
     var fileLink =[];

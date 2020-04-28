@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var bidSchema = mongoose.Schema({
   ordernum :Number,
   userid : String,
-  userclass : String,
+  vender : String,
   detail : Object,
   wdate : Date
 });
