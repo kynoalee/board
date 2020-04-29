@@ -14,7 +14,10 @@ var common = {
             calByte.toString();
             return calByte+stringByte;
         },
-    test : "1"
+    test : "1",
+    numberWithCommas : function(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
 };
 
 module.exports = common;
