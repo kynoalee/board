@@ -47,3 +47,22 @@ function getDetailInfo(ordernum,fileLinks){
     }
 
 }
+
+var buttonDoubleCheck = false;
+
+function selectThisOrder(ordernum,vender,status){
+    if(buttonDoubleCheck){
+        return buttonDoubleCheck;
+    } else{
+        buttonDoubleCheck = true;
+        var statusName = status =="select"?'선정':status =="reject"?'거절':'오류';
+        if(confirm("정말 해당 입찰을 "+statusName +"하시겠습니까?")){
+            $('input[name=status]').val(status);
+            $('input[name=ordernum]').val(ordernum);
+            $('input[name=vender]').val(vender);
+            $('#selectForm').submit();
+        }else {
+            buttonDoubleCheck = false;
+        }
+    }
+}
