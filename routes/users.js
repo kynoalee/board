@@ -22,6 +22,8 @@ router.post('/', function(req, res){
       Log.create({document_name : "User",type:"error",contents:{error: err, user : req.body,content : "회원가입 시도 중 DB create 오류"},wdate:Date()});
       return res.redirect('/users/new');
     }
+    req.body.password='';
+    req.body.passwordConfirmation='';
     Log.create({document_name : "User",type:"create",contents:{user : req.body,content : "회원가입 완료"},wdate:Date()});
     res.redirect('/');
   });

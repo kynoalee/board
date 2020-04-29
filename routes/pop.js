@@ -145,7 +145,6 @@ router.post('/bid',util.isLoggedin,bid.array('file'),function(req,res,next){
         req.files = [''];
         next();
     }
-
 },
 function(req,res){
     // req.body.filelink
@@ -156,8 +155,6 @@ function(req,res){
         mdate : nowDate
     }
     var bidding = {
-        ordernum : req.body.ordernum,
-        vender : req.user.userid,
         userid : req.body.orderid,
         detail : {
             price : req.body.price,
@@ -175,13 +172,10 @@ function(req,res){
             req.flash("errors",{message:"DB Error"});
             return res.redirect('/');
         }
-        console.log(sum);
-        bidding.userid = sum.userid;
         Log.create({document_name : "Summary",type:"update",contents:{summary:sum,content:"입찰 시도 update"},wdate:Date()});
-        Bid.Ing.updateOne({ordernum:req.body.ordernum,userid : req.user.userid},bidding,{upsert:true},function(err2,bid){
+        Bid.Ing.updateOne({ordernum:req.body.ordernum,vender : req.user.userid},bidding,{upsert:true},function(err2,bid){
             if(err2) {
-                Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰 시도 upsert DB에러"},wdate:Date()});
-                console.log(err2);
+                Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"입찰 시도 upsert DB에러"},wdate:Date()});
                 req.flash("errors",{message:"DB Error"});
                 return res.redirect('/');
             }

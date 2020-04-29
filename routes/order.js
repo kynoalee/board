@@ -322,28 +322,22 @@ router.get('/bidVenderIn',util.isLoggedin,function(req,res){
             }
             var orderlinks = [];
             var summaryList = {};
-            for(let check of bid){
+            if(bid.length == 0 ){
                 for(let value of summary){
-                    if(check.ordernum != value.ordernum){
-                        let dateOb ={
-                            orderD : moment(value.orderdate).format("YYYY-MM-DD"),
-                            orderH : moment(value.orderdate).format("HH:mm:ss"),
-                            modiD : moment(value.mdate).format("YYYY-MM-DD"),
-                            modiH : moment(value.mdate).format("HH:mm:ss")
-                        };
-            
-                        let tmpSummary = {};
-                        tmpSummary.ordernum = value.ordernum;
-                        tmpSummary.orderid = value.orderid;
-                        tmpSummary.orderdateD = dateOb.orderD;
-                        tmpSummary.orderdateH = dateOb.orderH;
-                        tmpSummary.modidateD = dateOb.modiD;
-                        tmpSummary.modidateH = dateOb.modiH;
-                        summaryList[value.ordernum] = tmpSummary;
-            
-                        orderlinks[orderlinks.length] = { orderlink : value.ordernum};
-                    } 
+                    let tmpSummary = setTmpArray(value);
+                    summaryList[value.ordernum] = tmpSummary;
+                    orderlinks[orderlinks.length] = { orderlink : value.ordernum};
                 } 
+            } else{
+                for(let check of bid){
+                    for(let value of summary){
+                        if(check.ordernum != value.ordernum){
+                            let tmpSummary = setTmpArray(value);
+                            summaryList[value.ordernum] = tmpSummary;
+                            orderlinks[orderlinks.length] = { orderlink : value.ordernum};
+                        } 
+                    } 
+                }
             }
             Order.Detail.find({$or:orderlinks},function(err2,detail){
                 if(err2){
@@ -387,7 +381,6 @@ router.get('/bidList',function(req,res){
             return res.redirect('/');
         }        
         var biddingList = [];
-        console.log(bid);
         for(let val of bid){
             let tmpObj = {};
             tmpObj.ordernum = val.ordernum;
@@ -411,9 +404,8 @@ router.get('/bidList',function(req,res){
             biddingList.push(tmpObj);
         }
         Bid.Done.find({},function(err2,bidDone){
-            console.log('tes');
             if(err2){
-                Log.create({document_name : "BidDone∫",type:"error",contents:{error:err2,content:"입찰된 리스트 find DB에러"},wdate:Date()});
+                Log.create({document_name : "BidDone",type:"error",contents:{error:err2,content:"입찰된 리스트 find DB에러"},wdate:Date()});
                 console.log(err2);
                 req.flash("errors",{message : "DB ERROR"});
                 return res.redirect('/');
@@ -433,7 +425,24 @@ module.exports = router;
 
 // private functions area
 
+function setTmpArray(value){
+    let dateOb ={
+        orderD : moment(value.orderdate).format("YYYY-MM-DD"),
+        orderH : moment(value.orderdate).format("HH:mm:ss"),
+        modiD : moment(value.mdate).format("YYYY-MM-DD"),
+        modiH : moment(value.mdate).format("HH:mm:ss")
+    };
 
+    let tmpSummary = {};
+    tmpSummary.ordernum = value.ordernum;
+    tmpSummary.orderid = value.orderid;
+    tmpSummary.orderdateD = dateOb.orderD;
+    tmpSummary.orderdateH = dateOb.orderH;
+    tmpSummary.modidateD = dateOb.modiD;
+    tmpSummary.modidateH = dateOb.modiH;
+    
+    return tmpSummary;
+}
 
 function delayFileCreate(creatObj) {
     return new Promise(resolve => 
