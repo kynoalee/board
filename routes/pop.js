@@ -178,14 +178,14 @@ function(req,res){
         console.log(sum);
         bidding.userid = sum.userid;
         Log.create({document_name : "Summary",type:"update",contents:{summary:sum,content:"입찰 시도 update"},wdate:Date()});
-        Bid.updateOne({ordernum:req.body.ordernum,userid : req.user.userid},bidding,{upsert:true},function(err2,bid){
+        Bid.Ing.updateOne({ordernum:req.body.ordernum,userid : req.user.userid},bidding,{upsert:true},function(err2,bid){
             if(err2) {
                 Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰 시도 upsert DB에러"},wdate:Date()});
                 console.log(err2);
                 req.flash("errors",{message:"DB Error"});
                 return res.redirect('/');
             }
-            Log.create({document_name : "Bid",type:"upsert",contents:{error:err,content:"입찰 시도 upsert"},wdate:Date()});
+            Log.create({document_name : "Bid",type:"upsert",contents:{bid : bidding,content:"입찰 시도 upsert"},wdate:Date()});
             res.redirect('/pop/close');
         });
 

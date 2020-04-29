@@ -9,6 +9,19 @@ var bidSchema = mongoose.Schema({
   wdate : Date
 });
 
+var bidDoneSchema = mongoose.Schema({
+  ordernum : Number,
+  userid : String,
+  vender  : String,
+  detail : Object,
+  wdate : Date,
+  donedate : Date,
+  status : String
+});
+
 // model & export
-var Bid = mongoose.model('Bid', bidSchema);
-module.exports = Bid;
+var Ing = mongoose.model('Bid', bidSchema);
+var Done = mongoose.model('BidDone',bidDoneSchema);
+
+module.exports.Ing = Ing;
+module.exports.Done = Done;

@@ -313,7 +313,7 @@ router.get('/bidVenderIn',util.isLoggedin,function(req,res){
             return res.redirect("/");
         }
         var num = 0;
-        Bid.find({userid:req.user.userid},function(err,bid){
+        Bid.Ing.find({userid:req.user.userid},function(err,bid){
             if(err){
                 Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰 내역 find 중 DB 에러"},wdate:Date()});
                 console.log(err);
@@ -379,20 +379,61 @@ router.get('/bidList',function(req,res){
     } else if(userclass == 'vender'){
         findObj.vender = userid;
     }
-    Bid.find({userid:userid},function(err,bid){
+    Bid.Ing.find(findObj,function(err,bid){
         if(err){
             Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰된 리스트 find DB에러"},wdate:Date()});
             console.log(err);
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
+        }        
+        var biddingList = [];
+        console.log(bid);
+        for(let val of bid){
+            let tmpObj = {};
+            tmpObj.ordernum = val.ordernum;
+            tmpObj.deadline = val.detail.deadline;
+            tmpObj.summary = val.detail.summary;
+            tmpObj.description = val.detail.description;
+
+            // 이글에 연결된 나말고 다른 사람
+            if(userclass == 'normal'){
+                tmpObj.userid = val.vender;
+            } else if(userclass == 'vender'){
+                tmpObj.userid = val.userid;
+            }
+
+            // 날짜 포맷 변경
+            tmpObj.wdateD = moment(val.wdate).format("YYYY-MM-DD");
+            tmpObj.wdateH = moment(val.wdate).format("HH:mm:ss");
+
+            // price 포맷 변경
+            tmpObj.price = common.numberWithCommas(val.detail.price);
+            biddingList.push(tmpObj);
         }
+        Bid.Done.find({},function(err2,bidDone){
+            console.log('tes');
+            if(err2){
+                Log.create({document_name : "BidDone∫",type:"error",contents:{error:err2,content:"입찰된 리스트 find DB에러"},wdate:Date()});
+                console.log(err2);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }     
+            var bidDoneList = [];
+
+            res.render('order/bidList',{
+                bidding : biddingList,
+                bidDone : bidDoneList
+            });
+        });
+        
     });
-    res.render('order/bidList');
 });
 
 module.exports = router;
 
 // private functions area
+
+
 
 function delayFileCreate(creatObj) {
     return new Promise(resolve => 
