@@ -312,7 +312,6 @@ router.get('/bidVenderIn',util.isLoggedin,function(req,res){
             req.flash("errors",[{message : "DB error"}]);
             return res.redirect("/");
         }
-        var num = 0;
         Bid.Ing.find({vender:req.user.userid},function(err,bid){
             if(err){
                 Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰 내역 find 중 DB 에러"},wdate:Date()});
@@ -322,6 +321,7 @@ router.get('/bidVenderIn',util.isLoggedin,function(req,res){
             }
             var orderlinks = [];
             var summaryList = {};
+            // 해당 주문번호 입찰했으면 안보이도록
             if(bid.length == 0 ){
                 for(let value of summary){
                     let tmpSummary = setTmpArray(value);
@@ -329,14 +329,18 @@ router.get('/bidVenderIn',util.isLoggedin,function(req,res){
                     orderlinks[orderlinks.length] = { orderlink : value.ordernum};
                 } 
             } else{
-                for(let check of bid){
-                    for(let value of summary){
-                        if(check.ordernum != value.ordernum){
-                            let tmpSummary = setTmpArray(value);
-                            summaryList[value.ordernum] = tmpSummary;
-                            orderlinks[orderlinks.length] = { orderlink : value.ordernum};
-                        } 
-                    } 
+                here : for(let value of summary){
+                    if(bid.length != 0){
+                        for(let check of bid){ 
+                            if(check.ordernum == value.ordernum){
+                                continue here;
+                            } 
+                        }
+                    }
+
+                    let tmpSummary = setTmpArray(value);
+                    summaryList[value.ordernum] = tmpSummary;
+                    orderlinks[orderlinks.length] = { orderlink : value.ordernum};
                 }
             }
             Order.Detail.find({$or:orderlinks},function(err2,detail){
@@ -457,7 +461,14 @@ router.post('/bidList',function(req,res){
 
     };
     Bid.Ing.find(findObj,function(err,bid){
+        if(err){
+            Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰 리스트 find DB에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
         let now = Date();
+        let otherBidIds = [];
         let bidDoneObj = {};
         for(let bidObj of bid){
             if(bidObj.vender == req.body.vender){
@@ -470,21 +481,110 @@ router.post('/bidList',function(req,res){
                     wdate : bidObj.wdate,
                     donedate : now
                 };
+            }else{
+                otherBidIds.push({_id:bidObj._id});
             }
         }
 
         if(req.body.status == "select"){
             bidDoneObj.status = "select";
-            // 해당 입찰 건 bid done으로 create dont upsert
+
+            // 해당 입찰 건 bid done으로 create dont upsert, delete Bid
             workBidDB(bidDoneObj);
+
+            // 다른 입찰이 있는 지 확인
+            // 있다면 Bid 삭제, Summary status 변경 vender 삽입
+            let fObj = {ordernum : req.body.ordernum};
+            if(otherBidIds.length != 0){
+                fObj['$or'] = otherBidIds;
+            }
+            Bid.Ing.find(fObj,function(err,bid){
+                if(err){
+                    Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"선정된 입찰리스트와 같은 주문번호를 가진 입찰 내용 find DB에러"},wdate:Date()});
+                    console.log(err);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }
+                // 다른 입찰 내역이 있는 경우 Bid 삭제
+                if(bid.length != 0){
+                    Bid.Ing.remove({$or:otherBidIds},function(err2){
+                        if(err2){
+                            Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"입찰 선정으로 입찰내역 remove 중 DB 에러"},wdate:Date()});
+                            console.log(err2);
+                            req.flash("errors",{message : "DB ERROR"});
+                            return res.redirect('/');
+                        }
+                        Log.create({document_name : "Bid",type:"remove",contents:{content:"입찰 선정으로 입찰내역 remove"},wdate:Date()});
+                    });
+                }
+                let updateObj = {
+                    status : 1,
+                    vender : req.body.vender,
+                    mdate : now
+                };
+                Order.Summary.update({ordernum:req.body.ordernum},updateObj,function(err2){
+                    if(err2){
+                        Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"입찰 선정으로 인한 상태 변화 update 중 DB 에러"},wdate:Date()});
+                        console.log(err2);
+                        req.flash("errors",{message : "DB ERROR"});
+                        return res.redirect('/');
+                    }
+                    Log.create({document_name : "Summary",type:"update",contents:{update:updateObj,content:"입찰 선정으로 인한 상태 변화 update"},wdate:Date()});
+                    return res.redirect('order/bidList');
+                });
+            });
 
         } else if(req.body.status == "reject"){
             bidDoneObj.status = "reject";
+
             // 해당 입찰 건 bid done으로 create dont upsert , delete Bid
             workBidDB(bidDoneObj);
+
             // 해당 주문번호에 걸린 입찰이 또 있는지 확인
             // 주문번호입찰 있는지 여부에 따라 status 변경 , 여부에 상관없이 mdate 변경
-            
+            let fObj = {ordernum : req.body.ordernum};
+            if(otherBidIds.length != 0){
+                fObj['$or'] = otherBidIds;
+            }
+            Bid.Ing.find(fObj,function(err,bid){
+                if(err){
+                    Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"거절된 입찰리스트와 같은 주문번호를 가진 입찰 내용 find DB에러"},wdate:Date()});
+                    console.log(err);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }
+                // 다른 입찰 내역이 없는 경우 status 2 -> 1 
+                if(bid.length == 0){
+                    let updateObj = {
+                        status : 1,
+                        mdate : now
+                    };
+                    Order.Summary.update({ordernum:req.body.ordernum},updateObj,function(err2){
+                        if(err2){
+                            Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"입찰 거절로 인한 상태 변화 update 중 DB 에러"},wdate:Date()});
+                            console.log(err2);
+                            req.flash("errors",{message : "DB ERROR"});
+                            return res.redirect('/');
+                        }
+                        Log.create({document_name : "Summary",type:"update",contents:{update:updateObj,content:"입찰 거절로 인한 상태 변화 update"},wdate:Date()});
+                        return res.redirect('order/bidList');
+                    });
+                } else{
+                    let updateObj = {
+                        mdate : now
+                    };
+                    Order.Summary.update({ordernum:req.body.ordernum},updateObj,function(err2){
+                        if(err2){
+                            Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"입찰 거절로 인한 mdate update 중 DB 에러"},wdate:Date()});
+                            console.log(err2);
+                            req.flash("errors",{message : "DB ERROR"});
+                            return res.redirect('/');
+                        }
+                        Log.create({document_name : "Summary",type:"update",contents:{update:updateObj,content:"입찰 거절로 인한 mdate update"},wdate:Date()});
+                        return res.redirect('order/bidList');
+                    });
+                }
+            });            
         }
        
     });
