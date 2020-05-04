@@ -29,12 +29,12 @@
                   <td class="align-middle"><%=obj.wdateD%><br /><%=obj.wdateH%></td>
                   <td class="align-middle"><%=obj.deadline%></td>
                   <td class="align-middle"><%=obj.price%></td>
-                  <td class="align-middle"><%=obj.userid%></td>
+                  <td class="align-middle"><%=obj.anotherId%></td>
                   <td class="align-middle"><%=obj.summary%></td>
                   <td class="align-middle"><%=obj.description%></td>
                   <td>
-                    <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','select')">선정</button></div>
-                    <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','reject')">거절</button></div>
+                    <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','<%=obj.userid%>','select')">선정</button></div>
+                    <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','<%=obj.userid%>','reject')">거절</button></div>
                     <div><button>문의</button></div>
                   </td>
               </tr>
@@ -64,7 +64,7 @@
                   <td class="align-middle"><%=obj2.doneDateD%><br /><%=obj2.doneDateH%></td>
                   <td class="align-middle"><%=obj2.deadline%></td>
                   <td class="align-middle"><%=obj2.price%></td>
-                  <td class="align-middle"><%=obj2.userid%></td>
+                  <td class="align-middle"><%=obj2.anotherId%></td>
                   <td class="align-middle"><%=obj2.summary%></td>
                   <td class="align-middle"><%=obj2.description%></td>
                   <td class="align-middle"><%=obj2.status%></td>
@@ -75,6 +75,7 @@
     <form action="bidList" id='selectForm' method='post'>
       <input type="hidden" name="ordernum">
       <input type="hidden" name="vender">
+      <input type="hidden" name="customer">
       <input type="hidden" name="status">
     </form>
   </body>

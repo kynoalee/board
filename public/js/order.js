@@ -50,7 +50,7 @@ function getDetailInfo(ordernum,fileLinks){
 
 var buttonDoubleCheck = false;
 
-function selectThisOrder(ordernum,vender,status){
+function selectThisOrder(ordernum,vender,customer,status){
     if(buttonDoubleCheck){
         return buttonDoubleCheck;
     } else{
@@ -60,6 +60,7 @@ function selectThisOrder(ordernum,vender,status){
             $('input[name=status]').val(status);
             $('input[name=ordernum]').val(ordernum);
             $('input[name=vender]').val(vender);
+            $('input[name=customer]').val(customer);
             $('#selectForm').submit();
         }else {
             buttonDoubleCheck = false;
