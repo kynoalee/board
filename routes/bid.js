@@ -78,9 +78,9 @@ router.get('/bidVenderIn/:servername',util.isLoggedin,function(req,res){
     download.fileDownload(File,fileName,res);
 });
 
-router.get('/bidList',function(req,res){
-    var userid = 'imgcom';
-    var userclass = 'normal'; // req.user.userclass;
+router.get('/bidList',util.isLoggedin,function(req,res){
+    var userid = req.user.userid;
+    var userclass = req.user.userclass; // req.user.userclass;
     var findObj = {};
     if(userclass == 'normal'){
         findObj.userid = userid;
@@ -93,7 +93,8 @@ router.get('/bidList',function(req,res){
             console.log(err);
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
-        }        
+        }
+               
         var biddingList = [];
         for(let val of bid){
             let tmpObj = {};
@@ -104,12 +105,14 @@ router.get('/bidList',function(req,res){
 
             // 이글에 연결된 나말고 다른 사람
             if(userclass == 'normal'){
-                tmpObj.userid = val.vender;
+                tmpObj.anotherId = val.vender;
             } else if(userclass == 'vender'){
-                tmpObj.userid = val.userid;
+                tmpObj.anotherId = val.userid;
             }
-            tmpObj.vender = val.vender;
 
+            // post 전용 데이터
+            tmpObj.vender = val.vender;
+            tmpObj.customer = val.userid;
             // 날짜 포맷 변경
             tmpObj.wdateD = moment(val.wdate).format("YYYY-MM-DD");
             tmpObj.wdateH = moment(val.wdate).format("HH:mm:ss");
@@ -118,13 +121,17 @@ router.get('/bidList',function(req,res){
             tmpObj.price = common.numberWithCommas(val.detail.price);
             biddingList.push(tmpObj);
         }
-        Bid.Done.find({findObj},function(err2,bidDone){
+        Bid.Done.find(findObj,function(err2,bidDone){
             if(err2){
                 Log.create({document_name : "BidDone",type:"error",contents:{error:err2,content:"입찰된 리스트 find DB에러"},wdate:Date()});
                 console.log(err2);
                 req.flash("errors",{message : "DB ERROR"});
                 return res.redirect('/');
             }     
+            if(bid.length == 0 && bidDone.length == 0){
+                req.flash("errors",{message : "no Bid"});
+                return res.redirect('/');
+            }
             var bidDoneList = [];
             for(let val of bidDone){
                 let tmpObj = {};
@@ -136,9 +143,9 @@ router.get('/bidList',function(req,res){
 
                 // 이글에 연결된 나말고 다른 사람
                 if(userclass == 'normal'){
-                    tmpObj.userid = val.vender;
+                    tmpObj.anotherId = val.vender;
                 } else if(userclass == 'vender'){
-                    tmpObj.userid = val.userid;
+                    tmpObj.anotherId = val.userid;
                 }
     
                 // 날짜 포맷 변경
@@ -185,7 +192,7 @@ router.post('/bidList',function(req,res){
                 bidDoneObj = {
                     _id : bidObj._id,
                     ordernum : req.body.ordernum,
-                    userid : req.body.userid,
+                    userid : req.body.customer,
                     vender : req.body.vender,
                     detail : bidObj.detail,
                     wdate : bidObj.wdate,
@@ -240,7 +247,7 @@ router.post('/bidList',function(req,res){
                         return res.redirect('/');
                     }
                     Log.create({document_name : "Summary",type:"update",contents:{update:updateObj,content:"입찰 선정으로 인한 상태 변화 update"},wdate:Date()});
-                    return res.redirect('bid/bidList');
+                    return res.redirect('bidList');
                 });
             });
 
@@ -277,7 +284,7 @@ router.post('/bidList',function(req,res){
                             return res.redirect('/');
                         }
                         Log.create({document_name : "Summary",type:"update",contents:{update:updateObj,content:"입찰 거절로 인한 상태 변화 update"},wdate:Date()});
-                        return res.redirect('bid/bidList');
+                        return res.redirect('bidList');
                     });
                 } else{
                     let updateObj = {
@@ -291,7 +298,7 @@ router.post('/bidList',function(req,res){
                             return res.redirect('/');
                         }
                         Log.create({document_name : "Summary",type:"update",contents:{update:updateObj,content:"입찰 거절로 인한 mdate update"},wdate:Date()});
-                        return res.redirect('bid/bidList');
+                        return res.redirect('bidList');
                     });
                 }
             });            

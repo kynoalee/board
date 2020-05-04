@@ -135,7 +135,7 @@ router.get('/list',util.isLoggedin,function(req,res){
     if(req.user.userclass == "vender"){
         findObj.vender = req.user.userid;
     } else if(req.user.userclass == "normal") {
-        fundObj.userid = req.user.userid;
+        findObj.orderid = req.user.userid;
     }
 
     // test 이후 req.user.userid 
@@ -146,7 +146,7 @@ router.get('/list',util.isLoggedin,function(req,res){
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
         }
-        if(!arr.length){
+        if(arr.length ==0){
             req.flash("errors",[{message : "주문이 없습니다."}]);
             return res.redirect('/');
         }
