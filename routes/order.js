@@ -2,15 +2,12 @@ var express  = require('express');
 var router = express.Router();
 var multer = require('multer');
 var moment = require('moment');
-var common = require('../modules/common');
 var nameSetting = require('../config/nameSetting');
 var config = require('../config/config');
 var util = require('../util'); // 1
 var File = require('../models/File');
-var Bid = require('../models/Bid');
 var Log = require('../models/Log');
 var Order = require('../models/Order');
-var download = require('../modules/download');
 
 // order new   
 router.get('/',util.isLoggedin,function(req, res){
@@ -138,7 +135,7 @@ router.get('/list',util.isLoggedin,function(req,res){
     if(req.user.userclass == "vender"){
         findObj.vender = req.user.userid;
     } else if(req.user.userclass == "normal") {
-        fundObj.userid = req.user.userid;
+        findObj.orderid = req.user.userid;
     }
 
     // test 이후 req.user.userid 
@@ -149,7 +146,7 @@ router.get('/list',util.isLoggedin,function(req,res){
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
         }
-        if(!arr.length){
+        if(arr.length ==0){
             req.flash("errors",[{message : "주문이 없습니다."}]);
             return res.redirect('/');
         }
@@ -284,7 +281,7 @@ router.get('/list',util.isLoggedin,function(req,res){
                 }
                 // 각 상태 정렬 필요.
                 for(let keyVal in nameSetting.statusName){
-                    sortArray(orderDetail['status'+nameSetting.statusName[keyVal].status]);
+                    sortArrayTimeDiff(orderDetail['status'+nameSetting.statusName[keyVal].status]);
                 }
                 res.render('order/list',{
                     summary : summary,
@@ -299,241 +296,9 @@ router.get('/list',util.isLoggedin,function(req,res){
     });   
 });
 
-// vender order check bid in util.isLoggedIn,
-router.get('/bidVenderIn',util.isLoggedin,function(req,res){
-    if(req.user.userclass != "vender"){
-        req.flash("errors",{message : "NO Permission"});
-        return res.redirect('/');
-    }
-    Order.Summary.find({vender:{$exists : false},$or:[{status : 1},{status : 2}]},function(err,summary){
-        if(err){
-            Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"입찰목록 주문 목록 find 중 DB 에러"},wdate:Date()});
-            console.log(err);
-            req.flash("errors",[{message : "DB error"}]);
-            return res.redirect("/");
-        }
-        var num = 0;
-        Bid.Ing.find({vender:req.user.userid},function(err,bid){
-            if(err){
-                Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰 내역 find 중 DB 에러"},wdate:Date()});
-                console.log(err);
-                req.flash("errors",{message : "DB ERROR"});
-                return res.redirect('/');
-            }
-            var orderlinks = [];
-            var summaryList = {};
-            if(bid.length == 0 ){
-                for(let value of summary){
-                    let tmpSummary = setTmpArray(value);
-                    summaryList[value.ordernum] = tmpSummary;
-                    orderlinks[orderlinks.length] = { orderlink : value.ordernum};
-                } 
-            } else{
-                for(let check of bid){
-                    for(let value of summary){
-                        if(check.ordernum != value.ordernum){
-                            let tmpSummary = setTmpArray(value);
-                            summaryList[value.ordernum] = tmpSummary;
-                            orderlinks[orderlinks.length] = { orderlink : value.ordernum};
-                        } 
-                    } 
-                }
-            }
-            Order.Detail.find({$or:orderlinks},function(err2,detail){
-                if(err2){
-                    Log.create({document_name : "Detail",type:"error",contents:{error:err2,content:"입찰목록 detail find 중 DB 에러"},wdate:Date()});
-                    console.log(err2);
-                    req.flash("errors",[{message : "DB error"}]);
-                    return res.redirect("/");
-                }
-                for(let obj of detail){
-                    summaryList[obj.orderlink].detail = obj;
-                }
-                res.render('order/bidVenderIn',{
-                    summary : summaryList
-                });                         
-            });  
-        });
-              
-    });
-});
-
-// file download
-router.get('/bidVenderIn/:servername',util.isLoggedin,function(req,res){
-    var fileName = req.params.servername;
-    download.fileDownload(File,fileName,res);
-});
-
-router.get('/bidList',function(req,res){
-    var userid = 'imgcom';
-    var userclass = 'normal'; // req.user.userclass;
-    var findObj = {};
-    if(userclass == 'normal'){
-        findObj.userid = userid;
-    } else if(userclass == 'vender'){
-        findObj.vender = userid;
-    }
-    Bid.Ing.find(findObj,function(err,bid){
-        if(err){
-            Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰된 리스트 find DB에러"},wdate:Date()});
-            console.log(err);
-            req.flash("errors",{message : "DB ERROR"});
-            return res.redirect('/');
-        }        
-        var biddingList = [];
-        for(let val of bid){
-            let tmpObj = {};
-            tmpObj.ordernum = val.ordernum;
-            tmpObj.deadline = val.detail.deadline;
-            tmpObj.summary = val.detail.summary;
-            tmpObj.description = val.detail.description;
-
-            // 이글에 연결된 나말고 다른 사람
-            if(userclass == 'normal'){
-                tmpObj.userid = val.vender;
-            } else if(userclass == 'vender'){
-                tmpObj.userid = val.userid;
-            }
-            tmpObj.vender = val.vender;
-
-            // 날짜 포맷 변경
-            tmpObj.wdateD = moment(val.wdate).format("YYYY-MM-DD");
-            tmpObj.wdateH = moment(val.wdate).format("HH:mm:ss");
-
-            // price 포맷 변경
-            tmpObj.price = common.numberWithCommas(val.detail.price);
-            biddingList.push(tmpObj);
-        }
-        Bid.Done.find({findObj},function(err2,bidDone){
-            if(err2){
-                Log.create({document_name : "BidDone",type:"error",contents:{error:err2,content:"입찰된 리스트 find DB에러"},wdate:Date()});
-                console.log(err2);
-                req.flash("errors",{message : "DB ERROR"});
-                return res.redirect('/');
-            }     
-            var bidDoneList = [];
-            for(let val of bidDone){
-                let tmpObj = {};
-                tmpObj.ordernum = val.ordernum;
-                tmpObj.deadline = val.detail.deadline;
-                tmpObj.summary = val.detail.summary;
-                tmpObj.description = val.detail.description;
-                tmpObj.status = val.status;
-
-                // 이글에 연결된 나말고 다른 사람
-                if(userclass == 'normal'){
-                    tmpObj.userid = val.vender;
-                } else if(userclass == 'vender'){
-                    tmpObj.userid = val.userid;
-                }
-    
-                // 날짜 포맷 변경
-                tmpObj.wdateD = moment(val.wdate).format("YYYY-MM-DD");
-                tmpObj.wdateH = moment(val.wdate).format("HH:mm:ss");
-                tmpObj.doneDateD = moment(val.donedate).format("YYYY-MM-DD");
-                tmpObj.doneDateH = moment(val.donedate).format("HH:mm:ss");
-
-                // price 포맷 변경
-                tmpObj.price = common.numberWithCommas(val.detail.price);
-                bidDoneList.push(tmpObj);
-            }
-            res.render('order/bidList',{
-                bidding : biddingList,
-                bidDone : bidDoneList
-            });
-        });
-        
-    });
-});
-
-router.post('/bidList',function(req,res){
-    if(req.user.userclass == 'vender'){
-        Log.create({document_name : "Bid",type:"error",contents:{content:"입찰선정과정에 벤더유입됨. 퍼미션 에러"},wdate:Date()});
-        req.flash("errors",{message : "no Permission"});
-        return res.redirect('/');
-    }
-    var findObj = {
-        ordernum : req.body.ordernum,
-
-    };
-    Bid.Ing.find(findObj,function(err,bid){
-        let now = Date();
-        let bidDoneObj = {};
-        for(let bidObj of bid){
-            if(bidObj.vender == req.body.vender){
-                bidDoneObj = {
-                    _id : bidObj._id,
-                    ordernum : req.body.ordernum,
-                    userid : req.body.userid,
-                    vender : req.body.vender,
-                    detail : bidObj.detail,
-                    wdate : bidObj.wdate,
-                    donedate : now
-                };
-            }
-        }
-
-        if(req.body.status == "select"){
-            bidDoneObj.status = "select";
-            // 해당 입찰 건 bid done으로 create dont upsert
-            workBidDB(bidDoneObj);
-
-        } else if(req.body.status == "reject"){
-            bidDoneObj.status = "reject";
-            // 해당 입찰 건 bid done으로 create dont upsert , delete Bid
-            workBidDB(bidDoneObj);
-            // 해당 주문번호에 걸린 입찰이 또 있는지 확인
-            // 주문번호입찰 있는지 여부에 따라 status 변경 , 여부에 상관없이 mdate 변경
-            
-        }
-       
-    });
-    
-});
-
 module.exports = router;
 
 // private functions area
-
-async function workBidDB(obj){
-    await Bid.Done.create(obj,function(err,bidDone){
-        if(err){
-            console.log(err);
-            Log.create({document_name : "BidDone",type:"error",contents:{error:err,content:"입찰 "+obj.status+" 중 BidDone create DB 에러"},wdate:Date()});
-            req.flash("errors",{message : "DB Error"});
-            return res.redirect('/');
-        }
-        Log.create({document_name : "BidDone",type:"create",contents:{error:err,content:"입찰 "+obj.status+" 중 BidDone create"},wdate:Date()});
-    });
-    await Bid.Ing.remove({_id:obj._id},function(err,bid){
-        if(err){
-            console.log(err);
-            Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰 "+obj.status+" 중 BidDone remove DB 에러"},wdate:Date()});
-            req.flash("errors",{message : "DB Error"});
-            return res.redirect('/');
-        }
-        Log.create({document_name : "BidDone",type:"remove",contents:{content:"입찰 "+obj.status+" 중 BidDone remove"},wdate:Date()});
-    });
-}
-
-function setTmpArray(value){
-    let dateOb ={
-        orderD : moment(value.orderdate).format("YYYY-MM-DD"),
-        orderH : moment(value.orderdate).format("HH:mm:ss"),
-        modiD : moment(value.mdate).format("YYYY-MM-DD"),
-        modiH : moment(value.mdate).format("HH:mm:ss")
-    };
-
-    let tmpSummary = {};
-    tmpSummary.ordernum = value.ordernum;
-    tmpSummary.orderid = value.orderid;
-    tmpSummary.orderdateD = dateOb.orderD;
-    tmpSummary.orderdateH = dateOb.orderH;
-    tmpSummary.modidateD = dateOb.modiD;
-    tmpSummary.modidateH = dateOb.modiH;
-    
-    return tmpSummary;
-}
 
 function delayFileCreate(creatObj) {
     return new Promise(resolve => 
@@ -569,7 +334,7 @@ async function createFiles(array,req,next) {
 }
 
 // 어레이 내 시간 차로 정렬
-function sortArray(array){
+function sortArrayTimeDiff(array){
     array.sort(function(a,b){
         if(moment.duration(moment(a.wdate).diff(moment(b.wdate))).asMilliseconds() > 0){
             return 1;

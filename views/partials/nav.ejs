@@ -11,12 +11,12 @@
         <%if(currentUser && currentUser.userclass =="normal"){%>
         <li class="nav-item"><a href="/order" class="nav-link">Upload</a></li>
         <%} if(currentUser && currentUser.userclass =="vender"){%>
-        <li class="nav-item"><a href="/order/bidVenderIn" class="nav-link">BidInOrder</a></li>
+        <li class="nav-item"><a href="/bid/bidVenderIn" class="nav-link">BidInOrder</a></li>
         <%}%>
       </ul>
       <ul class="navbar-nav ml-auto">
         <% if(isAuthenticated){ %>
-          <li class="nav-item"><a href="/order/bidList" class="nav-link">Bid list</a></li>
+          <li class="nav-item"><a href="/bid/bidList" class="nav-link">Bid list</a></li>
           <li class="nav-item"><a href="/order/list" class="nav-link">Order list</a></li>
           <li class="nav-item"><a href="/users/<%= currentUser.userid %>" class="nav-link">My Account</a></li>
           <li class="nav-item"><a href="/logout" class="nav-link">Logout</a></li>
