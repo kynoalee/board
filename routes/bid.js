@@ -35,6 +35,11 @@ router.get('/bidVenderIn',util.isLoggedin,function(req,res){
             if(bid.length == 0 ){
                 for(let value of summary){
                     let tmpSummary = setTmpArray(value);
+                    if(value.status == 1){
+                        tmpSummary.status = "주문";
+                    } else {
+                        tmpSummary.status = "입찰 중";
+                    }
                     summaryList[value.ordernum] = tmpSummary;
                     orderlinks[orderlinks.length] = { orderlink : value.ordernum};
                 } 

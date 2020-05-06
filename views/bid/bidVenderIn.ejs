@@ -28,7 +28,7 @@
                     <td><%=summary[keyVal].orderdateD%><br /><%=summary[keyVal].orderdateH%></td>
                     <td><%=summary[keyVal].detail.deadline%></td>
                     <td><%=summary[keyVal].detail.summary%></td>
-                    <td>입찰중</td>
+                    <td><%=summary[keyVal].status%></td>
                 </tr>
                 <tr id="detailOrder<%=summary[keyVal].ordernum%>" class="collapse" data-parent="#summaryOrder<%=summary[keyVal].ordernum%>">
                   <td colspan=5>
