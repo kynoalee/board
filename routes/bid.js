@@ -224,7 +224,7 @@ router.post('/bidList',function(req,res){
                 }
                 // 다른 입찰 내역이 있는 경우 Bid 삭제
                 if(bid.length != 0){
-                    Bid.Ing.remove({$or:otherBidIds},function(err2){
+                    Bid.Ing.deleteMany({$or:otherBidIds},function(err2){
                         if(err2){
                             Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"입찰 선정으로 입찰내역 remove 중 DB 에러"},wdate:Date()});
                             console.log(err2);
@@ -239,7 +239,7 @@ router.post('/bidList',function(req,res){
                     vender : req.body.vender,
                     mdate : now
                 };
-                Order.Summary.update({ordernum:req.body.ordernum},updateObj,function(err2){
+                Order.Summary.updateOne({ordernum:req.body.ordernum},updateObj,function(err2){
                     if(err2){
                         Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"입찰 선정으로 인한 상태 변화 update 중 DB 에러"},wdate:Date()});
                         console.log(err2);
@@ -276,7 +276,7 @@ router.post('/bidList',function(req,res){
                         status : 1,
                         mdate : now
                     };
-                    Order.Summary.update({ordernum:req.body.ordernum},updateObj,function(err2){
+                    Order.Summary.updateOne({ordernum:req.body.ordernum},updateObj,function(err2){
                         if(err2){
                             Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"입찰 거절로 인한 상태 변화 update 중 DB 에러"},wdate:Date()});
                             console.log(err2);
@@ -290,7 +290,7 @@ router.post('/bidList',function(req,res){
                     let updateObj = {
                         mdate : now
                     };
-                    Order.Summary.update({ordernum:req.body.ordernum},updateObj,function(err2){
+                    Order.Summary.updateOne({ordernum:req.body.ordernum},updateObj,function(err2){
                         if(err2){
                             Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"입찰 거절로 인한 mdate update 중 DB 에러"},wdate:Date()});
                             console.log(err2);
@@ -320,16 +320,16 @@ async function workBidDB(obj){
             req.flash("errors",{message : "DB Error"});
             return res.redirect('/');
         }
-        Log.create({document_name : "BidDone",type:"create",contents:{error:err,content:"입찰 "+obj.status+" 중 BidDone create"},wdate:Date()});
+        Log.create({document_name : "BidDone",type:"create",contents:{create:obj,content:"입찰 "+obj.status+" 중 BidDone create"},wdate:Date()});
     });
-    await Bid.Ing.remove({_id:obj._id},function(err,bid){
+    await Bid.Ing.deleteMany({_id:obj._id},function(err,bid){
         if(err){
             console.log(err);
             Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰 "+obj.status+" 중 BidDone remove DB 에러"},wdate:Date()});
             req.flash("errors",{message : "DB Error"});
             return res.redirect('/');
         }
-        Log.create({document_name : "BidDone",type:"remove",contents:{content:"입찰 "+obj.status+" 중 BidDone remove"},wdate:Date()});
+        Log.create({document_name : "Bid",type:"remove",contents:{content:"입찰 "+obj.status+" 중 Bid remove"},wdate:Date()});
     });
 }
 

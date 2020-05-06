@@ -153,7 +153,7 @@ function(req,res){
     var summary = {
         status : 2,
         mdate : nowDate
-    }
+    };
     var bidding = {
         userid : req.body.orderid,
         detail : {
@@ -164,7 +164,8 @@ function(req,res){
             description : req.body.description
         },
         wdate : nowDate
-    }
+        
+    };
     Order.Summary.updateOne({ordernum:req.body.ordernum},summary,function(err,sum){
         if(err) {
             Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"입찰 시도 update DB에러"},wdate:Date()});
@@ -173,7 +174,7 @@ function(req,res){
             return res.redirect('/');
         }
         Log.create({document_name : "Summary",type:"update",contents:{summary:sum,content:"입찰 시도 update"},wdate:Date()});
-        Bid.Ing.updateOne({ordernum:req.body.ordernum,vender : req.user.userid},bidding,{upsert:true},function(err2,bid){
+        Bid.Ing.findOneAndUpdate({ordernum:req.body.ordernum,vender : req.user.userid},bidding,{new:true,upsert:true},function(err2,bid){
             if(err2) {
                 Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"입찰 시도 upsert DB에러"},wdate:Date()});
                 req.flash("errors",{message:"DB Error"});
@@ -184,8 +185,7 @@ function(req,res){
         });
 
     });
-}
-);
+});
 
 router.get('/close',function(req,res){
     res.render('pop/close');

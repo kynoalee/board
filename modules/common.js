@@ -1,5 +1,8 @@
 var common = {
     calculateByte : function(byte){
+            if(typeof byte != 'Number'){
+                byte = 0;
+            }
             let calByte = 0;
             let stringByte = 'Byte';
             if(byte>=1000 && byte < 1000000){
