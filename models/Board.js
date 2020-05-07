@@ -4,11 +4,29 @@ var mongoose = require('mongoose');
 
 // schema
 var boardSchema = mongoose.Schema({
-  title:{type:String, required:[true,'Title is required!']},
-  body:{type:String, required:[true,'Body is required!']},
-  author:{type:mongoose.Schema.Types.ObjectId, ref:'user', required:true}, // 1
-  createdAt:{type:Date, default:Date.now},
-  updatedAt:{type:Date},
+  qnanum:{
+    type: Number,
+    unique: true
+  }, 
+  where:String, // 어디서 문의한건지
+  linknum:Number, // 연결 주문,입찰 등 번호
+  userid:String, 
+  userclass:String,
+  nego:Boolean, // 네고관련 문의인지 
+  
+  // 문의 내용
+  summary:String,
+  contents:String,
+  filelinks:Array,
+  price:Number,
+  deadline:String,
+
+  // 연결 문의 포인터
+  parents:Number,
+  children:Number,
+
+  wdate:Date,
+  mdate:Date
 });
 
 // model & export
