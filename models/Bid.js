@@ -2,26 +2,23 @@ var mongoose = require('mongoose');
 
 // schema
 var bidSchema = mongoose.Schema({
+  bidnum:{
+    type:Number,
+    unique:true
+  },
   ordernum :Number,
   userid : String,
   vender : String,
   detail : Object,
-  wdate : Date
-});
-
-var bidDoneSchema = mongoose.Schema({
-  ordernum : Number,
-  userid : String,
-  vender  : String,
-  detail : Object,
+  status : String, 
+  // bidding, select, reject, delete
+  // (입찰, 선정, 거절, 삭제)
   wdate : Date,
-  donedate : Date,
-  status : String
+  mdate : Date,
+  donedate : Date
 });
 
 // model & export
-var Ing = mongoose.model('Bid', bidSchema);
-var Done = mongoose.model('BidDone',bidDoneSchema);
+var Bid = mongoose.model('Bid', bidSchema);
 
-module.exports.Ing = Ing;
-module.exports.Done = Done;
+module.exports = Bid;
