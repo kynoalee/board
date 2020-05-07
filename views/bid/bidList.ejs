@@ -37,7 +37,7 @@
                   <td>
                     <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','<%=obj.customer%>','select')">선정</button></div>
                     <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','<%=obj.customer%>','reject')">거절</button></div>
-                    <div><button onclick="('')">문의</button></div>
+                    <div><button onclick="goQna('<%=obj.bidnum%>','<%=currentUser.userid%>','<%=currentUser.userclass%>','bid')">문의</button></div>
                   </td>
               </tr>
           <%}%>             

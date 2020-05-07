@@ -7,6 +7,7 @@ var config = require('../config/config');
 var File = require('../models/File');
 var Order = require('../models/Order');
 var Bid = require('../models/Bid');
+var Board = require('../models/Board');
 var Log = require('../models/Log');
 var util = require('../util'); // 1
 var download = require('../modules/download');
@@ -206,8 +207,37 @@ function(req,res){
 
 // 문의 팝업
 router.get('/qna',function(req,res){
+    var qna = req.flash('qna')||{};
+    var errors = req.flash('errors')||{};
+    // 관련 질문이 있는지 파악
+    Board.findOne({linknum : req.query.linknum, children : -1},function(err,board){
 
+        let exQnaList = {
+            exQnaDisplay : "display-none",
+            lastQnaDisplay : "display-none"
+        };
+
+        if(board){
+            exQnaList.lastQnaDisplay = '';
+            exQnaList.lastData = board;
+            if(board.where == 'bid'){
+                exQnaList.lastData.whereName = "입찰";
+            }
+            // 부모 있는지 확인 ( 직전 외 이전 문의 찾기 )
+            if(board.parents != -1){
+                exQnaList.exQnaDisplay = '';
+            }
+            
+        }
+        res.render('pop/qna',{
+            qnaList : exQnaList,
+            qna:qna,
+            errors:errors
+        });
+    });
 });
+
+// 문의 
 
 // 팝업 닫기
 router.get('/close',function(req,res){
