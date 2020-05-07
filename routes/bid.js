@@ -31,7 +31,6 @@ router.get('/bidVenderIn',util.isLoggedin,function(req,res){
             }
             var orderlinks = [];
             var summaryList = {};
-            // 해당 주문번호 입찰했으면 안보이도록
             if(bid.length == 0 ){
                 for(let value of summary){
                     let tmpSummary = setTmpArrayForBidVenderIn(value);
@@ -44,10 +43,11 @@ router.get('/bidVenderIn',util.isLoggedin,function(req,res){
                     orderlinks[orderlinks.length] = { orderlink : value.ordernum};
                 } 
             } else{
+                // 해당 주문번호 입찰했으면 안보이도록
                 here : for(let value of summary){
                     if(bid.length != 0){
                         for(let check of bid){ 
-                            if(check.ordernum == value.ordernum){
+                            if(check.ordernum == value.ordernum && check.status =='bidding'){
                                 continue here;
                             } 
                         }
@@ -83,9 +83,9 @@ router.get('/bidVenderIn/:servername',util.isLoggedin,function(req,res){
     download.fileDownload(File,fileName,res);
 });
 
-router.get('/bidList',function(req,res){
-    var userid = 'imgcom'; //req.user.userid;
-    var userclass = 'normal'; //req.user.userclass; 
+router.get('/bidList',util.isLoggedin,function(req,res){
+    var userid = req.user.userid;
+    var userclass = req.user.userclass; 
     var findObj = {};
     if(userclass == 'normal'){
         findObj.userid = userid;
@@ -108,15 +108,15 @@ router.get('/bidList',function(req,res){
         for(let val of bid){
             if(val.status.toLowerCase() == 'bidding'){
             
-                let tmpObj = setTmpArrayForBidList(val);
+                let tmpObj = setTmpArrayForBidList(val,userclass);
                 
                 // post 전용 데이터
                 tmpObj.vender = val.vender;
                 tmpObj.customer = val.userid;
 
                 biddingList.push(tmpObj);
-            } else{
-                let tmpObj = setTmpArrayForBidList(val);
+            } else if(val.status.toLowerCase() == 'select' || val.status.toLowerCase() == 'reject'){
+                let tmpObj = setTmpArrayForBidList(val,userclass);
 
                 tmpObj.status = val.status;
 
@@ -144,7 +144,6 @@ router.post('/bidList',function(req,res){
     }
     var findObj = {
         ordernum : req.body.ordernum,
-
     };
     Bid.find(findObj,function(err,bid){
         if(err){
@@ -157,7 +156,7 @@ router.post('/bidList',function(req,res){
         let otherBidIds = [];
         let bidDoneObj = {};
         for(let bidObj of bid){
-            if(bidObj.vender == req.body.vender){
+            if(bidObj.vender == req.body.vender && bidObj.status == 'bidding'){
                 bidDoneObj = {
                     _id : bidObj._id,
                     mdate: now,
@@ -189,7 +188,7 @@ router.post('/bidList',function(req,res){
                     return res.redirect('/');
                 }
                 // 다른 입찰 내역이 있는 경우 Bid 삭제
-                if(bid.length != 0){
+                if(otherBidIds.length != 0){
                     Bid.updateOne({$or:otherBidIds},{status:"delete",mdate:now,donedate:now},function(err2){
                         if(err2){
                             Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"입찰 선정으로 입찰내역 status delete update 중 DB 에러"},wdate:Date()});
@@ -237,7 +236,7 @@ router.post('/bidList',function(req,res){
                     return res.redirect('/');
                 }
                 // 다른 입찰 내역이 없는 경우 status 2 -> 1 
-                if(bid.length == 0){
+                if(otherBidIds.length == 0){
                     let updateObj = {
                         status : 1,
                         mdate : now
@@ -290,8 +289,9 @@ async function workBidDB(obj){
     });
 }
 
-function setTmpArrayForBidList(val){
+function setTmpArrayForBidList(val,userclass){
     let tmpObj ={};
+    tmpObj.bidnum = val.bidnum;
     tmpObj.ordernum = val.ordernum;
     tmpObj.deadline = val.detail.deadline;
     tmpObj.summary = val.detail.summary;

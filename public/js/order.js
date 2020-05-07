@@ -67,8 +67,4 @@ function selectThisOrder(ordernum,vender,customer,status){
         }
     }
 }
-$(document).ready(function(){
-    $('#qnaBtn').click(function(){
-        alert('test');
-    });
-});
+

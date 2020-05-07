@@ -159,6 +159,8 @@ function(req,res){
     };
     var bidding = {
         userid : req.body.orderid,
+        vender : req.user.userid,
+        ordernum : req.body.ordernum,
         detail : {
             price : req.body.price,
             deadline : req.body.deadline,
@@ -171,24 +173,34 @@ function(req,res){
         mdate : nowDate
         
     };
-    Order.Summary.updateOne({ordernum:req.body.ordernum},summary,function(err,sum){
-        if(err) {
-            Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"입찰 시도 update DB에러"},wdate:Date()});
-            console.log(err);
-            req.flash("errors",{message:"DB Error"});
+    Bid.findOne({}).sort({bidnum:-1}).select("bidnum").exec(function(err1,bidnum){
+        if(err1){
+            Log.create({document_name : "Summary",type:"error",contents:{error:err1,content:"마지막 bidnum 가져오는 find DB 에러"},wdate:Date()});
+            console.log(err1);
+            req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
         }
-        Log.create({document_name : "Summary",type:"update",contents:{summary:sum,content:"입찰 시도 update"},wdate:Date()});
-        Bid.findOneAndUpdate({ordernum:req.body.ordernum,vender : req.user.userid},bidding,{new:true,upsert:true},function(err2,bid){
-            if(err2) {
-                Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"입찰 시도 upsert DB에러"},wdate:Date()});
+        bidding.bidnum = bidnum.bidnum + 1;
+
+        Order.Summary.updateOne({ordernum:req.body.ordernum},summary,function(err,sum){
+            if(err) {
+                Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"입찰 시도 update DB에러"},wdate:Date()});
+                console.log(err);
                 req.flash("errors",{message:"DB Error"});
                 return res.redirect('/');
             }
-            Log.create({document_name : "Bid",type:"upsert",contents:{bid : bidding,content:"입찰 시도 upsert"},wdate:Date()});
-            res.redirect('/pop/close');
-        });
+            Log.create({document_name : "Summary",type:"update",contents:{summary:sum,content:"입찰 시도 update"},wdate:Date()});
+            Bid.create(bidding,function(err2,bid){
+                if(err2) {
+                    Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"입찰 시도 create DB에러"},wdate:Date()});
+                    req.flash("errors",{message:"DB Error"});
+                    return res.redirect('/');
+                }
+                Log.create({document_name : "Bid",type:"create",contents:{bid : bidding,content:"입찰 시도 create"},wdate:Date()});
+                res.redirect('/pop/close');
+            });
 
+        });
     });
 });
 

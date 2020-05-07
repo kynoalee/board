@@ -12,7 +12,8 @@
     <table class="table table-hover">
       <thead>
           <tr>
-              <th>주문번호</th>
+              <th>입찰번호</th>
+              <th>연결주문</th>
               <th>입찰일시</th>
               <th>마감일자</th>
               <th>가격</th>
@@ -25,6 +26,7 @@
       <tbody>
           <%for(let obj of bidding){%>
               <tr>
+                  <td class="align-middle"><%=obj.bidnum%></td>
                   <td class="align-middle"><%=obj.ordernum%></td>
                   <td class="align-middle"><%=obj.wdateD%><br /><%=obj.wdateH%></td>
                   <td class="align-middle"><%=obj.deadline%></td>
@@ -35,7 +37,7 @@
                   <td>
                     <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','<%=obj.customer%>','select')">선정</button></div>
                     <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','<%=obj.customer%>','reject')">거절</button></div>
-                    <div><button id="qnaBtn">문의</button></div>
+                    <div><button onclick="('')">문의</button></div>
                   </td>
               </tr>
           <%}%>             
@@ -45,7 +47,8 @@
     <table class="table table-hover">
       <thead>
           <tr>
-              <th>주문번호</th>
+              <th>입찰번호</th>
+              <th>연결주문</th>
               <th>입찰일시</th>
               <th>마감일자</th>
               <th>선정/거절일자</th>
@@ -59,6 +62,7 @@
       <tbody>
           <%for(let obj2 of bidDone){%>
               <tr>
+                  <td class="align-middle"><%=obj2.bidnum%></td>
                   <td class="align-middle"><%=obj2.ordernum%></td>
                   <td class="align-middle"><%=obj2.wdateD%><br /><%=obj2.wdateH%></td>
                   <td class="align-middle"><%=obj2.doneDateD%><br /><%=obj2.doneDateH%></td>
