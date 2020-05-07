@@ -12,6 +12,7 @@ var util = require('../util'); // 1
 var download = require('../modules/download');
 var common = require("../modules/common");
 
+// 주문 정보 전부 보여주는 팝업 
 router.get('/detail',util.isLoggedin,function(req, res){
     var findObj = {ordernum : req.query.ordernum};
     if(req.user.userclass == "vender"){
@@ -112,6 +113,7 @@ router.get("/detail/:servername",util.isLoggedin,function(req,res){
     download.fileDownload(File,fileName,res);
 });
 
+// 입찰하기 위한 내용 입력
 router.get('/bid',util.isLoggedin,function(req,res){
     var errors = req.flash("errors")[0] || {};
     var bid = req.flash("bid")[0] || {};
@@ -136,6 +138,7 @@ var storage = multer.diskStorage({
 });
 var bid = multer({ storage: storage });
 
+// 입찰 내용 저장 
 router.post('/bid',util.isLoggedin,bid.array('file'),function(req,res,next){
     if(req.files.length){
         createFiles(req.files,req,next);
@@ -163,7 +166,9 @@ function(req,res){
             summary : req.body.summary,
             description : req.body.description
         },
-        wdate : nowDate
+        status : "bidding",
+        wdate : nowDate,
+        mdate : nowDate
         
     };
     Order.Summary.updateOne({ordernum:req.body.ordernum},summary,function(err,sum){
@@ -174,7 +179,7 @@ function(req,res){
             return res.redirect('/');
         }
         Log.create({document_name : "Summary",type:"update",contents:{summary:sum,content:"입찰 시도 update"},wdate:Date()});
-        Bid.Ing.findOneAndUpdate({ordernum:req.body.ordernum,vender : req.user.userid},bidding,{new:true,upsert:true},function(err2,bid){
+        Bid.findOneAndUpdate({ordernum:req.body.ordernum,vender : req.user.userid},bidding,{new:true,upsert:true},function(err2,bid){
             if(err2) {
                 Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"입찰 시도 upsert DB에러"},wdate:Date()});
                 req.flash("errors",{message:"DB Error"});
@@ -187,6 +192,12 @@ function(req,res){
     });
 });
 
+// 문의 팝업
+router.get('/qna',function(req,res){
+
+});
+
+// 팝업 닫기
 router.get('/close',function(req,res){
     res.render('pop/close');
 });
