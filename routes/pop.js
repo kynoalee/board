@@ -7,11 +7,13 @@ var config = require('../config/config');
 var File = require('../models/File');
 var Order = require('../models/Order');
 var Bid = require('../models/Bid');
+var Board = require('../models/Board');
 var Log = require('../models/Log');
 var util = require('../util'); // 1
 var download = require('../modules/download');
 var common = require("../modules/common");
 
+// 주문 정보 전부 보여주는 팝업 
 router.get('/detail',util.isLoggedin,function(req, res){
     var findObj = {ordernum : req.query.ordernum};
     if(req.user.userclass == "vender"){
@@ -112,6 +114,7 @@ router.get("/detail/:servername",util.isLoggedin,function(req,res){
     download.fileDownload(File,fileName,res);
 });
 
+// 입찰하기 위한 내용 입력
 router.get('/bid',util.isLoggedin,function(req,res){
     var errors = req.flash("errors")[0] || {};
     var bid = req.flash("bid")[0] || {};
@@ -136,6 +139,7 @@ var storage = multer.diskStorage({
 });
 var bid = multer({ storage: storage });
 
+// 입찰 내용 저장 
 router.post('/bid',util.isLoggedin,bid.array('file'),function(req,res,next){
     if(req.files.length){
         createFiles(req.files,req,next);
@@ -156,6 +160,8 @@ function(req,res){
     };
     var bidding = {
         userid : req.body.orderid,
+        vender : req.user.userid,
+        ordernum : req.body.ordernum,
         detail : {
             price : req.body.price,
             deadline : req.body.deadline,
@@ -163,30 +169,77 @@ function(req,res){
             summary : req.body.summary,
             description : req.body.description
         },
-        wdate : nowDate
+        status : "bidding",
+        wdate : nowDate,
+        mdate : nowDate
         
     };
-    Order.Summary.updateOne({ordernum:req.body.ordernum},summary,function(err,sum){
-        if(err) {
-            Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"입찰 시도 update DB에러"},wdate:Date()});
-            console.log(err);
-            req.flash("errors",{message:"DB Error"});
+    Bid.findOne({}).sort({bidnum:-1}).select("bidnum").exec(function(err1,bidnum){
+        if(err1){
+            Log.create({document_name : "Summary",type:"error",contents:{error:err1,content:"마지막 bidnum 가져오는 find DB 에러"},wdate:Date()});
+            console.log(err1);
+            req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
         }
-        Log.create({document_name : "Summary",type:"update",contents:{summary:sum,content:"입찰 시도 update"},wdate:Date()});
-        Bid.Ing.findOneAndUpdate({ordernum:req.body.ordernum,vender : req.user.userid},bidding,{new:true,upsert:true},function(err2,bid){
-            if(err2) {
-                Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"입찰 시도 upsert DB에러"},wdate:Date()});
+        bidding.bidnum = bidnum.bidnum + 1;
+
+        Order.Summary.updateOne({ordernum:req.body.ordernum},summary,function(err,sum){
+            if(err) {
+                Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"입찰 시도 update DB에러"},wdate:Date()});
+                console.log(err);
                 req.flash("errors",{message:"DB Error"});
                 return res.redirect('/');
             }
-            Log.create({document_name : "Bid",type:"upsert",contents:{bid : bidding,content:"입찰 시도 upsert"},wdate:Date()});
-            res.redirect('/pop/close');
-        });
+            Log.create({document_name : "Summary",type:"update",contents:{summary:sum,content:"입찰 시도 update"},wdate:Date()});
+            Bid.create(bidding,function(err2,bid){
+                if(err2) {
+                    Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"입찰 시도 create DB에러"},wdate:Date()});
+                    req.flash("errors",{message:"DB Error"});
+                    return res.redirect('/');
+                }
+                Log.create({document_name : "Bid",type:"create",contents:{bid : bidding,content:"입찰 시도 create"},wdate:Date()});
+                res.redirect('/pop/close');
+            });
 
+        });
     });
 });
 
+// 문의 팝업
+router.get('/qna',function(req,res){
+    var qna = req.flash('qna')||{};
+    var errors = req.flash('errors')||{};
+    // 관련 질문이 있는지 파악
+    Board.findOne({linknum : req.query.linknum, children : -1},function(err,board){
+
+        let exQnaList = {
+            exQnaDisplay : "display-none",
+            lastQnaDisplay : "display-none"
+        };
+
+        if(board){
+            exQnaList.lastQnaDisplay = '';
+            exQnaList.lastData = board;
+            if(board.where == 'bid'){
+                exQnaList.lastData.whereName = "입찰";
+            }
+            // 부모 있는지 확인 ( 직전 외 이전 문의 찾기 )
+            if(board.parents != -1){
+                exQnaList.exQnaDisplay = '';
+            }
+            
+        }
+        res.render('pop/qna',{
+            qnaList : exQnaList,
+            qna:qna,
+            errors:errors
+        });
+    });
+});
+
+// 문의 
+
+// 팝업 닫기
 router.get('/close',function(req,res){
     res.render('pop/close');
 });

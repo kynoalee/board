@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <%- include('../partials/head') %>
+    <script src="/js/qna.js"></script>
+    <link rel="stylesheet" href="/css/qna.css">
+    </head>
+    <body>
+        <div class="container mb-3">
+            <form action="/pop/qna" method="post" enctype="multipart/form-data"> 
+                <div class="form-group">
+                    <h2>문의</h2>
+                </div>
+                <div class="<%=qnaList.exQnaDisplay%>">
+                    <button onclick="exQnaList()">이전 문의 보기</button>
+                </div>    
+                <div class="<%=qnaList.lastQnaDisplay%>">
+                    <div>qna번호 <%=qnaList.lastData.qnanum%></div>
+                    <div>연결된 <%=qnaList.lastData.whereName%>번호 <%=qnaList.lastData.linknum%> </div>
+                    <div>문의자 <%=qnaList.lastData.userid%></div>
+                    <div>요약 <%=qnaList.lastData.summary%></div>
+                    <div>내용 <%=qnaList.lastData.contents%></div>
+                    <%if(qnaList.lastData.nego == true){%>
+                    <div>제안된 가격 <%=qnaList.lastData.price%></div>
+                    <div>제안된 마감시기 <%=qnaList.lastData.deadline%></div>
+                    <%}%>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <select name="qnaKind" id="qnaKind" onchange="setQnaHtml()">
+                            <option value="">--문의 종류--</option>
+                            <option value="qna">단순 질의</option>
+                            <option value="nego">입찰 내용 협상</option>
+                        </select>
+                    </div>
+                    <div id='nego' style="display:none">
+                        <div class="form-group">
+                            <label for="price">공정 가격</label>
+                            <input type="text" id="price" name="price" value="<%=qna.price %>" class="form-control <%= (errors.price)?'is-invalid':'' %>">
+                            <% if(errors.price){ %>
+                            <span class="invalid-feedback"><%= errors.price.message %></span>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% if(errors.unhandled){ %>
+                    <div class="invalid-feedback d-block">
+                        <%= errors.unhandled %>
+                    </div>
+                    <% } %>
+                </div>
+                
+                
+                <div>
+                    <button id="submitBtn" type="submit" class="btn btn-primary" disabled>Submit</button>
+                </div>  
+            </form>
+        </div>
+    </body>
+</html>
