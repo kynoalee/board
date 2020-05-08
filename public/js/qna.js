@@ -1,15 +1,15 @@
 function setQnaHtml(){
     if($('#qnaKind').val() == 'nego'){
-        $('#nego').css({"display":"block"});
+        $('#nego').removeClass('display-none');
         $('#nego').children('div').children("input[name=price]").prop("disabled",false);
     } else{
-        $('#nego').css({"display":"none"});
+        $('#nego').addClass('display-none');
         $('#nego').children('div').children("input[name=price]").prop("disabled",true);
     }
     if(!$('#qnaKind').val()){
-        $('#submitBtn').prop('disabled',true);
+        $('#submitBtn').addClass('display-none');
     } else{
-        $('#submitBtn').prop('disabled',false);
+        $('#submitBtn').removeClass('display-none');
     }
 }
 

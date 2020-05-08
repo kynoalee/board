@@ -102,3 +102,7 @@ function goPage(des){
     window.location.replace('/order');
   }
 }
+
+function closePage(){
+  window.close();
+}
