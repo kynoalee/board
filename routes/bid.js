@@ -5,6 +5,7 @@ var common = require('../modules/common');
 var util = require('../util'); // 1
 var File = require('../models/File');
 var Bid = require('../models/Bid');
+var Board = require('../models/Board');
 var Log = require('../models/Log');
 var Order = require('../models/Order');
 var download = require('../modules/download');
@@ -83,7 +84,7 @@ router.get('/bidVenderIn/:servername',util.isLoggedin,function(req,res){
     download.fileDownload(File,fileName,res);
 });
 
-router.get('/bidList',util.isLoggedin,function(req,res){
+router.get('/bidList',util.isLoggedin,function(req,res,next){
     var userid = req.user.userid;
     var userclass = req.user.userclass; 
     var findObj = {};
@@ -92,7 +93,7 @@ router.get('/bidList',util.isLoggedin,function(req,res){
     } else if(userclass == 'vender'){
         findObj.vender = userid;
     }
-    Bid.find(findObj,function(err,bid){
+    Bid.find(findObj,(err,bid)=>{
         if(err){
             Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰된 리스트 find DB에러"},wdate:Date()});
             console.log(err);
@@ -107,8 +108,18 @@ router.get('/bidList',util.isLoggedin,function(req,res){
         var bidDoneList = [];
         for(let val of bid){
             if(val.status.toLowerCase() == 'bidding'){
-            
                 let tmpObj = setTmpArrayForBidList(val,userclass);
+
+                if(userclass == 'vender'){
+                    tmpObj.qnaAble = false;
+
+                    // qna 및 nego 내용 추출
+                    Board.findOne({linknum:val.bidnum}).sort({qnanum:1}).select('qnanum').exec((err,board)=>{
+                        if(board.qnanum){
+                            tmpObj.qnaAble = true;
+                        }
+                    });
+                }
                 
                 // post 전용 데이터
                 tmpObj.vender = val.vender;
@@ -126,15 +137,13 @@ router.get('/bidList',util.isLoggedin,function(req,res){
                 bidDoneList.push(tmpObj);
             }
         }
-    
-        res.render('bid/bidList',{
-            bidding : biddingList,
-            bidDone : bidDoneList
-        });
-        
-        
+
+    res.render('bid/bidList',{
+        bidding : biddingList,
+        bidDone : bidDoneList
     });
-});
+}
+);
 
 router.post('/bidList',function(req,res){
     if(req.user.userclass == 'vender'){
@@ -332,3 +341,4 @@ function setTmpArrayForBidVenderIn(value){
     
     return tmpSummary;
 }
+

@@ -41,9 +41,13 @@ function getDetailInfo(ordernum,fileLinks){
                         $("#detailOrder"+ordernum).find(item2).children(".file-list").html(html);
                     }
                     $("#detailOrder"+ordernum).find(item2).css({"display":"block"});
+                } else if(result.result == "mongo error"){
+                    alert("DB Error");
+                } else if(result.result == "noFiles"){
+                    alert("no files");
                 }
             }
-        })
+        });
     }
 
 }

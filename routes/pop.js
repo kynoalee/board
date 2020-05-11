@@ -13,13 +13,26 @@ var util = require('../util'); // 1
 var download = require('../modules/download');
 var common = require("../modules/common");
 
+// 파일 서버 업로드 소스
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let newName = createServerName(file.originalname);
+        cb(null, config.file.local+newName.addPath)
+    },
+    filename: function (req, file, cb) {
+        let newName = createServerName(file.originalname);
+        cb(null, newName.serverName)
+    }
+});
+var files = multer({ storage: storage });
+
 // 주문 정보 전부 보여주는 팝업 
 router.get('/detail',util.isLoggedin,function(req, res){
     var findObj = {ordernum : req.query.ordernum};
     if(req.user.userclass == "vender"){
         findObj.vender = req.user.userid;
     } else if(req.user.userclass == "normal") {
-        fundObj.userid = req.user.userid;
+        findObj.userid = req.user.userid;
     }
     var filesInfo = [];
     Order.Summary.find(findObj,function(err,summary){
@@ -79,7 +92,7 @@ router.get('/detail',util.isLoggedin,function(req, res){
     
                 // 상태 값 시각화
                 var statusName;
-                switch(request.status){
+                switch(req.query.status){
                     case '1' : statusName = nameSetting.statusName.status1; 
                         break;
                     case '2' : statusName = nameSetting.statusName.status2; 
@@ -127,20 +140,10 @@ router.get('/bid',util.isLoggedin,function(req,res){
         orderid : orderid
     });
 });
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        let newName = createServerName(file.originalname);
-        cb(null, config.file.local+newName.addPath)
-    },
-    filename: function (req, file, cb) {
-        let newName = createServerName(file.originalname);
-        cb(null, newName.serverName)
-    }
-});
-var bid = multer({ storage: storage });
+
 
 // 입찰 내용 저장 
-router.post('/bid',util.isLoggedin,bid.array('file'),function(req,res,next){
+router.post('/bid',util.isLoggedin,files.array('file'),function(req,res,next){
     if(req.files.length){
         createFiles(req.files,req,next);
     } else{
@@ -206,29 +209,50 @@ function(req,res){
 });
 
 // 문의 팝업
-router.get('/qna',function(req,res){
+router.get('/qna',util.isLoggedin,function(req,res){
     var qna = req.flash('qna')||{};
     var errors = req.flash('errors')||{};
+    var userid =  req.query.userid;
+    var userclass = req.query.userclass;
     // 관련 질문이 있는지 파악
     Board.findOne({linknum : req.query.linknum, children : -1},function(err,board){
-
+        if(err){
+            Log.create({document_name : "Board",type:"error",contents:{error:err,content:"linknum에 걸린 부모 문의 find DB 에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
         let exQnaList = {
+            linknum : req.query.linknum,
             exQnaDisplay : "display-none",
-            lastQnaDisplay : "display-none"
+            lastQnaDisplay : "display-none",
+            qnaDisplay : "display-none",
+            parents : -1
         };
 
+        // 이전 문의 있을 시 
         if(board){
+            exQnaList.parents = board.qnanum;
             exQnaList.lastQnaDisplay = '';
             exQnaList.lastData = board;
+            exQnaList.wdate = moment(board.wdate).format("YYYY-MM-DD HH:mm:ss");
+            exQnaList.mdate = moment(board.mdate).format("YYYY-MM-DD HH:mm:ss");
+            // 문의 연결 정보 텍스트화
             if(board.where == 'bid'){
                 exQnaList.lastData.whereName = "입찰";
             }
+
+            // 직전문의를 쓴 문의자가 현재 나였는지 파악
+            if(userid != board.userid || userclass != board.userclass){
+                exQnaList.qnaDisplay = '';
+            }
+
             // 부모 있는지 확인 ( 직전 외 이전 문의 찾기 )
             if(board.parents != -1){
                 exQnaList.exQnaDisplay = '';
             }
-            
         }
+
         res.render('pop/qna',{
             qnaList : exQnaList,
             qna:qna,
@@ -237,12 +261,116 @@ router.get('/qna',function(req,res){
     });
 });
 
-// 문의 
+// 문의 create
+router.post('/qna',util.isLoggedin,files.array('file'),function(req,res,next){
+    // 파일 업로드가 있는지 확인
+    if(req.files.length){
+        createFiles(req.files,req,next);
+    } else{
+        console.log("upload nothing");
+        req.body.filelink = null;
+        req.files = [''];
+        next();
+    }
+},
+function(req,res){
+    var now = Date();
+    // qnanum 생성
+    Board.findOne({}).sort({qnanum:-1}).select("qnanum").exec(function(err1,qnanum){
+        if(err1){
+            Log.create({document_name : "Board",type:"error",contents:{error:err1,content:"마지막 qnanum 가져오는 find DB 에러"},wdate:Date()});
+            console.log(err1);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
+        // 질의 상태에 따른 처리 시스템상 완전 다른 방향
+        // 필수로 넘겨야 하는 정보 저장
+        var createData = {
+            qnanum : qnanum.qnanum + 1,
+            where : req.body.where,
+            linknum : req.body.linknum,
+            userid : req.user.userid,
+            userclass : req.user.userclass,
+            summary : req.body.summary,
+            contents : req.body.contents,
+            filelinks : req.body.filelink,
+            parents : req.body.parents,
+            children : -1,
+            wdate : now,
+            mdate : now
+        };
+
+        switch(req.body.qnaKind){
+            case 'qna':
+                createData.nego = false;
+                createQnaDocument(createData);
+                return res.redirect('/pop/qna');
+            case 'nego' :
+                createData.nego = true;
+                (async()=>{
+                    // 추가 정보 입력
+                    if(req.body.price)
+                        createData.price = req.body.price;
+                    if(req.body.deadline)
+                        createData.deadline = req.body.deadline;
+                    
+                    // 네고 문의일때 
+                    createData.negoConfirm = false;
+
+                    // 큐 앤에이
+                    await createQnaDocument(createData);
+
+                    // 네고 작성일 시
+                    return res.redirect('/pop/qna');
+                    // 네고
+
+                })();
+                break;
+            default : break;
+        }
+    });
+});
 
 // 팝업 닫기
 router.get('/close',function(req,res){
     res.render('pop/close');
 });
+
+async function createQnaDocument(createObj){
+    // 현재 문의 DB 저장
+    await Board.create(createObj,function(err){
+        if(err){
+            Log.create({document_name : "Board",type:"error",contents:{error:err,content:"문의 create DB 에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
+        Log.create({document_name : "Board",type:"create",contents:{create:createObj,content:"문의 create"},wdate:Date()});
+    });
+
+    // 직전 문의가 있을 경우
+    if(createObj.parents != -1){
+        // 직전 문의에 child 노드 값 update
+        await Board.findOne({qnanum : createObj.parents},function(err,board){
+            if(err){
+                Log.create({document_name : "Board",type:"error",contents:{error:err,content:"부모문의 노드 연결을 위한 부모문의 find DB 에러"},wdate:Date()});
+                console.log(err);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }
+            let updateObj = {children : createObj.qnanum ,mdate : createObj.mdate};
+            Board.updateOne({qnanum : createObj.parents}, updateObj,function(err2){
+                if(err2){
+                    Log.create({document_name : "Board",type:"error",contents:{error:err2,content:"부모문의의 자손 노드 update DB 에러"},wdate:Date()});
+                    console.log(err2);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }
+                Log.create({document_name : "Board",type:"update",contents:{update:updateObj,content:"부모문의의 자손 노드 update"},wdate:Date()});
+            });
+        });
+    }
+}
 
 function delayFileCreate(creatObj) {
     return new Promise(resolve => 
@@ -276,20 +404,6 @@ async function createFiles(array,req,next) {
   next();
 }
 
-function calculateByte(byte){
-    let calByte = 0;
-    let stringByte = 'Byte';
-    if(byte>=1000 && byte < 1000000){
-        calByte = (byte / 1000).toFixed(2);
-        stringByte = "KB";
-    } else if(byte >1000000){
-        calByte = (byte / 1000000).toFixed(2);
-        stringByte = "MB";
-    } else {
-        calByte = byte;
-    }
-    return calByte+stringByte;
-}
 // 업로드 파일 서버 저장용 이름 설정
 function createServerName(origin){
     let originSplitName = origin.split('.');
