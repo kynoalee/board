@@ -308,7 +308,20 @@ function(req,res){
             case 'nego' :
                 createData.nego = true;
                 (async()=>{
+                    // 추가 정보 입력
+                    if(req.body.price)
+                        createData.price = req.body.price;
+                    if(req.body.deadline)
+                        createData.deadline = req.body.deadline;
+                    
+                    // 네고 문의일때 
+                    createData.negoConfirm = false;
+
                     // 큐 앤에이
+                    await createQnaDocument(createData);
+
+                    // 네고 작성일 시
+                    return res.redirect('/pop/qna');
                     // 네고
 
                 })();
