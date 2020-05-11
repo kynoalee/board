@@ -34,11 +34,20 @@
                   <td class="align-middle"><%=obj.anotherId%></td>
                   <td class="align-middle"><%=obj.summary%></td>
                   <td class="align-middle"><%=obj.description%></td>
+                  <%if(currentUser.userclass == "vender"){%>
+                  <td>
+                    <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','<%=obj.customer%>','cancel')">취소</button></div>
+                    <%if(obj.qnaAble){%>
+                    <div><button onclick="goQna('<%=obj.bidnum%>','<%=currentUser.userid%>','<%=currentUser.userclass%>','bid')">문의</button></div>
+                    <%}%>
+                  </td>
+                  <%} else if(currentUser.userclass == "normal"){%>
                   <td>
                     <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','<%=obj.customer%>','select')">선정</button></div>
                     <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','<%=obj.customer%>','reject')">거절</button></div>
                     <div><button onclick="goQna('<%=obj.bidnum%>','<%=currentUser.userid%>','<%=currentUser.userclass%>','bid')">문의</button></div>
                   </td>
+                  <%}%>
               </tr>
           <%}%>             
         </tbody>

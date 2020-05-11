@@ -13,6 +13,7 @@ var bidSchema = mongoose.Schema({
   status : String, 
   // bidding, select, reject, delete
   // (입찰, 선정, 거절, 삭제)
+  check : Boolean,
   wdate : Date,
   mdate : Date,
   donedate : Date

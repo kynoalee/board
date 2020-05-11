@@ -13,7 +13,7 @@ function setQnaHtml(){
     }
 }
 
-function exQnaList(linknum,startnum){
+function exQnaList(linknum,endnum){
     var item1 = $( "div.waiting" );
     item1.css({"display":"block"});
     $.ajax({
@@ -21,7 +21,7 @@ function exQnaList(linknum,startnum){
         type : "POST",
         data : {
             linknum : linknum,
-            qnanum : startnum
+            qnanum : endnum
         },
         success : function(result){
             if(result.result == "success"){
