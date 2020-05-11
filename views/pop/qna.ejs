@@ -3,6 +3,7 @@
     <head>
     <%- include('../partials/head') %>
     <script src="/js/qna.js"></script>
+    <script src="/js/upload.js"></script>
     <link rel="stylesheet" href="/css/qna.css">
     </head>
     <body>
@@ -11,12 +12,23 @@
                 <div class="form-group">
                     <h2>문의</h2>
                 </div>
-                <div class="<%=qnaList.exQnaDisplay%>">
-                    <button onclick="exQnaList()">이전 문의 보기</button>
+                <div class="<%=qnaList.exQnaDisplay%> border-black">
+                    <button class="exQnaBtn" type="button" onclick="exQnaList('<%=qnaList.linknum%>','<%=qnaList.lastData.qnanum%>')">이전 문의 보기</button>
+                    <div class="waiting">
+                      <span class="ouro ouro3">
+                        <span class="left"><span class="anim"></span></span>
+                        <span class="right"><span class="anim"></span></span>
+                      </span>
+                    </div>
+                    <div class="done">
+                      <div class="qnaList">
+                      </div>
+                    </div>
                 </div>    
-                <div class="<%=qnaList.lastQnaDisplay%>">
+                <div class="<%=qnaList.lastQnaDisplay%> border-black">
                     <div>qna번호 <%=qnaList.lastData.qnanum%></div>
                     <div>연결된 <%=qnaList.lastData.whereName%>번호 <%=qnaList.lastData.linknum%> </div>
+                    <div>날짜(수정) <%=qnaList.wdate%> (<%=qnaList.mdate%>)</div>
                     <div>문의자 <%=qnaList.lastData.userid%></div>
                     <div>요약 <%=qnaList.lastData.summary%></div>
                     <div>내용 <%=qnaList.lastData.contents%></div>
@@ -25,15 +37,43 @@
                     <div>제안된 마감시기 <%=qnaList.lastData.deadline%></div>
                     <%}%>
                 </div>
-                <div>
+                <div class="inputDiv <%=qnaList.qnaDisplay%>">
                     <div class="form-group">
                         <select name="qnaKind" id="qnaKind" onchange="setQnaHtml()">
                             <option value="">--문의 종류--</option>
                             <option value="qna">단순 질의</option>
                             <option value="nego">입찰 내용 협상</option>
                         </select>
+
+                        <div class="form-group">
+                            <label for="file">File Upload</label> 
+                            <!-- 여러파일 넣고 빼기 되도록 , 넣는파일 설명-->
+                            <div>
+                              <input type="file" id='file' onchange="listFiles('file','fileList')" name='file' multiple/>       
+                            </div>
+                            <div id="fileList">
+                              <div>파일 모음</div>
+                            </div>
+                            <% if(errors){ %>
+                              <span class="invalid-feedback"><%= JSON.stringify(errors) %></span>
+                            <% } %>
+                          </div>
+                          <div class="form-group">
+                            <label for="summary">summary *</label>
+                            <input type="text" id="summary" name="summary" value="<%=qna.summary %>" class="form-control <%= (errors.summary)?'is-invalid':'' %>">
+                            <% if(errors.summary){ %>
+                              <span class="invalid-feedback"><%= errors.summary.message %></span>
+                            <% } %>
+                          </div>
+                          <div class="form-group">
+                            <label for="contents">내용 *</label>
+                            <textarea id="contents" name="contents" rows="5" class="form-control <%= (errors.contents)?'is-invalid':'' %>"><%=qna.contents %></textarea>
+                            <% if(errors.contents){ %>
+                              <span class="invalid-feedback"><%= errors.contents.message %></span>
+                            <% } %>
+                          </div>
                     </div>
-                    <div id='nego' style="display:none">
+                    <div id='nego' class="display-none">
                         <div class="form-group">
                             <label for="price">공정 가격</label>
                             <input type="text" id="price" name="price" value="<%=qna.price %>" class="form-control <%= (errors.price)?'is-invalid':'' %>">
@@ -41,18 +81,30 @@
                             <span class="invalid-feedback"><%= errors.price.message %></span>
                             <% } %>
                         </div>
+                        <div class="form-group">
+                            <label for="deadline">마감기간</label>
+                            <!-- 날짜 api -->
+                            <input type="text" id="endDate" name="deadline" class = "form-control">
+                            <% if(errors.deadline){ %>
+                              <span class="invalid-feedback"><%= errors.deadline.message %></span>
+                            <% } %>
+                          </div>
                     </div>
                     <% if(errors.unhandled){ %>
                     <div class="invalid-feedback d-block">
                         <%= errors.unhandled %>
                     </div>
                     <% } %>
+                    <input type="hidden" name="where" value ="bid">
+                    <input type="hidden" name="linknum" value = "<%=qnaList.linknum%>">
+                    <input type="hidden" name="parents" value = "<%=qnaList.parents%>">
+                    <div>
+                        <button id="submitBtn" type="submit" class="btn btn-primary display-none">Submit</button>
+                    </div>  
                 </div>
-                
-                
                 <div>
-                    <button id="submitBtn" type="submit" class="btn btn-primary" disabled>Submit</button>
-                </div>  
+                    <button id="submitBtn" type="button" class="btn btn-danger" onclick ="closePage()">닫기</button>
+                </div>
             </form>
         </div>
     </body>

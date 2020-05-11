@@ -9,7 +9,7 @@
   <body>
     <%- include('../partials/nav') %>
     <h1>입찰 리스트</h1>
-    <table class="table table-hover">
+    <table class="table table-striped">
       <thead>
           <tr>
               <th>입찰번호</th>
@@ -34,17 +34,26 @@
                   <td class="align-middle"><%=obj.anotherId%></td>
                   <td class="align-middle"><%=obj.summary%></td>
                   <td class="align-middle"><%=obj.description%></td>
+                  <%if(currentUser.userclass == "vender"){%>
+                  <td>
+                    <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','<%=obj.customer%>','cancel')">취소</button></div>
+                    <%if(obj.qnaAble){%>
+                    <div><button onclick="goQna('<%=obj.bidnum%>','<%=currentUser.userid%>','<%=currentUser.userclass%>','bid')">문의</button></div>
+                    <%}%>
+                  </td>
+                  <%} else if(currentUser.userclass == "normal"){%>
                   <td>
                     <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','<%=obj.customer%>','select')">선정</button></div>
                     <div><button onclick="selectThisOrder('<%=obj.ordernum%>','<%=obj.vender%>','<%=obj.customer%>','reject')">거절</button></div>
                     <div><button onclick="goQna('<%=obj.bidnum%>','<%=currentUser.userid%>','<%=currentUser.userclass%>','bid')">문의</button></div>
                   </td>
+                  <%}%>
               </tr>
           <%}%>             
         </tbody>
     </table>
     <h1>입찰 내역</h1>
-    <table class="table table-hover">
+    <table class="table table-striped">
       <thead>
           <tr>
               <th>입찰번호</th>
