@@ -36,24 +36,24 @@ router.post('/getFiles',function(req,res){
 router.post('/getQnaList',function(req,res){
     (async()=>{
         // 연결 문의 중 직전 문의 내용 가져오기
-        let nowQnaNum = req.body.qnanum;
         let qnaListsData = [];
         // 부모 노드가 없을 시까지 루프 
         await (async()=>{
-            console.log("loop start");
-            while(nowQnaNum != -1){
-                console.log("qnanum : " + nowQnaNum);
-                await Board.findOne({qnanum : nowQnaNum},function(err,board){
-                    if(err){
-                        Log.create({document_name : "Board",type:"error",contents:{error:err,content:"이전 문의 내용 find 중 DB 에러"},wdate:Date()});
-                        console.log(err);
-                        return res.send({result:"mongo error"});
+            console.log("linknum : " + req.body.linknum);
+            await Board.find({linknum : req.body.linknum},function(err,board){
+                if(err){
+                    Log.create({document_name : "Board",type:"error",contents:{error:err,content:"이전 문의 내용 find 중 DB 에러"},wdate:Date()});
+                    console.log(err);
+                    return res.send({result:"mongo error"});
+                }
+                here : for(let val of board){
+                    if(val.qnanum == req.body.qnanum){
+                        break here;
                     }
-                    qnaListsData.unshift(board);
-                    nowQnaNum = board.parents;
-                });
-            }
-            console.log('loop done');
+                    qnaListsData.push(val);
+                }
+            });
+            
         })();
         await (function(){
             console.log("all done");
