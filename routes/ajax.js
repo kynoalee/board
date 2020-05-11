@@ -1,6 +1,7 @@
 var express  = require('express');
 var router = express.Router();
 var File = require("../models/File");
+var Board = require("../models/Board");
 var Log = require("../models/Log");
 var common = require("../modules/common");
 
@@ -30,6 +31,36 @@ router.post('/getFiles',function(req,res){
     }else{
         return res.send({result:"noFiles"});
     }
+});
+
+router.post('/getQnaList',function(req,res){
+    (async()=>{
+        // 연결 문의 중 직전 문의 내용 가져오기
+        let nowQnaNum = req.body.qnanum;
+        let qnaListsData = [];
+        // 부모 노드가 없을 시까지 루프 
+        await (async()=>{
+            console.log("loop start");
+            while(nowQnaNum != -1){
+                console.log("qnanum : " + nowQnaNum);
+                await Board.findOne({qnanum : nowQnaNum},function(err,board){
+                    if(err){
+                        Log.create({document_name : "Board",type:"error",contents:{error:err,content:"이전 문의 내용 find 중 DB 에러"},wdate:Date()});
+                        console.log(err);
+                        return res.send({result:"mongo error"});
+                    }
+                    qnaListsData.unshift(board);
+                    nowQnaNum = board.parents;
+                });
+            }
+            console.log('loop done');
+        })();
+        await (function(){
+            console.log("all done");
+            res.send({result:"success",data:qnaListsData});
+        }
+        )();
+    })();
 });
 
 module.exports = router;

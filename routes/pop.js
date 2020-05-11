@@ -32,7 +32,7 @@ router.get('/detail',util.isLoggedin,function(req, res){
     if(req.user.userclass == "vender"){
         findObj.vender = req.user.userid;
     } else if(req.user.userclass == "normal") {
-        fundObj.userid = req.user.userid;
+        findObj.userid = req.user.userid;
     }
     var filesInfo = [];
     Order.Summary.find(findObj,function(err,summary){
@@ -92,7 +92,7 @@ router.get('/detail',util.isLoggedin,function(req, res){
     
                 // 상태 값 시각화
                 var statusName;
-                switch(request.status){
+                switch(req.query.status){
                     case '1' : statusName = nameSetting.statusName.status1; 
                         break;
                     case '2' : statusName = nameSetting.statusName.status2; 
@@ -275,6 +275,7 @@ router.post('/qna',util.isLoggedin,files.array('file'),function(req,res,next){
 },
 function(req,res){
     var now = Date();
+    // qnanum 생성
     Board.findOne({}).sort({qnanum:-1}).select("qnanum").exec(function(err1,qnanum){
         if(err1){
             Log.create({document_name : "Board",type:"error",contents:{error:err1,content:"마지막 qnanum 가져오는 find DB 에러"},wdate:Date()});
@@ -299,11 +300,11 @@ function(req,res){
             mdate : now
         };
 
-        switch(req.body.nego){
+        switch(req.body.qnaKind){
             case 'qna':
                 createData.nego = false;
                 createQnaDocument(createData);
-                return res.redirect('/qna');
+                return res.redirect('/pop/qna');
             case 'nego' :
                 createData.nego = true;
                 (async()=>{
