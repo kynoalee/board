@@ -13,7 +13,9 @@
                     <h2>문의</h2>
                 </div>
                 <div class="<%=qnaList.exQnaDisplay%> border-black">
+                  <%if(!qnaList.exQnaDisplay){%>
                     <button class="exQnaBtn" type="button" onclick="exQnaList('<%=qnaList.linknum%>','<%=qnaList.lastData.qnanum%>')">이전 문의 보기</button>
+                  <%}%>
                     <div class="waiting">
                       <span class="ouro ouro3">
                         <span class="left"><span class="anim"></span></span>
@@ -24,7 +26,8 @@
                       <div class="qnaList">
                       </div>
                     </div>
-                </div>    
+                </div>
+                <%if(!qnaList.lastQnaDisplay){%>    
                 <div class="<%=qnaList.lastQnaDisplay%> border-black">
                     <div>qna번호 <%=qnaList.lastData.qnanum%></div>
                     <div>연결된 <%=qnaList.lastData.whereName%>번호 <%=qnaList.lastData.linknum%> </div>
@@ -37,15 +40,25 @@
                     <div>제안된 마감시기 <%=qnaList.lastData.deadline%></div>
                     <%}%>
                 </div>
+                <%}%>
                 <div class="inputDiv <%=qnaList.qnaDisplay%>">
                     <div class="form-group">
-                        <select name="qnaKind" id="qnaKind" onchange="setQnaHtml()">
+                        
+                        <div class="<%=qnaList.negoDisplay%>">
+                          <button type="button" id="acceptBtn" class="btn btn-primary">수락</button>
+                          <button type="button" id="rejectBtn" class="btn btn-danger">거절</button>
+                          <button type="button" id="qnaBtn" class="btn btn-secondary">문의</button>
+                        </div>
+                        <div id="inputName"></div>
+                        <div class="<%=qnaList.noNegoDisplay%>">
+                          <select name="qnaKind" id="qnaKind" onchange="setQnaHtml()">
                             <option value="">--문의 종류--</option>
                             <option value="qna">단순 질의</option>
                             <option value="nego">입찰 내용 협상</option>
-                        </select>
-
-                        <div class="form-group">
+                          </select>
+                        </div>
+                        <div class="requiredDiv display-none">
+                          <div id="fileUpload" class="form-group">
                             <label for="file">File Upload</label> 
                             <!-- 여러파일 넣고 빼기 되도록 , 넣는파일 설명-->
                             <div>
@@ -72,10 +85,14 @@
                               <span class="invalid-feedback"><%= errors.contents.message %></span>
                             <% } %>
                           </div>
+                        </div>
                     </div>
                     <div id='nego' class="display-none">
                         <div class="form-group">
-                            <label for="price">공정 가격</label>
+                            <div>
+                              <div><label for="price">가격 변경</label></div>
+                              <div>현재 입찰 가격 : <span class="nowPrice"><%=qnaList.nowData.price%></span> <span class="diffPer"></span></div>
+                            </div>
                             <input type="text" id="price" name="price" value="<%=qna.price %>" class="form-control <%= (errors.price)?'is-invalid':'' %>">
                             <% if(errors.price){ %>
                             <span class="invalid-feedback"><%= errors.price.message %></span>
@@ -99,11 +116,11 @@
                     <input type="hidden" name="linknum" value = "<%=qnaList.linknum%>">
                     <input type="hidden" name="parents" value = "<%=qnaList.parents%>">
                     <div>
-                        <button id="submitBtn" type="submit" class="btn btn-primary display-none">Submit</button>
+                        <button id="submitBtn" type="submit" class="requiredDiv btn btn-primary display-none">Submit</button>
                     </div>  
                 </div>
                 <div>
-                    <button id="submitBtn" type="button" class="btn btn-danger" onclick ="closePage()">닫기</button>
+                    <button id="submitBtn" type="button" class="btn btn-dark" onclick ="closePage()">닫기</button>
                 </div>
             </form>
         </div>

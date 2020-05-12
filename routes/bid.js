@@ -84,7 +84,7 @@ router.get('/bidVenderIn/:servername',util.isLoggedin,function(req,res){
     download.fileDownload(File,fileName,res);
 });
 
-router.get('/bidList',util.isLoggedin,function(req,res,next){
+router.get('/bidList',util.isLoggedin,function(req,res){
     var userid = req.user.userid;
     var userclass = req.user.userclass; 
     var findObj = {};
@@ -106,26 +106,21 @@ router.get('/bidList',util.isLoggedin,function(req,res,next){
         }
         var biddingList = []; // 현재 입찰 중인 내역
         var bidDoneList = [];
+        var bidnumFindSet = [{linknum : -1}];
         for(let val of bid){
             if(val.status.toLowerCase() == 'bidding'){
                 let tmpObj = setTmpArrayForBidList(val,userclass);
-
+               
                 if(userclass == 'vender'){
                     tmpObj.qnaAble = false;
-
-                    // qna 및 nego 내용 추출
-                    Board.findOne({linknum:val.bidnum}).sort({qnanum:1}).select('qnanum').exec((err,board)=>{
-                        if(board.qnanum){
-                            tmpObj.qnaAble = true;
-                        }
-                    });
+                    bidnumFindSet.push({linknum : val.bidnum});
                 }
-                
+
                 // post 전용 데이터
                 tmpObj.vender = val.vender;
                 tmpObj.customer = val.userid;
 
-                biddingList.push(tmpObj);
+                biddingList[val.bidnum]=tmpObj;
             } else if(val.status.toLowerCase() == 'select' || val.status.toLowerCase() == 'reject'){
                 let tmpObj = setTmpArrayForBidList(val,userclass);
 
@@ -137,13 +132,39 @@ router.get('/bidList',util.isLoggedin,function(req,res,next){
                 bidDoneList.push(tmpObj);
             }
         }
+        Board.find({$or:bidnumFindSet,where:"bid"},(err2,board)=>{
+            if(err2){
+                Log.create({document_name : "Board",type:"error",contents:{error:err2,content:"각 입찰 관련 qna find DB에러"},wdate:Date()});
+                console.log(err2);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }
 
-    res.render('bid/bidList',{
-        bidding : biddingList,
-        bidDone : bidDoneList
+            for(let value of board){
+                biddingList[value.linknum].boardData = value;
+                biddingList[value.linknum].qnaAble = true;
+            }
+
+            // 배열 내  undefined 부분 삭제
+            biddingList.sort();
+            let max = biddingList.length;
+            let num = 0;
+            for(let i = 0 ; i < max ; i++){
+                if(!biddingList[num]){
+                    biddingList.pop();
+                } else {
+                    num += 1;
+                }
+            }
+
+            res.render('bid/bidList',{
+                bidding : biddingList,
+                bidDone : bidDoneList
+            });
+        });
+        
     });
-}
-);
+});
 
 router.post('/bidList',function(req,res){
     if(req.user.userclass == 'vender'){
@@ -341,4 +362,3 @@ function setTmpArrayForBidVenderIn(value){
     
     return tmpSummary;
 }
-
