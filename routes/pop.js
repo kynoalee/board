@@ -272,9 +272,6 @@ router.get('/qna',function(req,res){
                 }
                 exQnaList.nowData = {price : bid.detail.price , deadline : bid.detail.deadline};
 
-                // 네고 상태이면, 버튼 생성 및
-
-                console.log(exQnaList);
                 res.render('pop/qna',{
                     qnaList : exQnaList,
                     qna:qna,
@@ -330,7 +327,7 @@ function(req,res){
             case 'qna':
                 createData.nego = false;
                 createQnaDocument(createData);
-                return res.redirect('/pop/qna');
+                return res.redirect('/pop/close');
             case 'nego' :
                 // 네고 문의 일시
                 createData.nego = true;
@@ -345,7 +342,7 @@ function(req,res){
                 createData.negoConfirm = false;
 
                 createQnaDocument(createData);
-                return res.redirect('/pop/qna');
+                return res.redirect('/pop/close');
 
             case 'reject' :
                 createData.nego = true;

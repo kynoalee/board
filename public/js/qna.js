@@ -34,6 +34,10 @@ $(document).ready(()=>{
         var $option = $('<option value="reject" selected>거절</option>');
         $('#qnaKind').append($option);
     });
+
+    $('#acceptBtn').click(()=>{
+        // 승인 시 
+    });
 });
 function setQnaHtml(){
     if($('#qnaKind').val() == 'nego'){
