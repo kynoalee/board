@@ -2,10 +2,7 @@ var mongoose = require('mongoose');
 
 // schema
 var negoSchema = mongoose.Schema({
-    negonum : {
-        type:Number,
-        unique:true
-    },
+
     linkqnanum : Number,
     where : String,
     linknum : Number,
