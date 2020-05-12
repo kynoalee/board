@@ -1,3 +1,40 @@
+$(document).ready(()=>{
+    $('input[name=price]').keyup(()=>{
+        var nowPrice = $('.nowPrice').text();
+        var inputPrice = $('input[name=price]').val();
+        var diffPrice = (inputPrice - nowPrice);
+        var diffPer = Math.abs(diffPrice) / nowPrice * 100;
+        var innerText = '<span class="';
+        var tmpPer = '';
+        var tmpChange = '';
+        if(diffPrice > 0){
+            innerText += 'red">';
+            tmpChange = "인상";
+            tmpPer = '<span class="red">▲'+diffPer.toFixed(2)+'%</span>';
+        } else if (diffPrice < 0){
+            innerText += 'blue">';
+            tmpChange = "인하";
+            tmpPer = '<span class="blue">▼'+diffPer.toFixed(2)+'%</span>';
+        } else {
+            innerText += '">';
+            tmpChange = "변동 없음";
+            tmpPer = '<span>-'+diffPer.toFixed(2)+'%</span>';
+        }
+        innerText += "("+ Math.abs(diffPrice) + "원 "+tmpChange+" "+tmpPer +")"
+        $('.diffPer').html(innerText);
+    });
+
+    $('#rejectBtn').click(()=>{
+        // 파일 업로드 안보이게 , 거절은 무조건 거절만, 멘트 변경만 가능.
+        $('#fileUpload').addClass('display-none');
+        $('input[name=summary]').val('입찰내용 변경을 거절합니다.');
+        $('#contents').text('입찰 내용 변경을 거절하겠습니다.');
+        $('#inputName').html("<h2>거절</h2>");
+        $('.requiredDiv').removeClass('display-none');
+        var $option = $('<option value="reject" selected>거절</option>');
+        $('#qnaKind').append($option);
+    });
+});
 function setQnaHtml(){
     if($('#qnaKind').val() == 'nego'){
         $('#nego').removeClass('display-none');
@@ -7,9 +44,9 @@ function setQnaHtml(){
         $('#nego').children('div').children("input[name=price]").prop("disabled",true);
     }
     if(!$('#qnaKind').val()){
-        $('#submitBtn').addClass('display-none');
+        $('.requiredDiv').addClass('display-none');
     } else{
-        $('#submitBtn').removeClass('display-none');
+        $('.requiredDiv').removeClass('display-none');
     }
 }
 

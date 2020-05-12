@@ -106,7 +106,7 @@ router.get('/bidList',util.isLoggedin,function(req,res){
         }
         var biddingList = []; // 현재 입찰 중인 내역
         var bidDoneList = [];
-        var bidnumFindSet = [];
+        var bidnumFindSet = [{linknum : -1}];
         for(let val of bid){
             if(val.status.toLowerCase() == 'bidding'){
                 let tmpObj = setTmpArrayForBidList(val,userclass);

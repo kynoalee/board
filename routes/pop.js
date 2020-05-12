@@ -8,6 +8,7 @@ var File = require('../models/File');
 var Order = require('../models/Order');
 var Bid = require('../models/Bid');
 var Board = require('../models/Board');
+var Nego = require('../models/Nego');
 var Log = require('../models/Log');
 var util = require('../util'); // 1
 var download = require('../modules/download');
@@ -209,28 +210,29 @@ function(req,res){
 });
 
 // 문의 팝업
-router.get('/qna',util.isLoggedin,function(req,res){
+router.get('/qna',function(req,res){
     var qna = req.flash('qna')||{};
     var errors = req.flash('errors')||{};
-    var userid =  req.query.userid;
-    var userclass = req.query.userclass;
+    var userid = 'imgcom';//req.query.userid;
+    var userclass = 'normal';//req.query.userclass;
     // 관련 질문이 있는지 파악
-    Board.findOne({linknum : req.query.linknum, children : -1},function(err,board){
+    Board.findOne({linknum : req.query.linknum,where:req.query.where, children : -1},function(err,board){
         if(err){
             Log.create({document_name : "Board",type:"error",contents:{error:err,content:"linknum에 걸린 부모 문의 find DB 에러"},wdate:Date()});
             console.log(err);
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
         }
-        let exQnaList = {
+        var exQnaList = {
             linknum : req.query.linknum,
             exQnaDisplay : "display-none",
             lastQnaDisplay : "display-none",
-            qnaDisplay : "display-none",
+            qnaDisplay : "",
+            noNegoDisplay : "",
+            negoDisplay : "display-none",
             parents : -1
         };
 
-        // 이전 문의 있을 시 
         if(board){
             exQnaList.parents = board.qnanum;
             exQnaList.lastQnaDisplay = '';
@@ -242,22 +244,46 @@ router.get('/qna',util.isLoggedin,function(req,res){
                 exQnaList.lastData.whereName = "입찰";
             }
 
-            // 직전문의를 쓴 문의자가 현재 나였는지 파악
-            if(userid != board.userid || userclass != board.userclass){
-                exQnaList.qnaDisplay = '';
+            // 직전문의를 쓴 문의자가 현재 나였는지 파악 그리고 네고가 끝났는지 파악
+            if(userid == board.userid && userclass == board.userclass && !board.negoConfirm){
+                exQnaList.qnaDisplay = 'display-none';
             }
 
             // 부모 있는지 확인 ( 직전 외 이전 문의 찾기 )
             if(board.parents != -1){
                 exQnaList.exQnaDisplay = '';
             }
+            
+            // 직전 문의가 네고일시
+            if(board.nego && !board.negoConfirm){
+                exQnaList.noNegoDisplay = 'display-none';
+                exQnaList.negoDisplay = '';
+            }
         }
+        // 현재 설정된 가격과 마감시간 등 변경 데이터 검색
+        if(req.query.where == 'bid'){
+            // 입찰 중 협상 시 bid 데이터 검색
+            Bid.findOne({bidnum:req.query.linknum}).select('detail').exec((err2,bid)=>{
+                if(err2){
+                    Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"현재 입찰관련 상세 데이터 find DB 에러"},wdate:Date()});
+                    console.log(err2);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }
+                exQnaList.nowData = {price : bid.detail.price , deadline : bid.detail.deadline};
 
-        res.render('pop/qna',{
-            qnaList : exQnaList,
-            qna:qna,
-            errors:errors
-        });
+                // 네고 상태이면, 버튼 생성 및
+
+                console.log(exQnaList);
+                res.render('pop/qna',{
+                    qnaList : exQnaList,
+                    qna:qna,
+                    errors:errors
+                });
+            });
+        } else {
+            // 주문 진행 중 협상
+        }
     });
 });
 
@@ -299,33 +325,44 @@ function(req,res){
             wdate : now,
             mdate : now
         };
-
+        console.log("proccess : "+req.body.qnaKind);
         switch(req.body.qnaKind){
             case 'qna':
                 createData.nego = false;
                 createQnaDocument(createData);
                 return res.redirect('/pop/qna');
             case 'nego' :
+                // 네고 문의 일시
                 createData.nego = true;
-                (async()=>{
-                    // 추가 정보 입력
-                    if(req.body.price)
-                        createData.price = req.body.price;
-                    if(req.body.deadline)
-                        createData.deadline = req.body.deadline;
-                    
-                    // 네고 문의일때 
-                    createData.negoConfirm = false;
+                // 추가 정보 입력
+                if(req.body.price){
+                    createData.price = req.body.price;
+                }
+                if(req.body.deadline){
+                    createData.deadline = req.body.deadline;
+                }
 
-                    // 큐 앤에이
-                    await createQnaDocument(createData);
+                createData.negoConfirm = false;
 
-                    // 네고 작성일 시
-                    return res.redirect('/pop/qna');
-                    // 네고
+                createQnaDocument(createData);
+                return res.redirect('/pop/qna');
 
-                })();
-                break;
+            case 'reject' :
+                createData.nego = true;
+                createData.negoConfirm = true;
+                let negoData = {
+                    linkqnanum : createData.qnanum,
+                    where : createData.where,
+                    linknum : createData.linknum,
+
+                    status : 'reject',
+                    wdate : now
+                };
+
+                createQnaDocument(createData);
+                createNegoDocument(negoData);
+                return res.redirect('/pop/close');
+
             default : break;
         }
     });
@@ -369,6 +406,22 @@ async function createQnaDocument(createObj){
                 Log.create({document_name : "Board",type:"update",contents:{update:updateObj,content:"부모문의의 자손 노드 update"},wdate:Date()});
             });
         });
+    }
+}
+
+async function createNegoDocument(createObj){
+    // 확정 네고 저장
+    Nego.create(createObj,(err)=>{
+        if(err){
+            Log.create({document_name : "Nego",type:"error",contents:{error:err,content:"네고 create DB 에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
+        Log.create({document_name : "Nego",type:"create",contents:{create:createObj,content:"네고 create"},wdate:Date()});
+    });
+    if(createObj.status == 'accept'){
+
     }
 }
 
