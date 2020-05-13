@@ -210,11 +210,11 @@ function(req,res){
 });
 
 // 문의 팝업
-router.get('/qna',function(req,res){
+router.get('/qna',util.isLoggedin,function(req,res){
     var qna = req.flash('qna')||{};
     var errors = req.flash('errors')||{};
-    var userid = 'imgcom';//req.query.userid;
-    var userclass = 'normal';//req.query.userclass;
+    var userid = req.query.userid;
+    var userclass = req.query.userclass;
     // 관련 질문이 있는지 파악
     Board.findOne({linknum : req.query.linknum,where:req.query.where, children : -1},function(err,board){
         if(err){
@@ -326,7 +326,7 @@ function(req,res){
         switch(req.body.qnaKind){
             case 'qna':
                 createData.nego = false;
-                createQnaDocument(createData);
+                createQnaDocument(req,res,createData);
                 return res.redirect('/pop/close');
             case 'nego' :
                 // 네고 문의 일시
@@ -341,7 +341,7 @@ function(req,res){
 
                 createData.negoConfirm = false;
 
-                createQnaDocument(createData);
+                createQnaDocument(req,res,createData);
                 return res.redirect('/pop/close');
 
             case 'reject' :
@@ -356,9 +356,66 @@ function(req,res){
                     wdate : now
                 };
 
-                createQnaDocument(createData);
-                createNegoDocument(negoData);
+                createQnaDocument(req,res,createData);
+                createNegoDocument(req,res,negoData);
                 return res.redirect('/pop/close');
+
+            case 'accept' :
+                Board.findOne({qnanum : req.body.parents},(err2,QnaParents)=>{
+                    if(err2){
+                        Log.create({document_name : "Board",type:"error",contents:{error:err2,content:"입찰 변경내용 수락 변경 데이터 find DB 에러"},wdate:Date()});
+                        console.log(err2);
+                        req.flash("errors",{message : "DB ERROR"});
+                        return res.redirect('/');
+                    }
+                    let suggestedPrice = QnaParents.price;
+                    let suggestedDeadline = QnaParents.deadline;
+
+                    createData.nego = true;
+                    createData.negoConfirm = true;
+                    let negoData = {
+                        linkqnanum : createData.qnanum,
+                        where : createData.where,
+                        linknum : createData.linknum,
+    
+                        status : 'accept',
+                        wdate : now
+                    };
+
+                    let updateData = {
+                        mdate :now
+                    };
+
+                    if(suggestedPrice){
+                        createData.price = suggestedPrice;
+                        negoData.price = suggestedPrice;
+                        updateData.detail.price = suggestedPrice;
+                    }
+
+                    if(suggestedDeadline){
+                        createData.deadline = suggestedDeadline;
+                        negoData.deadline = suggestedDeadline;
+                        updateData.detail.deadline = suggestedDeadline;
+                    }
+                    console.log(negoData);
+                    createQnaDocument(req,res,createData);
+                    createNegoDocument(req,res,negoData);
+                    Bid.updateOne({bidnum : QnaParents.linknum},updateData,(err3)=>{
+                        if(err3){
+                            Log.create({document_name : "Bid",type:"error",contents:{error:err3,content:"입찰 변경내용 수락 입찰 내용 변경 update DB 에러"},wdate:Date()});
+                            console.log(err3);
+                            req.flash("errors",{message : "DB ERROR"});
+                            return res.redirect('/');
+                        }
+
+                        Log.create({document_name : "Bid",type:"update",contents:{update:updateData,content:"입찰 변경내용 수락 입찰 내용 변경 update"},wdate:Date()});
+                        return res.redirect('/pop/close');
+                    });
+
+                    
+                });
+                
+            
 
             default : break;
         }
@@ -370,7 +427,7 @@ router.get('/close',function(req,res){
     res.render('pop/close');
 });
 
-async function createQnaDocument(createObj){
+async function createQnaDocument(req,res,createObj){
     // 현재 문의 DB 저장
     await Board.create(createObj,function(err){
         if(err){
@@ -406,7 +463,7 @@ async function createQnaDocument(createObj){
     }
 }
 
-async function createNegoDocument(createObj){
+async function createNegoDocument(req,res,createObj){
     // 확정 네고 저장
     Nego.create(createObj,(err)=>{
         if(err){
@@ -417,9 +474,6 @@ async function createNegoDocument(createObj){
         }
         Log.create({document_name : "Nego",type:"create",contents:{create:createObj,content:"네고 create"},wdate:Date()});
     });
-    if(createObj.status == 'accept'){
-
-    }
 }
 
 function delayFileCreate(creatObj) {

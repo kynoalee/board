@@ -37,6 +37,13 @@ $(document).ready(()=>{
 
     $('#acceptBtn').click(()=>{
         // 승인 시 
+        $('#fileUpload').addClass('display-none');
+        $('input[name=summary]').val('입찰내용 변경을 수락합니다.');
+        $('#contents').text('입찰 내용 변경을 수락하겠습니다.');
+        $('#inputName').html("<h2>수락</h2>");
+        $('.requiredDiv').removeClass('display-none');
+        var $option = $('<option value="accept" selected>수락</option>');
+        $('#qnaKind').append($option);
     });
 });
 function setQnaHtml(){
