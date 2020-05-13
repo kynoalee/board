@@ -382,36 +382,46 @@ function(req,res){
                         wdate : now
                     };
 
-                    let updateData = {
-                        mdate :now
-                    };
-
-                    if(suggestedPrice){
-                        createData.price = suggestedPrice;
-                        negoData.price = suggestedPrice;
-                        updateData.detail.price = suggestedPrice;
-                    }
-
-                    if(suggestedDeadline){
-                        createData.deadline = suggestedDeadline;
-                        negoData.deadline = suggestedDeadline;
-                        updateData.detail.deadline = suggestedDeadline;
-                    }
-                    console.log(negoData);
-                    createQnaDocument(req,res,createData);
-                    createNegoDocument(req,res,negoData);
-                    Bid.updateOne({bidnum : QnaParents.linknum},updateData,(err3)=>{
+                    
+                    Bid.findOne({bidnum : QnaParents.linknum},(err3,bid)=>{
                         if(err3){
-                            Log.create({document_name : "Bid",type:"error",contents:{error:err3,content:"입찰 변경내용 수락 입찰 내용 변경 update DB 에러"},wdate:Date()});
+                            Log.create({document_name : "Bid",type:"error",contents:{error:err3,content:"입찰 기존 내용 find DB 에러"},wdate:Date()});
                             console.log(err3);
                             req.flash("errors",{message : "DB ERROR"});
                             return res.redirect('/');
                         }
+                        
+                        let updateData = {
+                            detail : bid.detail,
+                            mdate :now
+                        };
 
-                        Log.create({document_name : "Bid",type:"update",contents:{update:updateData,content:"입찰 변경내용 수락 입찰 내용 변경 update"},wdate:Date()});
-                        return res.redirect('/pop/close');
+                        if(suggestedPrice){
+                            createData.price = suggestedPrice;
+                            negoData.price = suggestedPrice;
+                            updateData.detail.price = suggestedPrice;
+                        }
+
+                        if(suggestedDeadline){
+                            createData.deadline = suggestedDeadline;
+                            negoData.deadline = suggestedDeadline;
+                            updateData.detail.deadline = suggestedDeadline;
+                        }
+                        console.log(negoData);
+                        createQnaDocument(req,res,createData);
+                        createNegoDocument(req,res,negoData);
+                        Bid.updateOne({bidnum : QnaParents.linknum},updateData,(err4)=>{
+                            if(err4){
+                                Log.create({document_name : "Bid",type:"error",contents:{error:err4,content:"입찰 변경내용 수락 입찰 내용 변경 update DB 에러"},wdate:Date()});
+                                console.log(err4);
+                                req.flash("errors",{message : "DB ERROR"});
+                                return res.redirect('/');
+                            }
+
+                            Log.create({document_name : "Bid",type:"update",contents:{update:updateData,content:"입찰 변경내용 수락 입찰 내용 변경 update"},wdate:Date()});
+                            return res.redirect('/pop/close');
+                        });
                     });
-
                     
                 });
                 
