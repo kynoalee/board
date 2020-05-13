@@ -24,6 +24,21 @@ $(document).ready(()=>{
         $('.diffPer').html(innerText);
     });
 
+    $('#qnaKind').change(()=>{
+        if($('#qnaKind').val() == 'nego'){
+            $('#nego').removeClass('display-none');
+            $('#nego').children('div').children("input[name=price]").prop("disabled",false);
+        } else{
+            $('#nego').addClass('display-none');
+            $('#nego').children('div').children("input[name=price]").prop("disabled",true);
+        }
+        if(!$('#qnaKind').val()){
+            $('.requiredDiv').addClass('display-none');
+        } else{
+            $('.requiredDiv').removeClass('display-none');
+        }
+    })
+
     $('#rejectBtn').click(()=>{
         // 파일 업로드 안보이게 , 거절은 무조건 거절만, 멘트 변경만 가능.
         $('#qnaSelect').addClass('display-none');
@@ -61,23 +76,12 @@ $(document).ready(()=>{
         $('#qnaKind').append($option2);
         $('#qnaKind').append($option3);
         $('#qnaSelect').removeClass('display-none');
+    });
 
+    $('button.negoqna').click(()=>{
+        $('#qnaKind').val('nego').trigger('change');
     });
 });
-function setQnaHtml(){
-    if($('#qnaKind').val() == 'nego'){
-        $('#nego').removeClass('display-none');
-        $('#nego').children('div').children("input[name=price]").prop("disabled",false);
-    } else{
-        $('#nego').addClass('display-none');
-        $('#nego').children('div').children("input[name=price]").prop("disabled",true);
-    }
-    if(!$('#qnaKind').val()){
-        $('.requiredDiv').addClass('display-none');
-    } else{
-        $('.requiredDiv').removeClass('display-none');
-    }
-}
 
 function exQnaList(linknum,endnum){
     var item1 = $( "div.waiting" );

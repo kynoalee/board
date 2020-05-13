@@ -213,8 +213,8 @@ function(req,res){
 router.get('/qna',function(req,res){
     var qna = req.flash('qna')||{};
     var errors = req.flash('errors')||{};
-    var userid = 'imgcam'; // req.query.userid;
-    var userclass = 'vender'; // req.query.userclass;
+    var userid = 'imgcom';//req.query.userid;
+    var userclass = 'normal';//req.query.userclass;
     // 관련 질문이 있는지 파악
     Board.findOne({linknum : req.query.linknum,where:req.query.where, children : -1},function(err,board){
         if(err){
@@ -227,6 +227,7 @@ router.get('/qna',function(req,res){
             linknum : req.query.linknum,
             exQnaDisplay : "display-none",
             lastQnaDisplay : "display-none",
+            requireDisplay : "display-none",
             qnaDisplay : "",
             noNegoDisplay : "",
             negoDisplay : "display-none",
@@ -234,6 +235,7 @@ router.get('/qna',function(req,res){
         };
 
         if(board){
+            // 직전문의가 있는경우
             exQnaList.parents = board.qnanum;
             exQnaList.lastQnaDisplay = '';
             exQnaList.lastData = board;
@@ -258,6 +260,12 @@ router.get('/qna',function(req,res){
             if(board.nego && !board.negoConfirm){
                 exQnaList.noNegoDisplay = 'display-none';
                 exQnaList.negoDisplay = '';
+            }
+
+            if(board.status == 'negoqna'){
+                exQnaList.noNegoDisplay = 'display-none';
+                exQnaList.negoDisplay = 'display-none';
+                exQnaList.requireDisplay = 'negoqna';
             }
         }
         // 현재 설정된 가격과 마감시간 등 변경 데이터 검색
@@ -339,11 +347,11 @@ function(req,res){
                     createData.nego = true;
                     createData.price = QnaParents.price?QnaParents.price:null;
                     createData.deadline = QnaParents.deadline?QnaParents.deadline:null;
-                    
+                    createData.status = "negoqna";
                     createQnaDocument(req,res,createData);
                     return res.redirect('/pop/close');
                 });
-
+            break;
             case 'nego' :
                 Board.findOne({qnanum : req.body.parents},(err2,QnaParents)=>{
                     if(err2){
@@ -369,7 +377,7 @@ function(req,res){
                     createQnaDocument(req,res,createData);
                     return res.redirect('/pop/close');
                 });
-
+            break;
             case 'reject' :
                 createData.nego = true;
                 createData.negoConfirm = true;
@@ -433,7 +441,6 @@ function(req,res){
                             negoData.deadline = suggestedDeadline;
                             updateData.detail.deadline = suggestedDeadline;
                         }
-                        console.log(negoData);
                         createQnaDocument(req,res,createData);
                         createNegoDocument(req,res,negoData);
                         Bid.updateOne({bidnum : QnaParents.linknum},updateData,(err4)=>{
@@ -450,7 +457,7 @@ function(req,res){
                     });
                     
                 });
-            
+            break;
             default : break;
         }
     });
@@ -458,7 +465,7 @@ function(req,res){
 
 // 팝업 닫기
 router.get('/close',function(req,res){
-    res.render('pop/close');
+    return res.render('pop/close');
 });
 
 async function createQnaDocument(req,res,createObj){
@@ -471,30 +478,29 @@ async function createQnaDocument(req,res,createObj){
             return res.redirect('/');
         }
         Log.create({document_name : "Board",type:"create",contents:{create:createObj,content:"문의 create"},wdate:Date()});
-    });
-
-    // 직전 문의가 있을 경우
-    if(createObj.parents != -1){
-        // 직전 문의에 child 노드 값 update
-        await Board.findOne({qnanum : createObj.parents},function(err,board){
-            if(err){
-                Log.create({document_name : "Board",type:"error",contents:{error:err,content:"부모문의 노드 연결을 위한 부모문의 find DB 에러"},wdate:Date()});
-                console.log(err);
-                req.flash("errors",{message : "DB ERROR"});
-                return res.redirect('/');
-            }
-            let updateObj = {children : createObj.qnanum ,mdate : createObj.mdate};
-            Board.updateOne({qnanum : createObj.parents}, updateObj,function(err2){
-                if(err2){
-                    Log.create({document_name : "Board",type:"error",contents:{error:err2,content:"부모문의의 자손 노드 update DB 에러"},wdate:Date()});
-                    console.log(err2);
+        // 직전 문의가 있을 경우
+        if(createObj.parents != -1){
+            // 직전 문의에 child 노드 값 update
+            Board.findOne({qnanum : createObj.parents},function(err,board){
+                if(err){
+                    Log.create({document_name : "Board",type:"error",contents:{error:err,content:"부모문의 노드 연결을 위한 부모문의 find DB 에러"},wdate:Date()});
+                    console.log(err);
                     req.flash("errors",{message : "DB ERROR"});
                     return res.redirect('/');
                 }
-                Log.create({document_name : "Board",type:"update",contents:{update:updateObj,content:"부모문의의 자손 노드 update"},wdate:Date()});
+                let updateObj = {children : createObj.qnanum ,mdate : createObj.mdate};
+                Board.updateOne({qnanum : createObj.parents}, updateObj,function(err2){
+                    if(err2){
+                        Log.create({document_name : "Board",type:"error",contents:{error:err2,content:"부모문의의 자손 노드 update DB 에러"},wdate:Date()});
+                        console.log(err2);
+                        req.flash("errors",{message : "DB ERROR"});
+                        return res.redirect('/');
+                    }
+                    Log.create({document_name : "Board",type:"update",contents:{update:updateObj,content:"부모문의의 자손 노드 update"},wdate:Date()});
+                });
             });
-        });
-    }
+        }
+    });
 }
 
 async function createNegoDocument(req,res,createObj){
