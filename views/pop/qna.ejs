@@ -47,10 +47,9 @@
                         <div class="<%=qnaList.negoDisplay%>">
                           <button type="button" id="acceptBtn" class="btn btn-primary">수락</button>
                           <button type="button" id="rejectBtn" class="btn btn-danger">거절</button>
-                          <button type="button" id="qnaBtn" class="btn btn-secondary">재협의</button>
+                          <button type="button" id="reNegoBtn" class="btn btn-secondary">재협의</button>
                         </div>
-                        <div id="inputName"></div>
-                        <div class="<%=qnaList.noNegoDisplay%>">
+                        <div id="qnaSelect" class="<%=qnaList.noNegoDisplay%>">
                           <select name="qnaKind" id="qnaKind" onchange="setQnaHtml()">
                             <option value="">--문의 종류--</option>
                             <option value="qna">단순 질의</option>

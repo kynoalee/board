@@ -210,11 +210,11 @@ function(req,res){
 });
 
 // 문의 팝업
-router.get('/qna',util.isLoggedin,function(req,res){
+router.get('/qna',function(req,res){
     var qna = req.flash('qna')||{};
     var errors = req.flash('errors')||{};
-    var userid = req.query.userid;
-    var userclass = req.query.userclass;
+    var userid = 'imgcam'; // req.query.userid;
+    var userclass = 'vender'; // req.query.userclass;
     // 관련 질문이 있는지 파악
     Board.findOne({linknum : req.query.linknum,where:req.query.where, children : -1},function(err,board){
         if(err){
@@ -328,21 +328,47 @@ function(req,res){
                 createData.nego = false;
                 createQnaDocument(req,res,createData);
                 return res.redirect('/pop/close');
+            case "negoqna" : 
+                Board.findOne({qnanum : req.body.parents},(err2,QnaParents)=>{
+                    if(err2){
+                        Log.create({document_name : "Board",type:"error",contents:{error:err2,content:"입찰 제안 변경 데이터 find DB 에러"},wdate:Date()});
+                        console.log(err2);
+                        req.flash("errors",{message : "DB ERROR"});
+                        return res.redirect('/');
+                    }
+                    createData.nego = true;
+                    createData.price = QnaParents.price?QnaParents.price:null;
+                    createData.deadline = QnaParents.deadline?QnaParents.deadline:null;
+                    
+                    createQnaDocument(req,res,createData);
+                    return res.redirect('/pop/close');
+                });
+
             case 'nego' :
-                // 네고 문의 일시
-                createData.nego = true;
-                // 추가 정보 입력
-                if(req.body.price){
-                    createData.price = req.body.price;
-                }
-                if(req.body.deadline){
-                    createData.deadline = req.body.deadline;
-                }
+                Board.findOne({qnanum : req.body.parents},(err2,QnaParents)=>{
+                    if(err2){
+                        Log.create({document_name : "Board",type:"error",contents:{error:err2,content:"입찰 제안 변경 데이터 find DB 에러"},wdate:Date()});
+                        console.log(err2);
+                        req.flash("errors",{message : "DB ERROR"});
+                        return res.redirect('/');
+                    }
+                    // 네고 문의 일시
+                    createData.nego = true;
+                    // 추가 정보 입력
+                    createData.price = QnaParents.price?QnaParents.price:null;
+                    createData.deadline = QnaParents.deadline?QnaParents.deadline:null;
+                    if(req.body.price){
+                        createData.price = req.body.price;
+                    }
+                    if(req.body.deadline){
+                        createData.deadline = req.body.deadline;
+                    }
 
-                createData.negoConfirm = false;
+                    createData.negoConfirm = false;
 
-                createQnaDocument(req,res,createData);
-                return res.redirect('/pop/close');
+                    createQnaDocument(req,res,createData);
+                    return res.redirect('/pop/close');
+                });
 
             case 'reject' :
                 createData.nego = true;
@@ -424,9 +450,7 @@ function(req,res){
                     });
                     
                 });
-                
             
-
             default : break;
         }
     });
