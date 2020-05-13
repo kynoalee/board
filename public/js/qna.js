@@ -24,35 +24,64 @@ $(document).ready(()=>{
         $('.diffPer').html(innerText);
     });
 
+    $('#qnaKind').change(()=>{
+        if($('#qnaKind').val() == 'nego'){
+            $('#nego').removeClass('display-none');
+            $('#nego').children('div').children("input[name=price]").prop("disabled",false);
+        } else{
+            $('#nego').addClass('display-none');
+            $('#nego').children('div').children("input[name=price]").prop("disabled",true);
+        }
+        if(!$('#qnaKind').val()){
+            $('.requiredDiv').addClass('display-none');
+        } else{
+            $('.requiredDiv').removeClass('display-none');
+        }
+    })
+
     $('#rejectBtn').click(()=>{
         // 파일 업로드 안보이게 , 거절은 무조건 거절만, 멘트 변경만 가능.
+        $('#qnaSelect').addClass('display-none');
         $('#fileUpload').addClass('display-none');
         $('input[name=summary]').val('입찰내용 변경을 거절합니다.');
         $('#contents').text('입찰 내용 변경을 거절하겠습니다.');
         $('#inputName').html("<h2>거절</h2>");
         $('.requiredDiv').removeClass('display-none');
         var $option = $('<option value="reject" selected>거절</option>');
+        $('#qnaKind *').remove();
         $('#qnaKind').append($option);
     });
 
     $('#acceptBtn').click(()=>{
         // 승인 시 
+        $('#qnaSelect').addClass('display-none');
+        $('#fileUpload').addClass('display-none');
+        $('input[name=summary]').val('입찰내용 변경을 수락합니다.');
+        $('#contents').text('입찰 내용 변경을 수락하겠습니다.');
+        $('#inputName').html("<h2>수락</h2>");
+        $('.requiredDiv').removeClass('display-none');
+        var $option = $('<option value="accept" selected>수락</option>');
+        $('#qnaKind *').remove();
+        $('#qnaKind').append($option);
+    });
+
+    $('#reNegoBtn').click(()=>{
+        // 재협의
+        $('#inputName').html("<h2>재협의</h2>");
+        var $option1 = $('<option value="">--문의 종류--</option>');
+        var $option2 = $('<option value="negoqna">단순 질의</option>');
+        var $option3 = $('<option value="nego">입찰 내용 협상</option>');
+        $('#qnaKind *').remove();
+        $('#qnaKind').append($option1);
+        $('#qnaKind').append($option2);
+        $('#qnaKind').append($option3);
+        $('#qnaSelect').removeClass('display-none');
+    });
+
+    $('button.negoqna').click(()=>{
+        $('#qnaKind').val('nego').trigger('change');
     });
 });
-function setQnaHtml(){
-    if($('#qnaKind').val() == 'nego'){
-        $('#nego').removeClass('display-none');
-        $('#nego').children('div').children("input[name=price]").prop("disabled",false);
-    } else{
-        $('#nego').addClass('display-none');
-        $('#nego').children('div').children("input[name=price]").prop("disabled",true);
-    }
-    if(!$('#qnaKind').val()){
-        $('.requiredDiv').addClass('display-none');
-    } else{
-        $('.requiredDiv').removeClass('display-none');
-    }
-}
 
 function exQnaList(linknum,endnum){
     var item1 = $( "div.waiting" );

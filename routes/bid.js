@@ -132,7 +132,7 @@ router.get('/bidList',util.isLoggedin,function(req,res){
                 bidDoneList.push(tmpObj);
             }
         }
-        Board.find({$or:bidnumFindSet,where:"bid"},(err2,board)=>{
+        Board.find({$or:bidnumFindSet,where:"bid",children:-1},(err2,board)=>{
             if(err2){
                 Log.create({document_name : "Board",type:"error",contents:{error:err2,content:"각 입찰 관련 qna find DB에러"},wdate:Date()});
                 console.log(err2);
@@ -141,8 +141,9 @@ router.get('/bidList',util.isLoggedin,function(req,res){
             }
 
             for(let value of board){
-                biddingList[value.linknum].boardData = value;
-                biddingList[value.linknum].qnaAble = true;
+                if(!value.negoConfirm){
+                    biddingList[value.linknum].qnaAble = true;
+                }
             }
 
             // 배열 내  undefined 부분 삭제
@@ -155,6 +156,11 @@ router.get('/bidList',util.isLoggedin,function(req,res){
                 } else {
                     num += 1;
                 }
+            }
+
+            // 네고가 끝난 문의가 있는 경우 
+            for(let val of biddingList){
+                    
             }
 
             res.render('bid/bidList',{

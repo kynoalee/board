@@ -51,7 +51,6 @@ router.post('/getQnaList',function(req,res){
             }
             qnaListsData.push(val);
         }
-        console.log(qnaListsData);
         console.log("all done");
         res.send({result:"success",data:qnaListsData});
     });        

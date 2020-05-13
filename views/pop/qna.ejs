@@ -28,36 +28,34 @@
                     </div>
                 </div>
                 <%if(!qnaList.lastQnaDisplay){%>    
-                <div class="<%=qnaList.lastQnaDisplay%> border-black">
-                    <div>qna번호 <%=qnaList.lastData.qnanum%></div>
-                    <div>연결된 <%=qnaList.lastData.whereName%>번호 <%=qnaList.lastData.linknum%> </div>
-                    <div>날짜(수정) <%=qnaList.wdate%> (<%=qnaList.mdate%>)</div>
-                    <div>문의자 <%=qnaList.lastData.userid%></div>
-                    <div>요약 <%=qnaList.lastData.summary%></div>
-                    <div>내용 <%=qnaList.lastData.contents%></div>
-                    <%if(qnaList.lastData.nego == true){%>
-                    <div>제안된 가격 <%=qnaList.lastData.price%></div>
-                    <div>제안된 마감시기 <%=qnaList.lastData.deadline%></div>
-                    <%}%>
+                <div id="lastQna" class="<%=qnaList.lastQnaDisplay%> border-black">
+                  <div>qna번호 <%=qnaList.lastData.qnanum%></div>
+                  <div>연결된 <%=qnaList.lastData.whereName%>번호 <%=qnaList.lastData.linknum%> </div>
+                  <div>날짜(수정) <%=qnaList.wdate%> (<%=qnaList.mdate%>)</div>
+                  <div>문의자 <%=qnaList.lastData.userid%></div>
+                  <div>요약 <%=qnaList.lastData.summary%></div>
+                  <div>내용 <%=qnaList.lastData.contents%></div>
+                  <%if(qnaList.lastData.nego == true){%>
+                  <div class="suggested-price" alt='<%=qnaList.lastData.price%>'>제안된 가격 <%=qnaList.lastData.price%></div>
+                  <div class="suggested-deadline" alt='<%=qnaList.lastData.deadline%>'>제안된 마감시기 <%=qnaList.lastData.deadline%></div>
+                  <%}%>
                 </div>
                 <%}%>
                 <div class="inputDiv <%=qnaList.qnaDisplay%>">
                     <div class="form-group">
-                        
                         <div class="<%=qnaList.negoDisplay%>">
                           <button type="button" id="acceptBtn" class="btn btn-primary">수락</button>
                           <button type="button" id="rejectBtn" class="btn btn-danger">거절</button>
-                          <button type="button" id="qnaBtn" class="btn btn-secondary">문의</button>
+                          <button type="button" id="reNegoBtn" class="btn btn-secondary">재협의</button>
                         </div>
-                        <div id="inputName"></div>
-                        <div class="<%=qnaList.noNegoDisplay%>">
+                        <div id="qnaSelect" class="<%=qnaList.noNegoDisplay%>">
                           <select name="qnaKind" id="qnaKind" onchange="setQnaHtml()">
                             <option value="">--문의 종류--</option>
                             <option value="qna">단순 질의</option>
                             <option value="nego">입찰 내용 협상</option>
                           </select>
                         </div>
-                        <div class="requiredDiv display-none">
+                        <div class="requiredDiv <%=qnaList.requireDisplay%>">
                           <div id="fileUpload" class="form-group">
                             <label for="file">File Upload</label> 
                             <!-- 여러파일 넣고 빼기 되도록 , 넣는파일 설명-->
@@ -116,7 +114,7 @@
                     <input type="hidden" name="linknum" value = "<%=qnaList.linknum%>">
                     <input type="hidden" name="parents" value = "<%=qnaList.parents%>">
                     <div>
-                        <button id="submitBtn" type="submit" class="requiredDiv btn btn-primary display-none">Submit</button>
+                        <button id="submitBtn" type="button" class="requiredDiv btn btn-primary <%=qnaList.requireDisplay%>">Submit</button>
                     </div>  
                 </div>
                 <div>
