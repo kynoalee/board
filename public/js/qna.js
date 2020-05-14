@@ -78,8 +78,12 @@ $(document).ready(()=>{
         $('#qnaSelect').removeClass('display-none');
     });
 
-    $('button.negoqna').click(()=>{
-        $('#qnaKind').val('nego').trigger('change');
+    $('#submitBtn').click(()=>{
+        if($('#submitBtn').hasClass('negoqna')===true){
+            $('#qnaKind').off('change');
+            $('#qnaKind').val('nego').trigger('change');
+        }
+        $('#qnaForm').submit();
     });
 });
 
