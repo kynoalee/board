@@ -210,11 +210,11 @@ function(req,res){
 });
 
 // 문의 팝업
-router.get('/qna',function(req,res){
+router.get('/qna',util.isLoggedin,function(req,res){
     var qna = req.flash('qna')||{};
     var errors = req.flash('errors')||{};
-    var userid = 'imgcom';//req.query.userid;
-    var userclass = 'normal';//req.query.userclass;
+    var userid = req.query.userid;
+    var userclass = req.query.userclass;
     // 관련 질문이 있는지 파악
     Board.findOne({linknum : req.query.linknum,where:req.query.where, children : -1},function(err,board){
         if(err){
