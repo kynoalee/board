@@ -8,7 +8,7 @@
     </head>
     <body>
         <div class="container mb-3">
-            <form action="/pop/qna" method="post" enctype="multipart/form-data"> 
+            <form id='qnaForm' action="/pop/qna" method="post" enctype="multipart/form-data"> 
                 <div class="form-group">
                     <h2>문의</h2>
                 </div>
@@ -43,13 +43,13 @@
                 <%}%>
                 <div class="inputDiv <%=qnaList.qnaDisplay%>">
                     <div class="form-group">
-                        <div class="<%=qnaList.negoDisplay%>">
+                        <div class="buttonDiv <%=qnaList.negoDisplay%>">
                           <button type="button" id="acceptBtn" class="btn btn-primary">수락</button>
                           <button type="button" id="rejectBtn" class="btn btn-danger">거절</button>
                           <button type="button" id="reNegoBtn" class="btn btn-secondary">재협의</button>
                         </div>
                         <div id="qnaSelect" class="<%=qnaList.noNegoDisplay%>">
-                          <select name="qnaKind" id="qnaKind" onchange="setQnaHtml()">
+                          <select name="qnaKind" id="qnaKind" >
                             <option value="">--문의 종류--</option>
                             <option value="qna">단순 질의</option>
                             <option value="nego">입찰 내용 협상</option>
