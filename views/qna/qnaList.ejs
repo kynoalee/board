@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../partials/head') %>
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+    <div class="container mb-3">
+      <h1>문의 리스트</h1>
+      <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>주문번호</th>
+                <th>주문자</th>
+                <th>주문일시</th>
+                <th>마감 희망일자</th>
+                <th>요약</th>
+                <th>상태</th>
+            </tr>
+        </thead>
+        <tbody>
+            <%for(let keyVal in summary){%>
+                <tr onclick="getDetailInfo('<%=keyVal%>','<%=summary[keyVal].detail.filelink%>')" data-toggle="collapse" data-target="#detailOrder<%=summary[keyVal].ordernum%>">
+                    <td><%=summary[keyVal].ordernum%></td>
+                    <td><%=summary[keyVal].orderid%></td>
+                    <td><%=summary[keyVal].orderdateD%><br /><%=summary[keyVal].orderdateH%></td>
+                    <td><%=summary[keyVal].detail.deadline%></td>
+                    <td><%=summary[keyVal].detail.summary%></td>
+                    <td><%=summary[keyVal].status%></td>
+                </tr>
+                <tr id="detailOrder<%=summary[keyVal].ordernum%>" class="collapse" data-parent="#summaryOrder<%=summary[keyVal].ordernum%>">
+                  <td colspan=5>
+                    <div class="waiting">
+                      <span class="ouro ouro3">
+                        <span class="left"><span class="anim"></span></span>
+                        <span class="right"><span class="anim"></span></span>
+                      </span>
+                    </div>
+                    <div class="done">
+                      <div>color : <%=summary[keyVal].detail.color%></div> 
+                      <div>size : <%=summary[keyVal].detail.size%></div>                
+                      <div>material : <%=summary[keyVal].detail.material%></div>    
+                      <div>prototype quantity</div>
+                      <div>quantity : <%=summary[keyVal].detail.quantity%></div>
+                      <div>summary : <%=summary[keyVal].detail.summary%></div>
+                      <div>description : <%=summary[keyVal].detail.description%></div>
+                      <div>files : </div>
+                      <div class="file-list"></div>
+                    </div>
+                  </td>
+                  <td><button type="button" onclick="bidIn('<%=keyVal%>','<%=summary[keyVal].orderid%>')">입찰</button></td>
+                </tr>
+            <%}%>             
+        </tbody>
+    </table>
+    </div>
+  </body>
+</html>
+
