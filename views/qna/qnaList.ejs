@@ -3,6 +3,7 @@
   <head>
     <%- include('../partials/head') %>
     <link rel="stylesheet" href="/css/qna.css">
+    <script src="/js/qna.js"></script>
   </head>
   <body>
     <%- include('../partials/nav') %>
@@ -21,14 +22,17 @@
         </thead>
         <tbody>
           <%for(let board of boardList){%>
-            <tr>
-              <td><%=board.idNum%></td>
-              <td><%=board.test%></td>
-              <td>연결번호</td>
-              <td>상태</td>
-              <td>제목</td>
-              <td>작성일자</td>
-            </tr>
+              <tr class="cursor-pointer" onclick="goQna('<%=board.data.linknum%>','<%=board.data.userid%>','<%=board.data.userclass%>','<%=board.data.where%>')">
+                <td><%=board.idNum%></td>
+                <td><%=board.where%></td>
+                <td><%=board.link%></td>
+                <td></td>
+                <td><%=board.summary%></td>
+                <td>
+                  <div><%=board.wdateD%> <%=board.wdateH%></div>
+                  <div><%=board.mdateD%> <%=board.mdateH%></div>
+                </td>
+              </tr>
           <%}%>
         </tbody>
     </table>
