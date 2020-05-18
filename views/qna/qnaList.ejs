@@ -2,57 +2,52 @@
 <html>
   <head>
     <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/css/qna.css">
+    <script src="/js/qna.js"></script>
   </head>
   <body>
     <%- include('../partials/nav') %>
     <div class="container mb-3">
       <h1>문의 리스트</h1>
-      <table class="table table-hover">
+      <table class="table table-striped">
         <thead>
-            <tr>
-                <th>주문번호</th>
-                <th>주문자</th>
-                <th>주문일시</th>
-                <th>마감 희망일자</th>
-                <th>요약</th>
-                <th>상태</th>
-            </tr>
+           <tr>
+             <td></td>
+             <td>연결위치</td>
+             <td>연결번호</td>
+             <td>상태</td>
+             <td>제목</td>
+             <td>작성일자</td>
+           </tr>
         </thead>
         <tbody>
-            <%for(let keyVal in summary){%>
-                <tr onclick="getDetailInfo('<%=keyVal%>','<%=summary[keyVal].detail.filelink%>')" data-toggle="collapse" data-target="#detailOrder<%=summary[keyVal].ordernum%>">
-                    <td><%=summary[keyVal].ordernum%></td>
-                    <td><%=summary[keyVal].orderid%></td>
-                    <td><%=summary[keyVal].orderdateD%><br /><%=summary[keyVal].orderdateH%></td>
-                    <td><%=summary[keyVal].detail.deadline%></td>
-                    <td><%=summary[keyVal].detail.summary%></td>
-                    <td><%=summary[keyVal].status%></td>
-                </tr>
-                <tr id="detailOrder<%=summary[keyVal].ordernum%>" class="collapse" data-parent="#summaryOrder<%=summary[keyVal].ordernum%>">
-                  <td colspan=5>
-                    <div class="waiting">
-                      <span class="ouro ouro3">
-                        <span class="left"><span class="anim"></span></span>
-                        <span class="right"><span class="anim"></span></span>
-                      </span>
-                    </div>
-                    <div class="done">
-                      <div>color : <%=summary[keyVal].detail.color%></div> 
-                      <div>size : <%=summary[keyVal].detail.size%></div>                
-                      <div>material : <%=summary[keyVal].detail.material%></div>    
-                      <div>prototype quantity</div>
-                      <div>quantity : <%=summary[keyVal].detail.quantity%></div>
-                      <div>summary : <%=summary[keyVal].detail.summary%></div>
-                      <div>description : <%=summary[keyVal].detail.description%></div>
-                      <div>files : </div>
-                      <div class="file-list"></div>
-                    </div>
-                  </td>
-                  <td><button type="button" onclick="bidIn('<%=keyVal%>','<%=summary[keyVal].orderid%>')">입찰</button></td>
-                </tr>
-            <%}%>             
+          <%for(let board of boardList){%>
+              <tr class="cursor-pointer" onclick="goQna('<%=board.data.linknum%>','<%=board.data.userid%>','<%=board.data.userclass%>','<%=board.data.where%>')">
+                <td><%=board.idNum%></td>
+                <td><%=board.where%></td>
+                <td><%=board.link%></td>
+                <td></td>
+                <td><%=board.summary%></td>
+                <td>
+                  <div><%=board.wdateD%> <%=board.wdateH%></div>
+                  <div><%=board.mdateD%> <%=board.mdateH%></div>
+                </td>
+              </tr>
+          <%}%>
         </tbody>
     </table>
+    </div>
+    <div class="container mb-3 text-center">
+      <a class="<%=pages.goPre%>" href="?pageNum=1">ㄴㄴ </a>
+      <a class="<%=pages.goPre%>" href="?pageNum=<%=pages.pre%>">ㄴ </a> 
+      <%for(let page = pages.start ; page <= pages.end ; page++){
+          if(page == pages.nowPage){%>
+      <span><%=page%> </span>
+          <%}else{%>
+      <a href="?pageNum=<%=page%>"><%=page%> </a> 
+          <%}}%>
+      <a class="<%=pages.goNext%>" href="?pageNum=<%=pages.next%>">ㄱ </a>
+      <a class="<%=pages.goNext%>" href="?pageNum=<%=pages.last%>">ㄱㄱ </a>
     </div>
   </body>
 </html>

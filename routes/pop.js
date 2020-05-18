@@ -363,13 +363,20 @@ function(req,res){
                     // 네고 문의 일시
                     createData.nego = true;
                     // 추가 정보 입력
-                    createData.price = QnaParents.price?QnaParents.price:null;
-                    createData.deadline = QnaParents.deadline?QnaParents.deadline:null;
-                    if(req.body.price){
-                        createData.price = req.body.price;
-                    }
-                    if(req.body.deadline){
-                        createData.deadline = req.body.deadline;
+                    if(!QnaParents){
+                        // 초기 협상
+                        console.log("Initial negotiation...");
+                        if(req.body.price){
+                            createData.price = req.body.price;
+                        }
+                        if(req.body.deadline){
+                            createData.deadline = req.body.deadline;
+                        }
+                    } else {
+                        // 재협상시
+                        console.log("Renegotiation...");
+                        createData.price = QnaParents.price?QnaParents.price:null;
+                        createData.deadline = QnaParents.deadline?QnaParents.deadline:null;
                     }
 
                     createData.negoConfirm = false;

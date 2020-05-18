@@ -1,7 +1,9 @@
 .display-none{
     display:none;
 }
-
+.cursor-pointer{
+    cursor:pointer;
+}
 .border-black {
     border: 1px solid black;
 }
