@@ -151,5 +151,5 @@ function exQnaList(linknum,endnum){
 }
 
 function goQna(linknum,userid,userclass,where){
-    window.open("/pop/qna?linknum="+linknum+"&userid="+userid+"&userclass="+userclass+"&where="+where,"qnaId"+where+linknum,'width=430,height=500,location=no,status=no,scrollbars=yes');
+    window.open("/qna/qna?linknum="+linknum+"&userid="+userid+"&userclass="+userclass+"&where="+where);
 }

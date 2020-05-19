@@ -7,8 +7,9 @@
     <link rel="stylesheet" href="/css/qna.css">
     </head>
     <body>
+      <%- include('../partials/nav') %>
         <div class="container mb-3">
-            <form id='qnaForm' action="/pop/qna" method="post" enctype="multipart/form-data"> 
+            <form id='qnaForm' action="/qna/qna" method="post" enctype="multipart/form-data"> 
                 <div class="form-group">
                     <h2>문의</h2>
                 </div>
@@ -113,6 +114,8 @@
                     <input type="hidden" name="where" value ="bid">
                     <input type="hidden" name="linknum" value = "<%=qnaList.linknum%>">
                     <input type="hidden" name="parents" value = "<%=qnaList.parents%>">
+                    <input type="hidden" name="vender" value = "<%=qnaList.nowData.vender%>">
+                    <input type="hidden" name="customer" value = "<%=qnaList.nowData.customer%>">
                     <div>
                         <button id="submitBtn" type="button" class="requiredDiv btn btn-primary <%=qnaList.requireDisplay%>">Submit</button>
                     </div>  

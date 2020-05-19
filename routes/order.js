@@ -8,6 +8,7 @@ var util = require('../util'); // 1
 var File = require('../models/File');
 var Log = require('../models/Log');
 var Order = require('../models/Order');
+var Upload = require('../modules/upload');
 
 // order new   
 router.get('/',util.isLoggedin,function(req, res){
@@ -22,21 +23,21 @@ router.get('/',util.isLoggedin,function(req, res){
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        let newName = createServerName(file.originalname);
+        let newName = Upload.createServerName(file.originalname);
         cb(null, config.file.local+newName.addPath)
     },
     filename: function (req, file, cb) {
-        let newName = createServerName(file.originalname);
+        let newName = Upload.createServerName(file.originalname);
         cb(null, newName.serverName)
     }
 });
-var order = multer({ storage: storage });
+var order = multer({storage:storage});
 
 // new order create
 router.post('/',order.array('file'),util.isLoggedin, function(req,res,next){
     // File create
     if(req.files.length){
-        createFiles(req.files,req,next);
+        Upload.createFiles(req.files,req,next);
     } else{
         console.log("upload with no file");
         req.body.filelink = null;
@@ -298,76 +299,5 @@ router.get('/list',util.isLoggedin,function(req,res){
 
 module.exports = router;
 
-// private functions area
 
-function delayFileCreate(creatObj) {
-    return new Promise(resolve => 
-             setTimeout(() => { 
-                File.create(creatObj,function(err,file){
-                    if(err){
-                        Log.create({document_name : "File",type:"error",contents:{error:error,content:"파일 create 중 DB 에러"},wdate:Date()});
-                        console.log(err);
-                    }
-                    Log.create({document_name : "File",type:"create",contents:{file:file,content:"파일 저장"},wdate:Date()});
-                    console.log("done");
-                });                    
-                resolve(); }, 300) ); 
-}
-
-async function createFiles(array,req,next) {
-    var fileLink =[];
-    for(let fileInfo of array){
-        let creatObj ={
-            originname:fileInfo.originalname,
-            servername:fileInfo.filename,
-            filepath:fileInfo.path.replace("../",""),
-            uploadid:req.user.userid,
-            filetype:fileInfo.mimetype,
-            size:fileInfo.size,
-            udate:Date()
-        };
-        await delayFileCreate(creatObj);
-        fileLink[fileLink.length] = fileInfo.filename;
-  }
-  req.body.filelink = fileLink;
-  next();
-}
-
-// 어레이 내 시간 차로 정렬
-function sortArrayTimeDiff(array){
-    array.sort(function(a,b){
-        if(moment.duration(moment(a.wdate).diff(moment(b.wdate))).asMilliseconds() > 0){
-            return 1;
-        } else if(moment.duration(moment(a.wdate).diff(moment(b.wdate))).asMilliseconds() < 0){
-            return -1;
-        } else {
-            return 0;
-        }
-    });
-}
-
-// 업로드 파일 서버 저장용 이름 설정
-function createServerName(origin){
-    let originSplitName = origin.split('.');
-    let extension = originSplitName.pop();
-    let serverName = "file";
-    let newServerName =moment().format('YYMMDDHHmmssSSS_')+serverName+'.'+extension;
-    let addPath = 'etc/';
-    if(/(txt|text)/.test(extension)) {
-        addPath = 'texts/';
-    }
-    else if(/(jpeg|jpg|png)/.test(extension)) {
-        addPath = 'images/';
-    }
-    else if(/(mp4|avi|mkv)/.test(extension)) {
-        addPath = 'videos/';
-    }
-    else if(/(gif)/.test(extension)) {
-        addPath = 'gif/';
-    }
-    else if(/(pdf)/.test(extension)) {
-        addPath = 'pdf/';
-    }
-    return {serverName : newServerName, extension : extension,addPath : addPath};
-}
 
