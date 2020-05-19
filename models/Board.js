@@ -12,6 +12,8 @@ var boardSchema = mongoose.Schema({
   linknum:Number, // 연결 주문,입찰 등 번호
   userid:String, 
   userclass:String,
+  customer:String,
+  vender:String,
   status : String, // nego , qna , renego , negoqna
   nego:Boolean, // 네고관련 문의인지 
   negoConfirm : {
