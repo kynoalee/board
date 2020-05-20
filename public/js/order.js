@@ -72,6 +72,6 @@ function selectThisOrder(ordernum,vender,customer,status){
     }
 }
 
-function goQna(linknum,userid,userclass,where){
-    window.open("/qna/qna?linknum="+linknum+"&userid="+userid+"&userclass="+userclass+"&where="+where);
+function goQna(linknum,where){
+    window.open("/qna/qna?linknum="+linknum+"&where="+where);
 }
