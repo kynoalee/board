@@ -52,8 +52,11 @@
                         <div id="qnaSelect" class="<%=qnaList.noNegoDisplay%>">
                           <select name="qnaKind" id="qnaKind" >
                             <option value="">--문의 종류--</option>
-                            <option value="qna">단순 질의</option>
+                            <option value="question">단순 질의</option>
                             <option value="nego">입찰 내용 협상</option>
+                            <%if(qnaList.selectValue){%>
+                              <option value="<%=qnaList.selectValue%>" selected>-</option>
+                            <%}%>
                           </select>
                         </div>
                         <div class="requiredDiv <%=qnaList.requireDisplay%>">
