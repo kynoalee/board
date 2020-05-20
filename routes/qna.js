@@ -24,7 +24,7 @@ var storage = multer.diskStorage({
 var files = multer({ storage: storage });
 
 // 문의 리스트
-router.get('/',(req,res)=>{
+router.get('/',util.isLoggedin,(req,res)=>{
     const pageNum = req.query.pageNum || 1; // 페이지 포인터
     const boardNum = req.query.boardNum || 10; // 게시물 갯수 
     const blockNum = 5; // 페이징 보여줄 갯수. 
@@ -32,9 +32,9 @@ router.get('/',(req,res)=>{
         parents : -1
     };
     if(req.user.userclass == 'vender'){
-        findObj.customer = req.user.userid;
-    } else if(req.user.userclass == 'normal'){
         findObj.vender = req.user.userid;
+    } else if(req.user.userclass == 'normal'){
+        findObj.customer = req.user.userid;
     }
     Board.find(findObj).sort({qnanum:1}).skip((pageNum-1)*boardNum).limit(boardNum).exec((err,board)=>{
         if(err){
@@ -134,8 +134,7 @@ router.get('/',(req,res)=>{
 router.get('/qna',util.isLoggedin,function(req,res){
     var qna = req.flash('qna')||{};
     var errors = req.flash('errors')||{};
-    var userid = req.query.userid;
-    var userclass = req.query.userclass;
+    
     // 관련 질문이 있는지 파악
     Board.findOne({linknum : req.query.linknum,where:req.query.where, children : -1},function(err,board){
         if(err){
@@ -149,8 +148,8 @@ router.get('/qna',util.isLoggedin,function(req,res){
             exQnaDisplay : "display-none",
             lastQnaDisplay : "display-none",
             requireDisplay : "display-none",
-            qnaDisplay : "",
-            noNegoDisplay : "",
+            qnaDisplay : "display-none",
+            noNegoDisplay : "display-none",
             negoDisplay : "display-none",
             parents : -1
         };
@@ -166,28 +165,37 @@ router.get('/qna',util.isLoggedin,function(req,res){
             if(board.where == 'bid'){
                 exQnaList.lastData.whereName = "입찰";
             }
-
-            // 직전문의를 쓴 문의자가 현재 나였는지 파악 그리고 네고가 끝났는지 파악
-            if(userid == board.userid && userclass == board.userclass && !board.negoConfirm){
-                exQnaList.qnaDisplay = 'display-none';
-            }
-
             // 부모 있는지 확인 ( 직전 외 이전 문의 찾기 )
             if(board.parents != -1){
                 exQnaList.exQnaDisplay = '';
             }
             
-            // 직전 문의가 네고일시
-            if(board.nego && !board.negoConfirm){
-                exQnaList.noNegoDisplay = 'display-none';
-                exQnaList.negoDisplay = '';
-            }
+            // 해당 글을 내가 쓰지 않은 경우 
+            if(board.userid != req.user.userid){
+                // 직전문의가 단순질의의 질문인경우
+                if(board.status == "question"){
+                    exQnaList.qnaDisplay ='';
+                    exQnaList.requireDisplay ='';
+                    exQnaList.selectValue = 'answer';
+                }
 
-            if(board.status == 'negoqna'){
-                exQnaList.noNegoDisplay = 'display-none';
-                exQnaList.negoDisplay = 'display-none';
-                exQnaList.requireDisplay = 'negoqna';
+                // 직전문의가 단순질의의 답변인경우
+                if(board.status == "answer"){
+                    exQnaList.qnaDisplay ='';
+                    exQnaList.noNegoDisplay = '';
+
+                }
+
+                // 네고인경우
+                if(2){
+
+                }
             }
+            
+        } else{
+            // 첫문의
+            exQnaList.qnaDisplay = '';
+            exQnaList.noNegoDisplay = '';
         }
         // 현재 설정된 가격과 마감시간 등 변경 데이터 검색
         if(req.query.where == 'bid'){
@@ -262,9 +270,17 @@ function(req,res){
         };
         console.log("proccess : "+req.body.qnaKind);
         switch(req.body.qnaKind){
-            case 'qna':
+            case 'question':
                 createData.nego = false;
+                createData.status = "question";
                 createQnaDocument(req,res,createData);
+                console.log("question done!")
+                return res.redirect('/qna');
+            case 'answer':
+                createData.nego = false;
+                createData.status = "answer";
+                createQnaDocument(req,res,createData);
+                console.log("answer done!")
                 return res.redirect('/qna');
             case "negoqna" : 
                 Board.findOne({qnanum : req.body.parents},(err2,QnaParents)=>{
@@ -279,11 +295,12 @@ function(req,res){
                     createData.deadline = QnaParents.deadline?QnaParents.deadline:null;
                     createData.status = "negoqna";
                     createQnaDocument(req,res,createData);
+                    console.log("qna during negotiation done!")
                     return res.redirect('/qna');
                 });
             break;
             case 'nego' :
-                Board.findOne({qnanum : req.body.parents},(err2,QnaParents)=>{
+                Board.findOne({qnanum : req.body.parents,nego : true},(err2,QnaParents)=>{
                     if(err2){
                         Log.create({document_name : "Board",type:"error",contents:{error:err2,content:"입찰 제안 변경 데이터 find DB 에러"},wdate:Date()});
                         console.log(err2);

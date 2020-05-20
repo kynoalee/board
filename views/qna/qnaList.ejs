@@ -9,6 +9,7 @@
     <%- include('../partials/nav') %>
     <div class="container mb-3">
       <h1>문의 리스트</h1>
+     
       <table class="table table-striped">
         <thead>
            <tr>
@@ -22,7 +23,7 @@
         </thead>
         <tbody>
           <%for(let board of boardList){%>
-              <tr class="cursor-pointer" onclick="goQna('<%=board.data.linknum%>','<%=board.data.userid%>','<%=board.data.userclass%>','<%=board.data.where%>')">
+              <tr class="cursor-pointer" onclick="goQna('<%=board.data.linknum%>','<%=board.data.where%>')">
                 <td><%=board.idNum%></td>
                 <td><%=board.where%></td>
                 <td><%=board.link%></td>

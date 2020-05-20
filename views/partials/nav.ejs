@@ -15,9 +15,8 @@
         <%}%>
       </ul>
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item"><a href="/qna" class="nav-link">Qna List</a></li>
-
         <% if(isAuthenticated){ %>
+          <li class="nav-item"><a href="/qna" class="nav-link">Qna List</a></li>
           <li class="nav-item"><a href="/bid/bidList" class="nav-link">Bid list</a></li>
           <li class="nav-item"><a href="/order/list" class="nav-link">Order list</a></li>
           <li class="nav-item"><a href="/users/<%= currentUser.userid %>" class="nav-link">My Account</a></li>
