@@ -140,12 +140,6 @@ router.get('/bidList',util.isLoggedin,function(req,res){
                 return res.redirect('/');
             }
 
-            for(let value of board){
-                if(!value.negoConfirm){
-                    biddingList[value.linknum].qnaAble = true;
-                }
-            }
-
             // 배열 내  undefined 부분 삭제
             biddingList.sort();
             let max = biddingList.length;
