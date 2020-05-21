@@ -169,7 +169,7 @@ router.get('/qna',util.isLoggedin,function(req,res){
             if(board.parents != -1){
                 exQnaList.exQnaDisplay = '';
             }
-            
+           
             // 해당 글을 내가 쓰지 않은 경우 
             if(board.userid != req.user.userid){
                 // 직전문의가 단순질의의 질문인경우
@@ -198,7 +198,14 @@ router.get('/qna',util.isLoggedin,function(req,res){
                     exQnaList.requireDisplay ='';
                     exQnaList.selectValue = 'negoA';
                 }
-            }
+            } 
+            // 승인이나 거절 한 이후 bid 전용
+            if(board.status == "accept" || board.status == "reject"){
+                if(req.user.userclass != "vender"){
+                exQnaList.qnaDisplay = '';
+                exQnaList.noNegoDisplay = '';
+                }  
+            } 
             
         } else{
             // 첫문의
@@ -360,21 +367,32 @@ function(req,res){
                 });
                 break;
             case 'reject' :
-                createData.nego = true;
-                
-                let negoData = {
-                    linkqnanum : createData.qnanum,
-                    where : createData.where,
-                    linknum : createData.linknum,
+                Board.findOne({qnanum : req.body.parents},(err2,QnaParents)=>{
+                    if(err2){
+                        Log.create({document_name : "Board",type:"error",contents:{error:err2,content:"reNego 입찰 제안 변경 데이터 find DB 에러"},wdate:Date()});
+                        console.log(err2);
+                        req.flash("errors",{message : "DB ERROR"});
+                        return res.redirect('/');
+                    }
+                    createData.nego = true;
+                    createData.status = "reject";
+                    createData.price = QnaParents.price;
+                    createData.deadline = QnaParents.deadline;
+                    
+                    let negoData = {
+                        linkqnanum : createData.qnanum,
+                        where : createData.where,
+                        linknum : createData.linknum,
 
-                    status : 'reject',
-                    wdate : now
-                };
+                        status : 'reject',
+                        wdate : now
+                    };
 
-                createQnaDocument(req,res,createData);
-                createNegoDocument(req,res,negoData);
-                return res.redirect('/qna');
-
+                    createQnaDocument(req,res,createData);
+                    createNegoDocument(req,res,negoData);
+                    return res.redirect('/qna');
+                });
+                break;
             case 'accept' :
                 Board.findOne({qnanum : req.body.parents},(err2,QnaParents)=>{
                     if(err2){
@@ -410,7 +428,7 @@ function(req,res){
                             detail : bid.detail,
                             mdate :now
                         };
-
+                        createData.status = "accept";
                         if(suggestedPrice){
                             createData.price = suggestedPrice;
                             negoData.price = suggestedPrice;
