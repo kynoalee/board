@@ -25,7 +25,7 @@ $(document).ready(()=>{
     });
 
     $('#qnaKind').change(()=>{
-        if($('#qnaKind').val() == 'nego'){
+        if($('#qnaKind').val() == 'nego' ||$('#qnaKind').val() == 'reNego'){
             $('#nego').removeClass('display-none');
             $('#nego').children('div').children("input[name=price]").prop("disabled",false);
             $('#nego').children('div').children("input[name=deadline]").prop("disabled",false);
@@ -82,8 +82,8 @@ $(document).ready(()=>{
                 // 재협의
                 $('#inputName').html("<h2>재협의</h2>");
                 var $option1 = $('<option value="">--문의 종류--</option>');
-                var $option2 = $('<option value="negoqna">단순 질의</option>');
-                var $option3 = $('<option value="nego">입찰 내용 협상</option>');
+                var $option2 = $('<option value="negoQ">단순 질의</option>');
+                var $option3 = $('<option value="reNego">입찰 내용 협상</option>');
                 $('#qnaKind *').remove();
                 $('#qnaKind').append($option1);
                 $('#qnaKind').append($option2);

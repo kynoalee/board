@@ -59,13 +59,15 @@ function selectThisOrder(ordernum,vender,customer,status){
         return buttonDoubleCheck;
     } else{
         buttonDoubleCheck = true;
-        var statusName = status =="select"?'선정':status =="reject"?'거절':'오류';
+        var statusName = status =="select"?'선정':status =="reject"?'거절':'취소';
         if(confirm("정말 해당 입찰을 "+statusName +"하시겠습니까?")){
-            $('input[name=status]').val(status);
-            $('input[name=ordernum]').val(ordernum);
-            $('input[name=vender]').val(vender);
-            $('input[name=customer]').val(customer);
-            $('#selectForm').submit();
+            if(statusName == 'select'){
+                $('input[name=status]').val(status);
+                $('input[name=ordernum]').val(ordernum);
+                $('input[name=vender]').val(vender);
+                $('input[name=customer]').val(customer);
+                $('#selectForm').submit();
+            } 
         }else {
             buttonDoubleCheck = false;
         }
