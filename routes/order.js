@@ -282,7 +282,7 @@ router.get('/list',util.isLoggedin,function(req,res){
                 }
                 // 각 상태 정렬 필요.
                 for(let keyVal in nameSetting.statusName){
-                    sortArrayTimeDiff(orderDetail['status'+nameSetting.statusName[keyVal].status]);
+                    //sortArrayTimeDiff(orderDetail['status'+nameSetting.statusName[keyVal].status]);
                 }
                 res.render('order/list',{
                     summary : summary,
