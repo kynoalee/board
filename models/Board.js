@@ -14,7 +14,8 @@ var boardSchema = mongoose.Schema({
   userclass:String,
   customer:String,
   vender:String,
-  status : String, // nego , qna , renego , negoqna
+  status : String, 
+  // question,answer,negoQ,negoA,nego,reNego,reject,accept
   nego:Boolean, // 네고관련 문의인지 
   
   // 문의 내용
