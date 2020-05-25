@@ -312,7 +312,7 @@ function(req,res){
                     console.log("question during negotiation done!")
                     return res.redirect('/qna');
                 });
-                case "negoA" : 
+            case "negoA" : 
                 Board.findOne({qnanum : req.body.parents},(err2,QnaParents)=>{
                     if(err2){
                         Log.create({document_name : "Board",type:"error",contents:{error:err2,content:"negoA 입찰 제안 변경 데이터 find DB 에러"},wdate:Date()});
@@ -380,6 +380,8 @@ function(req,res){
                     createData.deadline = QnaParents.deadline;
                     
                     let negoData = {
+                        vender : createData.vender,
+                        customer : createData.customer,
                         linkqnanum : createData.qnanum,
                         where : createData.where,
                         linknum : createData.linknum,
@@ -407,6 +409,8 @@ function(req,res){
                     createData.nego = true;
                     
                     let negoData = {
+                        vender : createData.vender,
+                        customer : createData.customer,
                         linkqnanum : createData.qnanum,
                         where : createData.where,
                         linknum : createData.linknum,
@@ -431,7 +435,7 @@ function(req,res){
                         createData.status = "accept";
                         if(suggestedPrice){
                             createData.price = suggestedPrice;
-                            negoData.price = suggestedPrice;
+                            negoData.aPrice = suggestedPrice;
                             updateData.detail.price = suggestedPrice;
                         }
 

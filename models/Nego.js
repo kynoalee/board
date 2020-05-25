@@ -3,15 +3,24 @@ var mongoose = require('mongoose');
 // schema
 var negoSchema = mongoose.Schema({
 
+    negonum : {
+        type:Number,
+        unique:true
+    },
     linkqnanum : Number,
+    vender : String,
+    customer : String,
     where : String,
     linknum : Number,
 
     // 네고 내용
-    price:Number,
-    deadline:String,
+    bPrice:Number,
+    aPrice:Number,
+    bDeadline:String,
+    aDeadline:String, 
 
     status : String,
+    // 
     wdate : Date
 });
 
