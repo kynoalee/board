@@ -21,3 +21,19 @@ function selectThisOrder(ordernum,vender,customer,status){
 function goQna(linknum,where){
     window.open("/qna/qna?linknum="+linknum+"&where="+where);
 }
+
+$(document).ready(()=>{
+    $('td.negoAcceptList').css({"background-color":"#00ff8c"});
+    // 리스트 색깔 주기 위함.
+    for(let val of $('tr')){
+        if($(val).attr('id')){
+            let newId = $(val).attr('id').replace('ing','');
+            let numericId = parseInt(newId);
+            if(numericId % 2 == 0){
+                $(val).css({'background-color':'#00d9ff'});
+            } else{
+                $(val).css({'background-color':'#ff0800'});
+            }
+        }
+    }
+});

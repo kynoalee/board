@@ -6,6 +6,7 @@ var util = require('../util'); // 1
 var File = require('../models/File');
 var Bid = require('../models/Bid');
 var Board = require('../models/Board');
+var Nego = require('../models/Nego');
 var Log = require('../models/Log');
 var Order = require('../models/Order');
 var download = require('../modules/download');
@@ -87,12 +88,16 @@ router.get('/bidVenderIn/:servername',util.isLoggedin,function(req,res){
 router.get('/bidList',util.isLoggedin,function(req,res){
     var userid = req.user.userid;
     var userclass = req.user.userclass; 
-    var findObj = {};
+    var findObj = {status : {$ne : 'delete'}};
+
+    // 현재 유저 등급에 맞춰 db 검색
     if(userclass == 'normal'){
         findObj.userid = userid;
     } else if(userclass == 'vender'){
         findObj.vender = userid;
     }
+
+    // 해당 유저가 관여한 모든 입찰 (입찰, 선정, 거절)
     Bid.find(findObj,(err,bid)=>{
         if(err){
             Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"입찰된 리스트 find DB에러"},wdate:Date()});
@@ -105,14 +110,15 @@ router.get('/bidList',util.isLoggedin,function(req,res){
             return res.redirect('/');
         }
         var biddingList = []; // 현재 입찰 중인 내역
-        var bidDoneList = [];
-        var bidnumFindSet = [{linknum : -1}];
+        var bidDoneList = []; // 입찰된 내역
+        var bidnumFindSet = [{linknum : -1}]; // bid가 아예 없을때, null 에러 막기 위한 허구값. 벤더 문의 버튼 여부 확인용  
         for(let val of bid){
             if(val.status.toLowerCase() == 'bidding'){
+                // 입찰 상태(대기)인 경우
                 let tmpObj = setTmpArrayForBidList(val,userclass);
                
                 if(userclass == 'vender'){
-                    tmpObj.qnaAble = false;
+                    tmpObj.qnaAble = false; // 벤더 전용. 문의 버튼. 답장해야할 시에 true
                     bidnumFindSet.push({linknum : val.bidnum});
                 }
 
@@ -122,6 +128,7 @@ router.get('/bidList',util.isLoggedin,function(req,res){
 
                 biddingList[val.bidnum]=tmpObj;
             } else if(val.status.toLowerCase() == 'select' || val.status.toLowerCase() == 'reject'){
+                // 입찰이 된 경우
                 let tmpObj = setTmpArrayForBidList(val,userclass);
 
                 tmpObj.status = val.status;
@@ -132,6 +139,19 @@ router.get('/bidList',util.isLoggedin,function(req,res){
                 bidDoneList.push(tmpObj);
             }
         }
+
+        // 배열 내  undefined 부분 삭제
+        // bidnum 순으로 정리함.
+        biddingList.sort();
+        let max = biddingList.length;
+        let num = 0;
+        for(let i = 0 ; i < max ; i++){
+            if(!biddingList[num]){
+                biddingList.pop();
+            } else {
+                num += 1;
+            }
+        }
         Board.find({$or:bidnumFindSet,where:"bid",children:-1},(err2,board)=>{
             if(err2){
                 Log.create({document_name : "Board",type:"error",contents:{error:err2,content:"각 입찰 관련 qna find DB에러"},wdate:Date()});
@@ -140,21 +160,43 @@ router.get('/bidList',util.isLoggedin,function(req,res){
                 return res.redirect('/');
             }
 
-            // 배열 내  undefined 부분 삭제
-            biddingList.sort();
-            let max = biddingList.length;
-            let num = 0;
-            for(let i = 0 ; i < max ; i++){
-                if(!biddingList[num]){
-                    biddingList.pop();
-                } else {
-                    num += 1;
+            // 각 문의가 있으므로, 문의 버튼 display
+            for(let val of board){
+                for(let bidding of biddingList){
+                    if(bidding.bidnum == val.linknum){
+                        bidding.qnaAble = true;
+                    }
                 }
             }
+            
+            var negoFind = {status : "accept"};
+            if(userclass == 'normal'){
+                negoFind.customer = userid;
+            } else if(userclass == 'vender'){
+                negoFind.vender = userid;
+            }
+            // 연결된 네고가 있는지 파악
+            Nego.find(negoFind,(err3,nego)=>{
+                if(err3){
+                    Log.create({document_name : "Nego",type:"error",contents:{error:err3,content:"각 입찰 관련 nego find DB에러"},wdate:Date()});
+                    console.log(err3);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }
+                for(let bidding of biddingList){
+                    let tmpArray=[];
+                    for(let val of nego){
+                        if(bidding.bidnum == val.linknum){
+                            tmpArray.push(val);
+                        }
+                    }
+                    bidding.nego = tmpArray;
+                }
 
-            res.render('bid/bidList',{
-                bidding : biddingList,
-                bidDone : bidDoneList
+                res.render('bid/bidList',{
+                    bidding : biddingList,
+                    bidDone : bidDoneList
+                });
             });
         });
         
@@ -312,6 +354,7 @@ async function workBidDB(obj){
     });
 }
 
+// 입찰 기본 배열 생성
 function setTmpArrayForBidList(val,userclass){
     let tmpObj ={};
     tmpObj.bidnum = val.bidnum;
