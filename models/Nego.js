@@ -20,8 +20,9 @@ var negoSchema = mongoose.Schema({
     aDeadline:String, 
 
     status : String,
-    // 
-    wdate : Date
+    // negotiating,accept,reject
+    wdate : Date,
+    mdate : Date
 });
 
 // model & export

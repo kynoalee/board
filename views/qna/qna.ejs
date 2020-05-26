@@ -36,9 +36,12 @@
                   <div>문의자 <%=qnaList.lastData.userid%></div>
                   <div>요약 <%=qnaList.lastData.summary%></div>
                   <div>내용 <%=qnaList.lastData.contents%></div>
-                  <%if(qnaList.lastData.nego == true){%>
+                  <%if(qnaList.lastData.nego){%>
+                    <%if(qnaList.lastData.price){%>
                   <div class="suggested-price" alt='<%=qnaList.lastData.price%>'>제안된 가격 <%=qnaList.lastData.price%></div>
+                    <%}if(qnaList.lastData.deadline){%>
                   <div class="suggested-deadline" alt='<%=qnaList.lastData.deadline%>'>제안된 마감시기 <%=qnaList.lastData.deadline%></div>
+                    <%}%>
                   <%}%>
                 </div>
                 <%}%>

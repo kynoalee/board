@@ -135,14 +135,86 @@ function exQnaList(linknum,endnum){
                     html += '<div>문의자'+ val.userid+'</div>';
                     html += '<div>요약'+ val.summary+'</div>';
                     html += '<div>내용'+ val.contents+'</div>';
-                    if(val.nego == true){
-                        html += '<div>제안된 가격'+ val.price+'</div>';
-                        html += '<div>제안된 마감시기'+ val.deadline+'</div>';
+                    if(val.nego){
+                        if(val.price){
+                            html += '<div>제안된 가격'+ val.price+'</div>';
+                        }
+                        if(val.deadline){
+                            html += '<div>제안된 마감시기'+ val.deadline+'</div>';
+                        }                        
                     }
                     html += '</div>';
                     item2.children(".qnaList").html(html);
                 }
                 item2.css({"display":"block"});
+            } else if(result.result == "mongo error"){
+                alert('mongo error');
+            }
+        }
+    });
+}
+
+function getQnaDetail(linknum,endnum){
+    $.ajax({
+        url : "/ajax/getQnaDetail",
+        type : "POST",
+        data : {
+            linknum : linknum,
+            qnanum : endnum
+        },
+        success : function(result){
+            if(result.result == "success"){
+                if(result.data.length !=0){
+                    var html = `<table class="table">
+                        <thead>
+                            <tr>
+                                <td>상태</td>
+                                <td>글쓴이</td>
+                                <td>변경 내용</td>
+                                <td>제목</td>
+                                <td>작성일자</td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    `;
+                    let num=0;
+                    for(let val of result.data){
+                        // 상태 ,글쓴이, 제목, 작성일자, 변경 내용
+                        html += "<tr>";
+                        // 상태 
+                        let status = '';
+                        switch(val.status){
+                            case 'question' : status = '질문';break;
+                            case 'answer' : status = '답변';break;
+                            case 'negoQ' : status = '네고질의 질문';break;
+                            case 'negoA' : status = '네고질의 답변';break;
+                            case 'nego' : status = '네고 신청';break;
+                            case 'reNego' : status = '재 네고';break;
+                            case 'reject' : status = '변경거절';break;
+                            case 'accept' : status = '변경승인';break;
+                            default:break;
+                        }
+                        let wdate = new Date(val.wdate);
+
+                        html += "<td>"+status+"</td>";
+                        html += "<td>"+val.userid+"</td>";
+                        html += "<td></td>";
+                        html += "<td>"+val.summary+"</td>";
+                        html += "<td>"+wdate.format('yyyy-MM-dd hh:mm:ss')+"</td>";
+                        if(num == 0){
+                            html+= "<td rowspan="+result.data.length+"><button height=3 type='button' onclick=\"goQna('"+val.linknum+"','"+val.where+"')\">상세보기</button></td>";
+                            num+=1;
+                        }
+                        html += "</tr>";
+                    }
+                    html += "</tbody></table>";
+                    
+                    $('div#linkedQna'+endnum).html(html);
+                    $('div#linkedQna'+endnum).removeClass('display-none');
+                } else {
+                    $('tr#qnaEnd'+endnum).removeAttr('onclick');
+                }
             } else if(result.result == "mongo error"){
                 alert('mongo error');
             }

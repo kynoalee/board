@@ -187,7 +187,9 @@ router.get('/bidList',util.isLoggedin,function(req,res){
                     let tmpArray=[];
                     for(let val of nego){
                         if(bidding.bidnum == val.linknum){
-                            tmpArray.push(val);
+                            let tmpObj = val;
+                            tmpObj.mdateFormated = moment(val.mdate).format("YYYY-MM-DD HH:mm:ss");
+                            tmpArray.push(tmpObj);
                         }
                     }
                     bidding.nego = tmpArray;

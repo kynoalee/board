@@ -10,3 +10,7 @@
 .border-red {
     border: 1px solid red;
 }
+
+.padding-none {
+    padding:0;
+}
