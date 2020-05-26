@@ -135,9 +135,13 @@ function exQnaList(linknum,endnum){
                     html += '<div>문의자'+ val.userid+'</div>';
                     html += '<div>요약'+ val.summary+'</div>';
                     html += '<div>내용'+ val.contents+'</div>';
-                    if(val.nego == true){
-                        html += '<div>제안된 가격'+ val.price+'</div>';
-                        html += '<div>제안된 마감시기'+ val.deadline+'</div>';
+                    if(val.nego){
+                        if(val.price){
+                            html += '<div>제안된 가격'+ val.price+'</div>';
+                        }
+                        if(val.deadline){
+                            html += '<div>제안된 마감시기'+ val.deadline+'</div>';
+                        }                        
                     }
                     html += '</div>';
                     item2.children(".qnaList").html(html);

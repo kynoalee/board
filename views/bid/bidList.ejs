@@ -57,12 +57,14 @@
           <td class="negoAcceptList" colspan=9>
             <%for(let negoVal of obj.nego){%>
               <div>
-                <span>가격변경</span>
+                <span><%=negoVal.mdateFormated%></span>
+                <%if(negoVal.aPrice){%>
+                <span> | 가격변경</span>
                 <span><%=negoVal.bPrice%>원 -> <%=negoVal.aPrice%>원</span>
-                <span>마감시간변경</span>
+                <%}if(negoVal.aDeadline){%>
+                <span> | 마감시간변경</span>
                 <span><%=negoVal.bDeadline%> -> <%=negoVal.aDeadline%></span>
-                <span>입찰변경일자</span>
-                <span><%=negoVal.mdate%></span>
+                <%}%>
               </div>
             <%}%>
           </td>

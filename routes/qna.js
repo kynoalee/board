@@ -376,7 +376,6 @@ function(req,res){
 
                         negoData.bPrice = bidData.detail.price;
                         negoData.bDeadline = bidData.detail.deadline;
-                        
 
                         createQnaDocument(req,res,createData);
                         createNegoDocument(req,res,negoData);
