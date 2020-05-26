@@ -96,6 +96,7 @@ router.get('/',util.isLoggedin,(req,res)=>{
             var idNum = (pageNum-1)*boardNum+1; // 게시물 자체 번호 전체 갯수에 의존.
             for(let val of board){
                 let tmpObj = {
+                    qnanum : val.qnanum,
                     idNum : idNum,
                     link : val.linknum,
                     summary : val.summary,
