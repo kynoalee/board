@@ -10,7 +10,7 @@
     <div class="container mb-3">
       <h1>문의 리스트</h1>
      
-      <table class="table table-striped">
+      <table class="table">
         <thead>
            <tr>
              <td></td>
@@ -23,7 +23,7 @@
         </thead>
         <tbody>
           <%for(let board of boardList){%>
-              <tr class="cursor-pointer" onclick="goQna('<%=board.data.linknum%>','<%=board.data.where%>')">
+              <tr id="qnaEnd<%=board.qnanum%>" class="cursor-pointer" onclick="getQnaDetail('<%=board.link%>','<%=board.qnanum%>')" data-toggle="collapse" data-target="#qnaDetail<%=board.qnanum%>">
                 <td><%=board.idNum%></td>
                 <td><%=board.where%></td>
                 <td><%=board.link%></td>
@@ -33,6 +33,12 @@
                   <div><%=board.wdateD%> <%=board.wdateH%></div>
                   <div><%=board.mdateD%> <%=board.mdateH%></div>
                 </td>
+              </tr>
+              <tr id="qnaDetail<%=board.qnanum%>" class="collapse" style="padding :0">
+                  <td colspan=6 >
+                    <div id="linkedQna<%=board.qnanum%>" class="display-none">
+                    </div>
+                  </td>
               </tr>
           <%}%>
         </tbody>

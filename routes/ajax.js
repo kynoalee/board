@@ -56,4 +56,20 @@ router.post('/getQnaList',function(req,res){
     });        
 });
 
+router.post('/getQnaDetail',(req,res)=>{
+    // 문의 리스트에서 모든 연결 문의 가져오기
+    // 부모 노드가 없을 시까지 루프 
+    console.log('qnanum : ' + req.body.qnanum);
+    console.log("linknum : " + req.body.linknum);
+    Board.find({linknum : req.body.linknum,qnanum:{$ne:req.body.qnanum}},(err,board)=>{
+        if(err){
+            Log.create({document_name : "Board",type:"error",contents:{error:err,content:"문의리스트 모든 문의내용 find 중 DB 에러"},wdate:Date()});
+            console.log(err);
+            return res.send({result:"mongo error"});
+        }
+        console.log("all done");
+        res.send({result:"success",data:board});
+    }); 
+});
+
 module.exports = router;
