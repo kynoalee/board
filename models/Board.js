@@ -16,7 +16,7 @@ var boardSchema = mongoose.Schema({
   vender:String,
   status : String, 
   // question,answer,negoQ,negoA,nego,reNego,reject,accept
-  nego:Boolean, // 네고관련 문의인지 
+  nego:Number, // 네고링크번호
   
   // 문의 내용
   summary:String,
