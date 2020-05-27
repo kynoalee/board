@@ -196,14 +196,35 @@ function getQnaDetail(linknum,endnum){
                             default:break;
                         }
                         let wdate = new Date(val.wdate);
-
+                        var tmpText ='';
+                        // 변경사항있는지 파악 ( 네고인지 )
+                        if(val.status == "nego" || val.status == "reNego"){
+                            tmpText += '변경 신청';
+                            if(val.price){
+                                tmpText += " | 가격 "+val.price;
+                            }
+                            if(val.deadline){
+                                tmpText += " | 마감시간 "+val.deadline;
+                            }
+                        }
+                        // 확정
+                        if(val.status == "accept"){
+                            tmpText += '변경됨';
+                            if(val.price){
+                                tmpText += " | 가격 "+val.price;
+                            }
+                            if(val.deadline){
+                                tmpText += " | 마감시간 "+val.deadline;
+                            }
+                        }
+                        
                         html += "<td>"+status+"</td>";
                         html += "<td>"+val.userid+"</td>";
-                        html += "<td></td>";
                         html += "<td>"+val.summary+"</td>";
+                        html += "<td>"+tmpText+"</td>";
                         html += "<td>"+wdate.format('yyyy-MM-dd hh:mm:ss')+"</td>";
                         if(num == 0){
-                            html+= "<td rowspan="+result.data.length+"><button height=3 type='button' onclick=\"goQna('"+val.linknum+"','"+val.where+"')\">상세보기</button></td>";
+                            html+= "<td rowspan="+result.data.length+" class='height-max'><button class='btn height-max' type='button' onclick=\"goQna('"+val.linknum+"','"+val.where+"')\">상세보기</button></td>";
                             num+=1;
                         }
                         html += "</tr>";
