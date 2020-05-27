@@ -40,74 +40,7 @@
         </table>
         <!-- 라스트오더 -->
         <h3>주문 상세</h3>
-        <table class='table'>
-            <thead id="lastOrder" data-toggle="collapse" data-target="#orderDetail">
-                <tr>
-                    <td width=10 class="align-middle"><%=lastOrderNum%></td>
-                    <%for(let status of lastOrder){%>
-                    <td scope="col" class="align-middle">
-                        <div class="last"><%=status.title%></div>
-                        <div>
-                            <%if(status.type == 'images' ||status.type == 'gifs'){%>
-                            <img width = 150 height = 150 src= "<%=status.path%>" />
-                            <%} else if(status.type == 'videos'){%>
-                            <video width = 150 height = 150 src="<%=status.path%>" controls loop></video>
-                            <%} else if(status.type == 'not'){%>
-                            <img width = 150 height = 150 src="/img/<%=status.filename%>.png" alt="">
-                            <%} else {%>
-                            <img src="/img/Unknown.png" width = 150 height = 150>
-                            <%}%>
-                        </div>  
-                        <div>
-                            <%=status.summary%>
-                        </div>  
-                    </td>
-                    <%}%>
-                </tr>
-            </thead>
-            <!-- 주문 상세 -->
-            <tbody id="orderDetail" class="collapse" data-parent="#lastOrder">
-                <tr>
-                    <td><!--빈공간--></td>
-
-                    <td scope="row" onclick="goPopup('<%=lastOrderNum%>','1')">
-                        <%for(let details of orderDetail.status1){%>
-                        <div><%=details.userclass%> : <%=details.summary%></div>
-                        <%}%>
-                    </td>
-                    <td onclick="goPopup('<%=lastOrderNum%>','2')">
-                        <%for(let details of orderDetail.status2){%>
-                        <div><%=details.userclass%> : <%=details.summary%></div>
-                        <%}%>
-                    </td>
-                    <td onclick="goPopup('<%=lastOrderNum%>','3')">
-                        <%for(let details of orderDetail.status3){%>
-                        <div><%=details.userclass%> : <%=details.summary%></div>
-                        <%}%>
-                    </td>
-                    <td onclick="goPopup('<%=lastOrderNum%>','4')">
-                        <%for(let details of orderDetail.status4){%>
-                        <div><%=details.userclass%> : <%=details.summary%></div>
-                        <%}%>
-                    </td>
-                    <td onclick="goPopup('<%=lastOrderNum%>','5')">
-                        <%for(let details of orderDetail.status5){%>
-                        <div><%=details.userclass%> : <%=details.summary%></div>
-                        <%}%>
-                    </td>
-                    <td onclick="goPopup('<%=lastOrderNum%>','6')">
-                        <%for(let details of orderDetail.status6){%>
-                        <div><%=details.userclass%> : <%=details.summary%></div>
-                        <%}%>
-                    </td>
-                    <td onclick="goPopup('<%=lastOrderNum%>','7')">
-                        <%for(let details of orderDetail.status7){%>
-                        <div><%=details.userclass%> : <%=details.summary%></div>
-                        <%}%>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+         <!-- 재공사 -->
         <!-- 주문 간략리스트 -->
         <h3>주문 목록</h3>
         <table class="table table-hover">
