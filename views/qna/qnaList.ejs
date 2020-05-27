@@ -18,6 +18,7 @@
              <td>연결번호</td>
              <td>상태</td>
              <td>제목</td>
+             <td>변경내용</td>
              <td>작성일자</td>
            </tr>
         </thead>
@@ -27,16 +28,14 @@
                 <td><%=board.idNum%></td>
                 <td><%=board.where%></td>
                 <td><%=board.link%></td>
-                <td></td>
+                <td><%=board.changedText%></td>
                 <td><%=board.summary%></td>
-                <td>
-                  <div><%=board.wdateD%> <%=board.wdateH%></div>
-                  <div><%=board.mdateD%> <%=board.mdateH%></div>
-                </td>
+                <td></td>
+                <td><%=board.wdateD%> <%=board.wdateH%></td>
               </tr>
               <tr id="qnaDetail<%=board.qnanum%>" class="collapse" style="padding :0">
-                  <td colspan=6 >
-                    <div id="linkedQna<%=board.qnanum%>" class="display-none">
+                  <td colspan=7>
+                    <div id="linkedQna<%=board.qnanum%>" class="display-none height-max">
                     </div>
                   </td>
               </tr>

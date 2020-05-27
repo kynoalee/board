@@ -104,7 +104,6 @@ router.get('/',util.isLoggedin,(req,res)=>{
                         linknum : val.linknum,
                         userid : val.userid,
                         userclass : val.userclass,
-                        where : val.where
                     }
                 };
                 // 날짜 포맷 변경
@@ -114,12 +113,45 @@ router.get('/',util.isLoggedin,(req,res)=>{
                 tmpObj.mdateH = moment(val.mdate).format("HH:mm:ss");
 
                 // 상태 변경 답변대기중 답변받음 답변완료 / 협상중 협상완료 
-                
+                switch(val.status){
+                    case 'question' : tmpObj.status = '질문';break;
+                    case 'answer' : tmpObj.status = '답변';break;
+                    case 'negoQ' : tmpObj.status = '네고질의 질문';break;
+                    case 'negoA' : tmpObj.status = '네고질의 답변';break;
+                    case 'nego' : tmpObj.status = '네고 신청';break;
+                    case 'reNego' : tmpObj.status = '재 네고';break;
+                    case 'reject' : tmpObj.status = '변경거절';break;
+                    case 'accept' : tmpObj.status = '변경승인';break;
+                    default:break;
+                }
 
                 if(val.where == 'bid'){
                     tmpObj.where = "입찰";
                 }
+                var tmpText ='';
+                // 변경사항있는지 파악 ( 네고인지 )
+                if(val.status == "nego" || val.status == "reNego"){
+                    tmpText += '변경 신청';
+                    if(val.price){
+                        tmpText += " | 가격 "+val.price;
+                    }
+                    if(val.deadline){
+                        tmpText += " | 마감시간 "+val.deadline;
+                    }
+                }
+                // 확정
+                if(val.status == "accept"){
+                    tmpText += '변경됨';
+                    if(val.price){
+                        tmpText += " | 가격 "+val.price;
+                    }
+                    if(val.deadline){
+                        tmpText += " | 마감시간 "+val.deadline;
+                    }
+                }
                 
+                tmpObj.changedText = tmpText;
+
                 boardLists.push(tmpObj);
                 idNum++;
             }
