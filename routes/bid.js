@@ -207,7 +207,7 @@ router.get('/bidList',util.isLoggedin,function(req,res){
 
 router.post('/bidList',function(req,res){
     console.log("bidding process...")
-    if(req.user.userclass == 'vender'){
+    if(req.user.userclass == 'vender'&& (req.body.status == "select" || req.body.status == "reject" )){
         Log.create({document_name : "Bid",type:"error",contents:{content:"입찰선정과정에 벤더유입됨. 퍼미션 에러"},wdate:Date()});
         req.flash("errors",{message : "no Permission"});
         return res.redirect('/');
@@ -291,49 +291,47 @@ router.post('/bidList',function(req,res){
 
             // 해당 주문번호에 걸린 입찰이 또 있는지 확인
             // 주문번호입찰 있는지 여부에 따라 status 변경 , 여부에 상관없이 mdate 변경
-            let fObj = {ordernum : req.body.ordernum};
-            if(otherBidIds.length != 0){
-                fObj['$or'] = otherBidIds;
-            }
-            Bid.find(fObj,function(err,bid){
-                if(err){
-                    Log.create({document_name : "Bid",type:"error",contents:{error:err,content:"거절된 입찰리스트와 같은 주문번호를 가진 입찰 내용 find DB에러"},wdate:Date()});
-                    console.log(err);
+            // 다른 입찰 내역이 없는 경우 status 2 -> 1 
+            let updateObj = {
+                mdate : now
+            };
+            if(otherBidIds.length == 0){
+                updateObj.status = 1;
+            } 
+
+            Order.Summary.updateOne({ordernum:req.body.ordernum},updateObj,function(err2){
+                if(err2){
+                    Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"입찰 거절로 인한 update 중 DB 에러"},wdate:Date()});
+                    console.log(err2);
                     req.flash("errors",{message : "DB ERROR"});
                     return res.redirect('/');
                 }
-                // 다른 입찰 내역이 없는 경우 status 2 -> 1 
-                if(otherBidIds.length == 0){
-                    let updateObj = {
-                        status : 1,
-                        mdate : now
-                    };
-                    Order.Summary.updateOne({ordernum:req.body.ordernum},updateObj,function(err2){
-                        if(err2){
-                            Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"입찰 거절로 인한 상태 변화 update 중 DB 에러"},wdate:Date()});
-                            console.log(err2);
-                            req.flash("errors",{message : "DB ERROR"});
-                            return res.redirect('/');
-                        }
-                        Log.create({document_name : "Summary",type:"update",contents:{update:updateObj,content:"입찰 거절로 인한 상태 변화 update"},wdate:Date()});
-                        return res.redirect('bidList');
-                    });
-                } else{
-                    let updateObj = {
-                        mdate : now
-                    };
-                    Order.Summary.updateOne({ordernum:req.body.ordernum},updateObj,function(err2){
-                        if(err2){
-                            Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"입찰 거절로 인한 mdate update 중 DB 에러"},wdate:Date()});
-                            console.log(err2);
-                            req.flash("errors",{message : "DB ERROR"});
-                            return res.redirect('/');
-                        }
-                        Log.create({document_name : "Summary",type:"update",contents:{update:updateObj,content:"입찰 거절로 인한 mdate update"},wdate:Date()});
-                        return res.redirect('bidList');
-                    });
+                Log.create({document_name : "Summary",type:"update",contents:{update:updateObj,content:"입찰 거절로 인한 update"},wdate:Date()});
+                return res.redirect('bidList');
+            });         
+        } else if(req.body.status == "cancel"){
+            bidDoneObj.status = "delete";
+            workBidDB(bidDoneObj);
+            // 해당 주문번호에 걸린 입찰이 또 있는지 확인
+            // 주문번호입찰 있는지 여부에 따라 status 변경 , 여부에 상관없이 mdate 변경
+            // 다른 입찰 내역이 없는 경우 status 2 -> 1 
+            let updateObj = {
+                mdate : now
+            };
+            if(otherBidIds.length == 0){
+                updateObj.status = 1;
+            } 
+
+            Order.Summary.updateOne({ordernum:req.body.ordernum},updateObj,function(err2){
+                if(err2){
+                    Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"입찰 취소로 인한 update 중 DB 에러"},wdate:Date()});
+                    console.log(err2);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
                 }
-            });            
+                Log.create({document_name : "Summary",type:"update",contents:{update:updateObj,content:"입찰 취소로 인한 update"},wdate:Date()});
+                return res.redirect('bidList');
+            });         
         }
        
     });
