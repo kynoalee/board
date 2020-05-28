@@ -87,51 +87,29 @@ function (req,res,next){
     });
 },
 function(req,res){
-    // Order Summary, Order last create
+    // Order Summary create
     var summaryObj ={
         ordernum : req.body.ordernum,
         orderid : req.body.userid,
         orderdate : req.body.wdate,
         mdate :req.body.wdate,
         status : req.body.status
-    };
-    var lastObj = {
-        ordernum : req.body.ordernum,
-        wdate : req.body.wdate,
-        mdate : req.body.wdate
-    };
-    lastObj['filepath'+req.body.status] = req.files[0].path;
-    lastObj['summary'+req.body.status] = req.body.summary;
-
+    }
     Order.Summary.create(summaryObj,function(err,summary){
         if(err){
             Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"주문 summary create DB 에러"},wdate:Date()});
             req.flash('errors',{});
             return res.redirect('order');
-        } else{
-            Log.create({document_name : "Summary",type:"create",contents:{summary:summaryObj,content:"주문 summary create"},wdate:Date()});
-            Order.Last.create(lastObj,function(err,last){
-                if(err){
-                    Log.create({document_name : "Last",type:"error",contents:{summary:summaryObj,content:"주문 last create 중 DB 에러"},wdate:Date()});
-                    req.flash('errors',{});
-                    return res.redirect('order');
-                }
-                Log.create({document_name : "Last",type:"create",contents:{summary:summaryObj,content:"주문 Last create"},wdate:Date()});
-                res.redirect('order/list');
-            });
-        }
+        } 
+        Log.create({document_name : "Summary",type:"create",contents:{summary:summaryObj,content:"주문 summary create"},wdate:Date()});
+        res.redirect('order/list');           
     });
 });
 
 // my order list get
 router.get('/list',util.isLoggedin,function(req,res){
     // 주문 리스트 상태 값 정의
-    var summaryNum = {all : 0};
-    var orderDetail = {};
-    for(let keyVal in nameSetting.statusName){
-        orderDetail["status"+nameSetting.statusName[keyVal].status] = [];
-        summaryNum[keyVal] = 0; 
-    }
+    var summaryNum = {all : 0};   
     var findObj = {};
     if(req.user.userclass == "vender"){
         findObj.vender = req.user.userid;
@@ -151,8 +129,14 @@ router.get('/list',util.isLoggedin,function(req,res){
             req.flash("errors",[{message : "주문이 없습니다."}]);
             return res.redirect('/');
         }
+
+        // 주문요약을 프론트에서 보여줄 배열
         var summary = [];
-        for(var ob of arr){      
+
+        // 각 주문요약 데이터 정제
+        for(var ob of arr){ 
+            
+            // 날짜 데이터 포맷팅
             let dateOb ={
                 orderD : moment(ob.orderdate).format("YYYY-MM-DD"),
                 orderH : moment(ob.orderdate).format("HH:mm:ss"),
@@ -160,6 +144,7 @@ router.get('/list',util.isLoggedin,function(req,res){
                 modiH : moment(ob.mdate).format("HH:mm:ss")
             };
 
+            // 상태 한글화
             let stat = '';
             numberCheck :for(let keyVal in nameSetting.statusName){
                 if(ob.status == nameSetting.statusName[keyVal].status){
@@ -170,6 +155,7 @@ router.get('/list',util.isLoggedin,function(req,res){
                 }
             }
             
+            // 데이터 객체 묶음
             let contents = {
                 ordernum : ob.ordernum,
                 orderdateD : dateOb.orderD,
@@ -182,8 +168,9 @@ router.get('/list',util.isLoggedin,function(req,res){
             }
             summary.push(contents);
         }
-        // 주문 번호 순 정렬 
-       summary.sort(function(a,b){
+        
+        // 최근 수정 주문 파악 -> 맨처음 오픈시 보여줄 주문번호 파악용
+        summary.sort(function(a,b){
             if(moment.duration(moment(a.modidate).diff(moment(b.modidate))).asMilliseconds() < 0){
                 return 1;
             } else if(moment.duration(moment(a.modidate).diff(moment(b.modidate))).asMilliseconds() > 0){
@@ -192,106 +179,40 @@ router.get('/list',util.isLoggedin,function(req,res){
                 return 0;
             }
         });
-
-        var initialOrdernum = req.query.ordernum?req.query.ordernum :summary[0].ordernum;
-        summary.sort(function(a,b){
-            return a.ordernum < b.ordernum ? -1 : a.ordernum > b. ordernum ? 1 : 0;
-        });
-        // Last Order
-
-        Order.Last.find({ordernum:initialOrdernum},function(err1,last){
-            if(err1){
-                Log.create({document_name : "Last",type:"error",contents:{error:err1,content:""},wdate:Date()});
-                console.log(err1);
+        
+        // 주문상세 
+        var orderDetail = {};
+        Order.Detail.findOne({orderlink:summary[0].ordernum}).sort({wdate:-1}).exec((err2,detailArray)=>{
+            if(err2){
+                Log.create({document_name : "Detail",type:"error",contents:{error:err2,content:"주문상세 find 중 DB 에러"},wdate:Date()});
+                console.log(err2);
                 req.flash("errors",{message : "DB ERROR"});
                 return res.redirect('/');
             }
-            Order.Detail.find({orderlink:initialOrdernum},function(err2,detail){
-                if(err2){
-                    Log.create({document_name : "Detail",type:"error",contents:{error:err2,content:""},wdate:Date()});
-                    console.log(err2);
-                    req.flash("errors",{message : "DB ERROR"});
-                    return res.redirect('/');
+            console.log(detailArray);
+            orderDetail.ordernum = detailArray.orderlink;
+            orderDetail.status = detailArray.status;
+            // 상태 한글화
+            let stat = '';
+            numberCheck :for(let keyVal in nameSetting.statusName){
+                if(ob.status == nameSetting.statusName[keyVal].status){
+                    stat = nameSetting.statusName[keyVal].value;
+                    summaryNum[keyVal] += 1;
+                    summaryNum.all +=1;
+                    break numberCheck;
                 }
-                var lastOrderNum = initialOrdernum;
-                var lastOrder = [
-                    {},
-                    {
-                        type : "not",
-                        filename : 'bidding'
-                    },
-                    {
-                        type : "not",
-                        filename : 'ptmaking'
-                    },
-                    {
-                        type : "not",
-                        filename : 'ptdeli'
-                    },
-                    {
-                        type : "not",
-                        filename : 'making'
-                    },
-                    {
-                        type : "not",
-                        filename : 'deli'
-                    },
-                    {
-                        type : "not",
-                        filename : 'done'
-                    }
-                ];
-                for(let keyVal in nameSetting.statusName){
-                    if(last[0]['summary'+nameSetting.statusName[keyVal].status]){
-                        let routerPath =last[0]['filepath'+nameSetting.statusName[keyVal].status].replace("../files","");
-                        let fileType = routerPath.split('/');
-                        lastOrder[0] = { 
-                            summary : last[0]['summary'+nameSetting.statusName[keyVal].status],
-                            type : fileType[1],
-                            path : routerPath,
-                            title : nameSetting.statusName[keyVal].value,
-                            filename : ''
-                        };
-                    }
-                }
-                // 디테일 링크 설정
-                
-                
-                for(var detailInfo of detail){
-                    switch(detailInfo.userclass){
-                        case "normal" : detailInfo.userclass = "C"; 
-                            break;
-                        case "vender" : detailInfo.userclass = "V";
-                            break;
-                        default : detailInfo.userclass = "PD";
-                            break;  
-                    }
-                    statusCheck : for(let keyVal in nameSetting.statusName){
-                        if(detailInfo.status == nameSetting.statusName[keyVal].status){
-                            let newObj = {
-                                detailnum : detailInfo.order_detailnum,
-                                summary : detailInfo.summary,
-                                wdate : detailInfo.wdate,
-                                userclass : detailInfo.userclass
-                            };
-                            orderDetail["status"+nameSetting.statusName[keyVal].status].push(newObj);
-                            
-                            break statusCheck;
-                        }
-                    }
-                }
-                // 각 상태 정렬 필요.
-                for(let keyVal in nameSetting.statusName){
-                    //sortArrayTimeDiff(orderDetail['status'+nameSetting.statusName[keyVal].status]);
-                }
-                res.render('order/list',{
-                    summary : summary,
-                    lastOrder : lastOrder,
-                    lastOrderNum : lastOrderNum,
-                    orderDetail : orderDetail,
-                    summaryNum : summaryNum,
-                    statusName : nameSetting.statusName
-                });
+            }
+
+            // 주문 번호 순 정렬 
+            summary.sort(function(a,b){
+                return a.ordernum < b.ordernum ? -1 : a.ordernum > b. ordernum ? 1 : 0;
+            });
+            
+            res.render('order/list',{
+                summary : summary,
+                orderDetail : orderDetail,
+                summaryNum : summaryNum,
+                statusName : nameSetting.statusName
             });
         });
     });   
