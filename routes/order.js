@@ -109,12 +109,7 @@ function(req,res){
 // my order list get
 router.get('/list',util.isLoggedin,function(req,res){
     // 주문 리스트 상태 값 정의
-    var summaryNum = {all : 0};
-    var orderDetail = {};
-    for(let keyVal in nameSetting.statusName){
-        orderDetail["status"+nameSetting.statusName[keyVal].status] = [];
-        summaryNum[keyVal] = 0; 
-    }
+    var summaryNum = {all : 0};   
     var findObj = {};
     if(req.user.userclass == "vender"){
         findObj.vender = req.user.userid;
@@ -184,17 +179,41 @@ router.get('/list',util.isLoggedin,function(req,res){
                 return 0;
             }
         });
-
-        // 주문 번호 순 정렬 
-        summary.sort(function(a,b){
-            return a.ordernum < b.ordernum ? -1 : a.ordernum > b. ordernum ? 1 : 0;
-        });
         
-        res.render('order/list',{
-            summary : summary,
-            orderDetail : orderDetail,
-            summaryNum : summaryNum,
-            statusName : nameSetting.statusName
+        // 주문상세 
+        var orderDetail = {};
+        Order.Detail.findOne({orderlink:summary[0].ordernum}).sort({wdate:-1}).exec((err2,detailArray)=>{
+            if(err2){
+                Log.create({document_name : "Detail",type:"error",contents:{error:err2,content:"주문상세 find 중 DB 에러"},wdate:Date()});
+                console.log(err2);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }
+            console.log(detailArray);
+            orderDetail.ordernum = detailArray.orderlink;
+            orderDetail.status = detailArray.status;
+            // 상태 한글화
+            let stat = '';
+            numberCheck :for(let keyVal in nameSetting.statusName){
+                if(ob.status == nameSetting.statusName[keyVal].status){
+                    stat = nameSetting.statusName[keyVal].value;
+                    summaryNum[keyVal] += 1;
+                    summaryNum.all +=1;
+                    break numberCheck;
+                }
+            }
+
+            // 주문 번호 순 정렬 
+            summary.sort(function(a,b){
+                return a.ordernum < b.ordernum ? -1 : a.ordernum > b. ordernum ? 1 : 0;
+            });
+            
+            res.render('order/list',{
+                summary : summary,
+                orderDetail : orderDetail,
+                summaryNum : summaryNum,
+                statusName : nameSetting.statusName
+            });
         });
     });   
 });

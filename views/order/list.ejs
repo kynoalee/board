@@ -41,25 +41,27 @@
         <!-- 라스트오더 -->
         <h3>주문 상세</h3>
          <!-- 재공사 -->
-         <table style="border:1px solid black; width:100%">
-             <tr>
-                 <td>주문 번호 : 486 / 상태 : 주문</td>
-                 <td></td>
-             </tr>
-             <tr>
-                 <td width=200><img style='width:100%' alt="" src="/img/Unknown.png"/></td>
-                 <td style="padding-top : 0">
-                     <div>글쓴이 : 앙</div>
-                     <div>마감시간 : 내일</div>
-                     <div>요약 : 부품 데스</div>
-                     <div>작성일자 : 앙</div>
-                 </td>
-             </tr>
-             <tr>
-                 <td></td>
-                 <td ><button style="float:right">눌러</button></td>
-             </tr>
-         </table>
+         <div  style="border:1px solid black; width:100%;padding:10px">
+            <table style="width:100%">
+                <tr>
+                    <td>주문 번호 : 486 / 상태 : 주문</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td width=200><img style='width:100%' alt="" src="/img/Unknown.png"/></td>
+                    <td>
+                        <div>글쓴이 : 앙</div>
+                        <div>마감시간 : 내일</div>
+                        <div>요약 : 부품 데스</div>
+                        <div>작성일자 : 앙</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td ><button class="btn float-right" onclick="goPopup('<%=orderDetail.ordernum%>','<%=orderDetail.status%>')">눌러</button></td>
+                </tr>
+            </table>
+         </div>
         <!-- 주문 간략리스트 -->
         <h3>주문 목록</h3>
         <table class="table table-hover">
