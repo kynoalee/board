@@ -4,3 +4,25 @@
 .last {
   font-weight:bold;
 }
+.nav-fixed-buttons{
+  width:100px;
+  height:300px;
+  position:fixed;
+  right:10px;
+  bottom:150px;
+  border:1px solid black;
+}
+.buton{
+  display:block;
+  widows: 100%;
+  text-decoration: none;
+}
+.red-b{
+  background-color: red;
+}
+.blue-b{
+  background-color: blue;
+}
+.yellow-b{
+  background-color: yellow;
+}
