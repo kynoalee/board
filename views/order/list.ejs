@@ -44,16 +44,29 @@
          <div  style="border:1px solid black; width:100%;padding:10px">
             <table style="width:100%">
                 <tr>
-                    <td>주문 번호 : 486 / 상태 : 주문</td>
+                    <td>주문 번호 : <%=orderDetail.ordernum%> / 상태 : <%=orderDetail.statName%></td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td width=200><img style='width:100%' alt="" src="/img/Unknown.png"/></td>
+                    <td width=200>
+                        <%if(visualFile.type == "image"){%>
+                        <!-- file visualizing -->
+                        <img src='/images/<%=visualFile.fileName%>' style='width:100%' />
+                        <%} else if(visualFile.type == "gif"){%>
+                            <!-- file visualizing -->
+                            <img src='/gifs/<%=visualFile.fileName%>' style='width:100%' />
+                            
+                        <%} else if(visualFile.type == "video"){%>      
+                        <video src='/video/<%=visualFile.fileName%>' style='width:100%' loop control></video>
+                        <%} else{%>
+                        <img style='width:100%' alt="" src="/img/Unknown.png"/>
+                        <%}%>
+                    </td>
                     <td>
-                        <div>글쓴이 : 앙</div>
-                        <div>마감시간 : 내일</div>
-                        <div>요약 : 부품 데스</div>
-                        <div>작성일자 : 앙</div>
+                        <div>글쓴이 : <%=orderDetail.userid%></div>
+                        <div>마감시간 : <%=orderDetail.deadline%></div>
+                        <div>요약 : <%=orderDetail.summary%></div>
+                        <div>작성일자 : <%=orderDetail.wdate%></div>
                     </td>
                 </tr>
                 <tr>

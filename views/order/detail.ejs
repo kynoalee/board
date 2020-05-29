@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../partials/head') %>
+    <script src="/js/order.js"></script>
+    <link rel="stylesheet" href="/css/order.css">
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+
+    <div class="container container-per mb-3">
+        <div>
+            <!-- info -->
+            
+            <h2>주문 <%=details.orderlink%> 상세 </h2>
+            <div>제목 | <%=details.summary%></div>
+            <div>상태 | 
+              <select name="statusOp" id="">
+                <option value="">상태</option>
+              </select>
+            </div>
+            <div>작성자 | [<%=details.userclass%>]</div>
+            <div>작성일자 | </div>
+            <div>
+              uploadfiles
+              
+              <!-- file download -->
+              <div>
+                <%for(let downloadFile of filesInfo){%>
+                <div><a href="/order/detail/<%=downloadFile.server%>"><%=downloadFile.origin%></a> (<%=downloadFile.byte%>)</div>
+                <%}%>
+              </div>
+            </div>
+            <div>size : <%=details.size%></div>
+            <div>color : <%=details.color%></div>
+            <div>material : <%=details.material%></div>
+            <div>if prototype</div>
+            <div>quantity : <%=details.quantity%></div>
+            <div>deadline : <%=details.deadline%></div>
+            <div>description : <%=details.description%>
+              <%for(let imageInfo of visualFiles.images){%>
+                <!-- file visualizing -->
+                <div><img src='/images/<%=imageInfo.servername%>' width = 350 /></div>
+                <%}%>
+                <%for(let gifInfo of visualFiles.gifs){%>
+                  <!-- file visualizing -->
+                  <div><img src='/gifs/<%=gifInfo.servername%>' width = 350 /></div>
+                  <%}%>
+                <%for(let videoInfo of visualFiles.videos){%>      
+                <div><video src='/video/<%=videoInfo.servername%>' width = 350 loop control></video></div>
+                <%}%>
+              </div>
+
+        </div>
+        <div>
+            <!-- qna -->
+        </div>
+        <div>
+            <!-- history -->
+        </div>
+    </div>
+    <!-- 고정 메뉴 네비게이션 -->
+    <div class="nav-fixed-buttons">
+      <div>
+        <a class="buton red-b" href="#">탑</a>
+      </div>
+      <div>
+        <a class="buton blue-b" href="#">문의</a>
+      </div>
+      <div>
+        <a class="buton yellow-b" href="#">기타</a>
+      </div>
+    </div>
+    <div>s</div>
+    <div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div>
+  </body>
+</html>
+
