@@ -8,7 +8,7 @@ function goLastOrder(num){
 }
 
 function goPopup(ordernum,status){
-    window.open("/pop/detail?ordernum="+ordernum+"&status="+status,"popId"+status,'width=430,height=500,location=no,status=no,scrollbars=yes');
+    window.open("/order/detail?ordernum="+ordernum+"&status="+status);
 }
 
 function bidIn(ordernum,orderid){

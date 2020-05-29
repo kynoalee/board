@@ -7,8 +7,10 @@ var config = require('../config/config');
 var util = require('../util'); // 1
 var File = require('../models/File');
 var Log = require('../models/Log');
+var common = require('../modules/common');
 var Order = require('../models/Order');
 var Upload = require('../modules/upload');
+var Download = require('../modules/download');
 
 // order new   
 router.get('/',util.isLoggedin,function(req, res){
@@ -110,6 +112,10 @@ function(req,res){
 router.get('/list',util.isLoggedin,function(req,res){
     // 주문 리스트 상태 값 정의
     var summaryNum = {all : 0};   
+    for(let keyVal in nameSetting.statusName){
+        summaryNum[keyVal] = 0; 
+    }
+
     var findObj = {};
     if(req.user.userclass == "vender"){
         findObj.vender = req.user.userid;
@@ -182,40 +188,174 @@ router.get('/list',util.isLoggedin,function(req,res){
         
         // 주문상세 
         var orderDetail = {};
-        Order.Detail.findOne({orderlink:summary[0].ordernum}).sort({wdate:-1}).exec((err2,detailArray)=>{
+        var findOrdernum = req.query.ordernum ? req.query.ordernum : summary[0].ordernum ;
+        Order.Detail.findOne({orderlink:findOrdernum}).sort({wdate:-1}).exec((err2,detailArray)=>{
             if(err2){
                 Log.create({document_name : "Detail",type:"error",contents:{error:err2,content:"주문상세 find 중 DB 에러"},wdate:Date()});
                 console.log(err2);
                 req.flash("errors",{message : "DB ERROR"});
                 return res.redirect('/');
             }
-            console.log(detailArray);
             orderDetail.ordernum = detailArray.orderlink;
             orderDetail.status = detailArray.status;
+
             // 상태 한글화
             let stat = '';
-            numberCheck :for(let keyVal in nameSetting.statusName){
-                if(ob.status == nameSetting.statusName[keyVal].status){
+            numberCheck2 :for(let keyVal in nameSetting.statusName){
+                if(detailArray.status == nameSetting.statusName[keyVal].status){
                     stat = nameSetting.statusName[keyVal].value;
-                    summaryNum[keyVal] += 1;
-                    summaryNum.all +=1;
-                    break numberCheck;
+                    break numberCheck2;
                 }
             }
+
+            orderDetail.statName = stat;
+            orderDetail.userid = detailArray.userid;
+            orderDetail.wdate = moment(detailArray.wdate).format("YYYY-MM-DD HH:mm:ss");
+            orderDetail.deadline = detailArray.deadline;
+            orderDetail.summary = detailArray.summary;
+
 
             // 주문 번호 순 정렬 
             summary.sort(function(a,b){
                 return a.ordernum < b.ordernum ? -1 : a.ordernum > b. ordernum ? 1 : 0;
             });
-            
-            res.render('order/list',{
-                summary : summary,
-                orderDetail : orderDetail,
-                summaryNum : summaryNum,
-                statusName : nameSetting.statusName
+
+            // 관련 업로드된 파일정보 모두 가져오기
+            let files = [];
+            for(let val of detailArray.filelink){
+                files[files.length] = {servername : val};
+            }
+          
+
+            File.find({$or:files},function(err,file){
+                if(err){
+                    Log.create({document_name : "File",type:"error",contents:{error:err,content:"주문상세 file find DB에러"},wdate:Date()});
+                    console.log(err);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }                // 시각화 파일 정리
+                var visualFile  = {
+                    type : ''   
+                };
+                fileLoop : for(let fileInfo of file){ 
+                    let filetype = fileInfo.filetype.split('/');
+                    if(filetype[0] != 'image' && filetype[0] != 'video'){
+                        continue fileLoop;
+                    }
+                    visualFile.type = filetype[0] == 'image' && filetype[1] != 'gif' ? 'image' : filetype[0] == 'image' && filetype[1] == 'gif' ? 'gif' : filetype[0] == 'video' ? 'video' : '';
+                    visualFile.fileName = fileInfo.servername;
+                    break;
+                }
+
+                res.render('order/list',{
+                    summary : summary,
+                    orderDetail : orderDetail,
+                    summaryNum : summaryNum,
+                    visualFile : visualFile,
+                    statusName : nameSetting.statusName
+                });
             });
         });
     });   
+});
+
+// 주문상세 페이지
+router.get('/detail',util.isLoggedin,(req,res)=>{
+    var findObj = {ordernum : req.query.ordernum};
+    if(req.user.userclass == "vender"){
+        findObj.vender = req.user.userid;
+    } else if(req.user.userclass == "normal") {
+        findObj.userid = req.user.userid;
+    }
+    var filesInfo = [];
+    Order.Summary.find(findObj,function(err,summary){
+        if(err){
+            Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"주문상세 페이지 find DB에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
+        Order.Detail.find({status:req.query.status,orderlink:req.query.ordernum},function(err1,detail){
+            if(err1){
+                Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"주문상세 페이지 디테일 find DB에러"},wdate:Date()});
+                console.log(err1);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }
+            // 관련 업로드된 파일정보 모두 가져오기
+            let files = [];
+            for(let details of detail){
+                for(let val of details.filelink){
+                    files[files.length] = {servername : val};
+                }
+            }
+            File.find({$or:files},function(err,file){
+                if(err){
+                    Log.create({document_name : "File",type:"error",contents:{error:err,content:"주문상세 페이지 file find DB에러"},wdate:Date()});
+                    console.log(err);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }                // 시각화 파일 정리
+                var visualFiles  = {
+                    images : [],
+                    videos : [],
+                    gifs :[]
+                };
+                for(let fileInfo of file){ 
+                    let filetype = fileInfo.filetype.split('/');
+                    if(filetype[0] == 'image' && filetype[1] != 'gif'){
+                        visualFiles.images.push(fileInfo);
+                    } else if(filetype[0] == 'image' && filetype[1] == 'gif'){
+                        visualFiles.gifs.push(fileInfo);
+                    }
+                     else if(filetype[0] == 'video'){
+                        visualFiles.videos.push(fileInfo);
+                    }
+                    filesInfo[filesInfo.length] = {
+                        'origin' : fileInfo.originname,
+                        'server' : fileInfo.servername,
+                        'byte' : common.calculateByte(fileInfo.size)
+                    };
+                }
+    
+                // 해당 상태값 입력한 정보 최신화
+                detail.sort(function(a,b){
+                    return a.order_detailnum < b.order_detailnum ? -1 : a.order_detailnum > b. order_detailnum ? 1 : 0;
+                });
+    
+                // 상태 값 시각화
+                var statusName;
+                switch(req.query.status){
+                    case '1' : statusName = nameSetting.statusName.status1; 
+                        break;
+                    case '2' : statusName = nameSetting.statusName.status2; 
+                        break;
+                    case '3' : statusName = nameSetting.statusName.status3; 
+                        break;
+                    case '4' : statusName = nameSetting.statusName.status4; 
+                        break;
+                    case '5' : statusName = nameSetting.statusName.status5; 
+                        break;
+                    case '6' : statusName = nameSetting.statusName.status6; 
+                        break;
+                    default : break;
+                }
+        
+                res.render('order/detail',{
+                    filesInfo:filesInfo,
+                    details:detail[0],
+                    visualFiles : visualFiles,
+                    statusName : statusName
+                }); 
+            });
+        });  
+    });
+});
+
+// 다운로드 라우터
+router.get("/detail/:servername",util.isLoggedin,function(req,res){
+    let fileName = req.params.servername;
+    Download.fileDownload(File,fileName,res);
 });
 
 module.exports = router;
