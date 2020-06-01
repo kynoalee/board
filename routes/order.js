@@ -262,20 +262,50 @@ router.get('/list',util.isLoggedin,function(req,res){
 // 주문상세 페이지
 router.get('/detail',util.isLoggedin,(req,res)=>{
     var findObj = {ordernum : req.query.ordernum};
-    if(req.user.userclass == "vender"){
-        findObj.vender = req.user.userid;
-    } else if(req.user.userclass == "normal") {
-        findObj.userid = req.user.userid;
-    }
     var filesInfo = [];
-    Order.Summary.find(findObj,function(err,summary){
+    Order.Summary.findOne(findObj,function(err,summary){
         if(err){
             Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"주문상세 페이지 find DB에러"},wdate:Date()});
             console.log(err);
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
         }
-        Order.Detail.find({status:req.query.status,orderlink:req.query.ordernum},function(err1,detail){
+        // 주문 포괄 데이터
+        let summaryData = {
+            ordernum : summary.ordernum,
+            orderid : summary.orderid,
+            vender : summary.vender
+        };
+        summaryData.wdate = moment(summary.orderdate).format("YYYY-MM-DD HH:mm:ss");
+        summaryData.mdate = moment(summary.mdate).format("YYYY-MM-DD HH:mm:ss");
+
+        // 상태값 프론트에 보낼 거 정제
+        var statusArray = [];
+        for(let i = 0; i < summary.status;i++){
+            let statusN = '';
+            let loopStat = i+1;
+            switch(loopStat){
+                case 1 : statusN = nameSetting.statusName['order'].value; 
+                    break;
+                case 2 : statusN = nameSetting.statusName['bidding'].value; 
+                    break;
+                case 3 : statusN = nameSetting.statusName['ptWork'].value; 
+                    break;
+                case 4 : statusN = nameSetting.statusName['ptDeli'].value; 
+                    break;
+                case 5 : statusN = nameSetting.statusName['work'].value; 
+                    break;
+                case 6 : statusN = nameSetting.statusName['deli'].value; 
+                    break;
+                case 7 : statusN = nameSetting.statusName['done'].value; 
+                    break;
+                default : break;
+            }
+            statusArray.push(statusN);            
+        }
+        summaryData.status = statusArray;
+        summaryData.getStatus = req.query.status ? req.query.status : summary.status;
+        Order.Detail.find({status:summaryData.getStatus,orderlink:req.query.ordernum},function(err1,detail){
             if(err1){
                 Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"주문상세 페이지 디테일 find DB에러"},wdate:Date()});
                 console.log(err1);
@@ -283,7 +313,7 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
                 return res.redirect('/');
             }
             // 관련 업로드된 파일정보 모두 가져오기
-            let files = [];
+            let files = [{servername:0}];
             for(let details of detail){
                 for(let val of details.filelink){
                     files[files.length] = {servername : val};
@@ -325,7 +355,7 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
     
                 // 상태 값 시각화
                 var statusName;
-                switch(req.query.status){
+                switch(summaryData.getStatus){
                     case '1' : statusName = nameSetting.statusName.status1; 
                         break;
                     case '2' : statusName = nameSetting.statusName.status2; 
@@ -342,6 +372,7 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
                 }
         
                 res.render('order/detail',{
+                    summaryData:summaryData,
                     filesInfo:filesInfo,
                     details:detail[0],
                     visualFiles : visualFiles,
