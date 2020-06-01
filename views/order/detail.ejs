@@ -4,40 +4,39 @@
     <%- include('../partials/head') %>
     <script src="/js/order.js"></script>
     <link rel="stylesheet" href="/css/order.css">
+    <script>
+      var statusNow = '<%=summaryData.status%>';
+      var getStatus = '<%=summaryData.getStatus%>';
+    </script>
   </head>
   <body>
     <%- include('../partials/nav') %>
-
+    <input type="hidden" name='ordernum' value='<%=summaryData.ordernum%>'>
     <div class="container container-per mb-3">
         <div>
             <!-- info -->
             
-            <h2>주문 <%=details.orderlink%> 상세 </h2>
-            <div>제목 | <%=details.summary%></div>
+            <h2>주문 상세</h2>
+            <!-- summary data. 상태에 상관없는 주문 내용 -->
+            <div>주문번호 | <%=summaryData.ordernum%></div>
             <div>상태 | 
-              <select name="statusOp" id="">
-                <option value="">상태</option>
+              <select name="status" id="statusOp">
               </select>
             </div>
-            <div>작성자 | [<%=details.userclass%>]</div>
-            <div>작성일자 | </div>
-            <div>
-              uploadfiles
-              
-              <!-- file download -->
-              <div>
-                <%for(let downloadFile of filesInfo){%>
-                <div><a href="/order/detail/<%=downloadFile.server%>"><%=downloadFile.origin%></a> (<%=downloadFile.byte%>)</div>
-                <%}%>
-              </div>
-            </div>
-            <div>size : <%=details.size%></div>
-            <div>color : <%=details.color%></div>
-            <div>material : <%=details.material%></div>
-            <div>if prototype</div>
-            <div>quantity : <%=details.quantity%></div>
-            <div>deadline : <%=details.deadline%></div>
-            <div>description : <%=details.description%>
+            <div>주문자 | <%=summaryData.orderid%></div>
+            <div>제작자 | <%=summaryData.vender%></div>
+            <div>주문일자 | <%=summaryData.wdate%></div>
+            <div>최근작업일자 | <%=summaryData.mdate%></div>
+            <!-- detail data. 주문 상세 내용 -->
+            <div class="bordered">
+              <div>주문 상세 번호 | </div>
+              <div>size : </div>
+              <div>color : <%=details%></div>
+              <div>material : <%=details%></div>
+              <div>if prototype</div>
+              <div>quantity : <%=details%></div>
+              <div>deadline : <%=details%></div>
+              <div>description : <%=details%>
               <%for(let imageInfo of visualFiles.images){%>
                 <!-- file visualizing -->
                 <div><img src='/images/<%=imageInfo.servername%>' width = 350 /></div>
@@ -50,6 +49,16 @@
                 <div><video src='/video/<%=videoInfo.servername%>' width = 350 loop control></video></div>
                 <%}%>
               </div>
+              <div class='bordered'>
+                파일 다운로드
+                <!-- file download -->
+                <div>
+                  <%for(let downloadFile of filesInfo){%>
+                  <div><a href="/order/detail/<%=downloadFile.server%>"><%=downloadFile.origin%></a> (<%=downloadFile.byte%>)</div>
+                  <%}%>
+                </div>
+              </div>
+            </div>
 
         </div>
         <div>

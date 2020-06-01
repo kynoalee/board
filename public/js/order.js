@@ -1,4 +1,32 @@
-// order/list 제어 함수 모음
+$(document).ready(()=>{
+    createStatus(statusNow,getStatus);
+    $('#statusOp').change(()=>{
+        if($('#statusOp').val() != getStatus){
+            var newForm = $('<form></form>');
+            newForm.attr('name','newForm');
+            newForm.attr('method','get');
+            newForm.append($('#statusOp'));
+            newForm.append($('input[name=ordernum]'));
+            newForm.appendTo('body');
+    
+            newForm.submit();
+        }
+       
+    });
+});
+
+function createStatus(statusNow,getStatus){
+    let temp = statusNow.split(',');
+    for(let i = 1; i <= temp.length;i++){
+        let selected = '';
+        if(i == getStatus){
+            selected = 'selected'; 
+        }
+        let html = `<option value = '`+i+`' `+selected+`>`+temp[i-1]+`</option>`;
+        $('#statusOp').append(html);
+    }
+}
+
 function alertTest(){
     alert('test');
 }
@@ -7,8 +35,8 @@ function goLastOrder(num){
     window.location.href ="/order/list?ordernum="+num;
 }
 
-function goPopup(ordernum,status){
-    window.open("/order/detail?ordernum="+ordernum+"&status="+status);
+function goPopup(ordernum){
+    window.open("/order/detail?ordernum="+ordernum);
 }
 
 function bidIn(ordernum,orderid){
