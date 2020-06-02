@@ -73,7 +73,6 @@ function (req,res,next){
             req.body.orderlink = summary.ordernum + 1;
             req.body.ordernum = summary.ordernum + 1;
             req.body.prototypeB = req.body.prototypeB == "true" ?true:false;
-            console.log(req.body);
             Order.Detail.create(req.body,function(err,detail){
                 if(err){
                     Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"주문 detail create 중 에러"},wdate:Date()});
@@ -289,15 +288,11 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
                     break;
                 case 2 : statusN = nameSetting.statusName['bidding'].value; 
                     break;
-                case 3 : statusN = nameSetting.statusName['ptWork'].value; 
+                case 3 : statusN = nameSetting.statusName['work'].value; 
                     break;
-                case 4 : statusN = nameSetting.statusName['ptDeli'].value; 
+                case 4 : statusN = nameSetting.statusName['deli'].value; 
                     break;
-                case 5 : statusN = nameSetting.statusName['work'].value; 
-                    break;
-                case 6 : statusN = nameSetting.statusName['deli'].value; 
-                    break;
-                case 7 : statusN = nameSetting.statusName['done'].value; 
+                case 5 : statusN = nameSetting.statusName['done'].value; 
                     break;
                 default : break;
             }
@@ -305,6 +300,11 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
         }
         summaryData.status = statusArray;
         summaryData.getStatus = req.query.status ? req.query.status : summary.status;
+        // status 2는 입찰 중이므로, 입찰페이지로 이동을 권유.
+        // 프론트에서 처리할것, 강제 이동시 1로 이동
+        if(summaryData.getStatus == 2){
+            summaryData.getStatus = 1;
+        }
         Order.Detail.find({status:summaryData.getStatus,orderlink:req.query.ordernum},function(err1,detail){
             if(err1){
                 Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"주문상세 페이지 디테일 find DB에러"},wdate:Date()});
@@ -312,6 +312,35 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
                 req.flash("errors",{message : "DB ERROR"});
                 return res.redirect('/');
             }
+            var detailData = [];
+            // 디테일별 데이터 정제
+            for(let val of detail){
+                let tmp = {
+                    detailnum : val.order_detailnum,
+                    summary : val.summary,
+                    description : val.description,
+                    userid : val.userid
+                };
+
+                //  선택 데이터 확인
+                if(val.size){
+                    tmp.size = val.size;
+                }
+                if(val.color){
+                    tmp.color = val.color;
+                }
+                if(val.material){
+                    tmp.material = val.material;
+                }
+                if(val.quantity){
+                    tmp.quantity = val.quantity;
+                }
+                if(val.deadline){
+                    tmp.deadline = val.deadline;
+                }
+                detailData[detailData.length] = tmp;
+            }
+
             // 관련 업로드된 파일정보 모두 가져오기
             let files = [{servername:0}];
             for(let details of detail){
@@ -319,6 +348,8 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
                     files[files.length] = {servername : val};
                 }
             }
+
+            // 
             File.find({$or:files},function(err,file){
                 if(err){
                     Log.create({document_name : "File",type:"error",contents:{error:err,content:"주문상세 페이지 file find DB에러"},wdate:Date()});
@@ -338,7 +369,7 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
                     } else if(filetype[0] == 'image' && filetype[1] == 'gif'){
                         visualFiles.gifs.push(fileInfo);
                     }
-                     else if(filetype[0] == 'video'){
+                    else if(filetype[0] == 'video'){
                         visualFiles.videos.push(fileInfo);
                     }
                     filesInfo[filesInfo.length] = {
@@ -352,34 +383,16 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
                 detail.sort(function(a,b){
                     return a.order_detailnum < b.order_detailnum ? -1 : a.order_detailnum > b. order_detailnum ? 1 : 0;
                 });
-    
-                // 상태 값 시각화
-                var statusName;
-                switch(summaryData.getStatus){
-                    case '1' : statusName = nameSetting.statusName.status1; 
-                        break;
-                    case '2' : statusName = nameSetting.statusName.status2; 
-                        break;
-                    case '3' : statusName = nameSetting.statusName.status3; 
-                        break;
-                    case '4' : statusName = nameSetting.statusName.status4; 
-                        break;
-                    case '5' : statusName = nameSetting.statusName.status5; 
-                        break;
-                    case '6' : statusName = nameSetting.statusName.status6; 
-                        break;
-                    default : break;
-                }
         
                 res.render('order/detail',{
                     summaryData:summaryData,
                     filesInfo:filesInfo,
                     details:detail[0],
                     visualFiles : visualFiles,
-                    statusName : statusName
                 }); 
             });
-        });  
+        });
+       
     });
 });
 
