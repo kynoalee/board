@@ -2,6 +2,10 @@ $(document).ready(()=>{
     createStatus(statusNow,getStatus);
     $('#statusOp').change(()=>{
         if($('#statusOp').val() != getStatus){
+            if($('#statusOp').val()==2){
+                window.open("/bid/bidList");
+                $('#statusOp').val(1);
+            }
             var newForm = $('<form></form>');
             newForm.attr('name','newForm');
             newForm.attr('method','get');

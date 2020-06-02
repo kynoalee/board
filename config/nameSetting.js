@@ -8,28 +8,19 @@ var nameSetting = {
             value: '입찰 중',
             status : 2,
         },
-        ptWork : {
-            value:'PT제작',
-            status : 3,
-        },
-        ptDeli : {
-            value:'PT배송',
-            status : 4,
-    
-        },
         work : {
             value:'제작',
-            status : 5,
+            status : 3,
     
         },  
         deli : {
             value:'배송',
-            status : 6,
+            status : 4,
     
         },
         done : {
             value:'확정',
-            status : 7,
+            status : 5,
     
         }
     }
