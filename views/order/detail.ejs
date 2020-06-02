@@ -30,13 +30,7 @@
             <!-- detail data. 주문 상세 내용 -->
             <div class="bordered">
               <div>주문 상세 번호 | </div>
-              <div>size : </div>
-              <div>color : <%=details%></div>
-              <div>material : <%=details%></div>
-              <div>if prototype</div>
-              <div>quantity : <%=details%></div>
-              <div>deadline : <%=details%></div>
-              <div>description : <%=details%>
+
               <%for(let imageInfo of visualFiles.images){%>
                 <!-- file visualizing -->
                 <div><img src='/images/<%=imageInfo.servername%>' width = 350 /></div>

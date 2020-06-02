@@ -11,7 +11,9 @@ var orderSummarySchema = mongoose.Schema({
   mdate:Date,
   vender:String,
   status:Number,
-  customermemo:String
+  customermemo:String,
+  price:Number,
+  deadline:String
 });
 
 var orderDetailSchema = mongoose.Schema({
