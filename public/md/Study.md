@@ -281,10 +281,95 @@ function ex(num){
 			return function(){
 				 return newI;
 			};
-		}(i);
+		})(i);
 	}
 	return result;
 }
 ```
 
 그래서 클로저 내에서 익명함수를 정의하고 즉시 호출하면 고유한 값을 newI가 반환하므로, 상관이 없어짐.
+
+
+
+<h1>2020 06 03</h1>
+
+클로저는 은닉화에 도움이 된다. 이는 함수내의 함수인 클로저가 함수 내의 지역변수를 참조하여 반환하므로, 해당 함수의 지역변수를 파라미터로 지정하지 않는 이상, 이를 외부에서 접근할 방법이 없다. 
+
+이하 삽질한 내용 정리
+
+이전부터 시도하던 반복문 내 디비 호출이후 렌더링에 대해 여러 방법을 시도했다. (promise.then... reduce.. )
+
+그중에 갑자기 되기 시작한 기본 async & await를 통해 함수로 호출하는 방법. 
+
+```javascript
+var array = [0,1,2,3,4,5,6,7,8,9];
+
+exec(array);
+
+async function exec(array){
+  for(let i of array){
+  	await loopTimeout(i);
+  }
+  console.log('finish');
+}
+
+function loopTimeout(i){
+  return new Promise((resolve)=> {
+    setTimeout(()=>{
+      console.log(i);
+      resolve();  
+    },1000);
+  });
+}
+
+
+/* result:
+0
+...
+9
+finish
+*/
+```
+
+
+
+아주 동기적으로 작동을 잘한다! await를 걸어준 함수를 순차적으로 실행후, 마지막 로그를 찍게 된다. 
+
+디비를 루프로 부르고 싶을때 이제 이렇게 호출하면 될거같다.
+
+함수를 따로 선언하지 않고, 바로 호출하는 방식으로는 
+
+
+
+```javascript
+var array = [0,1,2,3,4,5,6,7,8,9];
+
+(async(k)=>{
+    for(let i of k){
+        await ((j)=>{
+            return new Promise((resolve)=> {
+                setTimeout(()=>{
+                    console.log(j);
+                    resolve();  
+                },1000);
+                });
+        })(i);
+    }
+    console.log('finish');
+    
+})(array);
+
+/* result:
+0
+...
+9
+finish
+*/
+```
+
+해결이 되서 만족스럽다.
+
+
+
+
+
