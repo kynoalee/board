@@ -1,7 +1,5 @@
 var moment = require('moment');
-var multer = require('multer');
 var File = require('../models/File');
-var config = require('../config/config');
 
 
 var Upload = {
@@ -37,7 +35,7 @@ var Upload = {
         next();
     },
 
-    createServerName : (origin)=>{
+    createServerName : function(origin){
         let originSplitName = origin.split('.');
         let extension = originSplitName.pop();
         let serverName = "file";
@@ -62,4 +60,4 @@ var Upload = {
     }
 }
 
-module.exports.Upload = Upload;
+module.exports = Upload;
