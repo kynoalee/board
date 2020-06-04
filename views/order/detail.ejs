@@ -28,31 +28,50 @@
             <div>주문일자 | <%=summaryData.wdate%></div>
             <div>최근작업일자 | <%=summaryData.mdate%></div>
             <!-- detail data. 주문 상세 내용 -->
+            <%for(let detail of detailData){%>
             <div class="bordered">
-              <div>주문 상세 번호 | </div>
-
-              <%for(let imageInfo of visualFiles.images){%>
+              <div>주문 상세 번호 | <%=detail.detailnum%></div>
+              <div>작성자 | <%=detail.userid%></div>
+              <div>작성일자 | <%=detail.wdate%></div>
+              <%if(detail.size){%>
+              <div>크기 | <%=detail.size%></div>
+              <%}%>
+              <%if(detail.color){%>
+              <div>색깔 | <%=detail.color%></div>
+              <%}%>
+              <%if(detail.material){%>
+              <div>재료 | <%=detail.material%></div>
+              <%}%>
+              <%if(detail.quantity){%>
+              <div>수량 | <%=detail.quantity%></div>
+              <%}%>
+              <%if(detail.deadline){%>
+              <div>마감시간 | <%=detail.deadline%></div>
+              <%}%>
+              <div>제목 | <%=detail.summary%></div>
+              <div>내용 | <%=detail.description%></div>
+              <%for(let imageInfo of detail.visualFiles.images){%>
                 <!-- file visualizing -->
                 <div><img src='/images/<%=imageInfo.servername%>' width = 350 /></div>
                 <%}%>
-                <%for(let gifInfo of visualFiles.gifs){%>
+                <%for(let gifInfo of detail.visualFiles.gifs){%>
                   <!-- file visualizing -->
                   <div><img src='/gifs/<%=gifInfo.servername%>' width = 350 /></div>
                   <%}%>
-                <%for(let videoInfo of visualFiles.videos){%>      
-                <div><video src='/video/<%=videoInfo.servername%>' width = 350 loop control></video></div>
+                <%for(let videoInfo of detail.visualFiles.videos){%>      
+                <div><video src='/videos/<%=videoInfo.servername%>' style='width:350px' controls loop></video></div>
                 <%}%>
               <div class='bordered'>
                 파일 다운로드
                 <!-- file download -->
                 <div>
-                  <%for(let downloadFile of filesInfo){%>
+                  <%for(let downloadFile of detail.filesInfo){%>
                   <div><a href="/order/detail/<%=downloadFile.server%>"><%=downloadFile.origin%></a> (<%=downloadFile.byte%>)</div>
                   <%}%>
                 </div>
               </div>
             </div>
-
+            <%}%>
         </div>
         <div>
             <!-- qna -->
@@ -67,14 +86,12 @@
         <a class="buton red-b" href="#">탑</a>
       </div>
       <div>
-        <a class="buton blue-b" href="#">문의</a>
+        <a class="buton yellow-b" href="#">질문</a>
       </div>
       <div>
-        <a class="buton yellow-b" href="#">기타</a>
+        <a class="buton yellow-b" href="#">넘기기</a>
       </div>
     </div>
-    <div>s</div>
-    <div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div><div>s</div>
   </body>
 </html>
 
