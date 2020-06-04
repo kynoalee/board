@@ -226,6 +226,7 @@ router.post('/bidList',function(req,res){
         let now = Date();
         let otherBidIds = [];
         let bidDoneObj = {};
+        let updateObj = {};
         for(let bidObj of bid){
             if(bidObj.vender == req.body.vender && bidObj.status == 'bidding'){
                 bidDoneObj = {
@@ -233,6 +234,8 @@ router.post('/bidList',function(req,res){
                     mdate: now,
                     donedate : now
                 };
+                updateObj.price = bidObj.detail.price;
+                updateObj.deadline = bidObj.detail.deadline;
             }else{
                 // 같은 주문번호에 다른 입찰들 체크
                 otherBidIds.push({_id:bidObj._id});
@@ -252,11 +255,9 @@ router.post('/bidList',function(req,res){
                 fObj['$or'] = otherBidIds;
             }
             
-            let updateObj = {
-                status : 3,
-                vender : req.body.vender,
-                mdate : now
-            };
+            updateObj.status = 3;
+            updateObj.vender = req.body.vender;
+            updateObj.mdate = now;
 
             // 오더 데이터에 벤더 데이터 삽입
             Order.Summary.updateOne({ordernum:req.body.ordernum},updateObj,function(err2){
@@ -275,9 +276,7 @@ router.post('/bidList',function(req,res){
                         req.flash("errors",{message : "DB ERROR"});
                         return res.redirect('/');
                     }
-                    delete details._id;
-                    details.wdate = Date();
-                    details.status =3;
+                   
                     Order.Detail.find({}).sort({order_detailnum:-1}).findOne().select("order_detailnum").exec(function(err,order_detail){
                         if(err){
                             Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"마지막 order detail num 가져오는 find DB 에러"},wdate:Date()});
@@ -286,7 +285,14 @@ router.post('/bidList',function(req,res){
                             return res.redirect('/');
                         }
 
+                        // 제작 상태에 들어갈 상세정보 입력
+                        delete details._id;
+                        details.wdate = Date();
+                        details.status =3;
+                        details.price = updateObj.price;
+                        details.deadline = updateObj.deadline;
                         details.order_detailnum = order_detail.order_detailnum+1;
+
                         Order.detail.create(details,(errD)=>{
                             if(errD){
                                 Log.create({document_name : "Detail",type:"error",contents:{error:errD,content:"입찰 선정으로 인한 detail create 중 DB 에러"},wdate:Date()});

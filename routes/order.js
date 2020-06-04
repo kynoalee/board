@@ -259,9 +259,10 @@ router.get('/list',util.isLoggedin,function(req,res){
 });
 
 // 주문상세 페이지
-router.get('/detail',util.isLoggedin,(req,res)=>{
+router.get('/detail',(req,res)=>{
+    req.query.ordernum = 2;
+    req.query.status = 1;
     var findObj = {ordernum : req.query.ordernum};
-    var filesInfo = [];
     Order.Summary.findOne(findObj,function(err,summary){
         if(err){
             Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"주문상세 페이지 find DB에러"},wdate:Date()});
@@ -305,7 +306,7 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
         if(summaryData.getStatus == 2){
             summaryData.getStatus = 1;
         }
-        Order.Detail.find({status:summaryData.getStatus,orderlink:req.query.ordernum},function(err1,detail){
+        Order.Detail.find({status:summaryData.getStatus,orderlink:req.query.ordernum}).sort({wdate:1}).exec(function(err1,detail){
             if(err1){
                 Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"주문상세 페이지 디테일 find DB에러"},wdate:Date()});
                 console.log(err1);
@@ -314,83 +315,82 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
             }
             var detailData = [];
             // 디테일별 데이터 정제
-            for(let val of detail){
-                let tmp = {
-                    detailnum : val.order_detailnum,
-                    summary : val.summary,
-                    description : val.description,
-                    userid : val.userid
-                };
-
-                //  선택 데이터 확인
-                if(val.size){
-                    tmp.size = val.size;
-                }
-                if(val.color){
-                    tmp.color = val.color;
-                }
-                if(val.material){
-                    tmp.material = val.material;
-                }
-                if(val.quantity){
-                    tmp.quantity = val.quantity;
-                }
-                if(val.deadline){
-                    tmp.deadline = val.deadline;
-                }
-                detailData[detailData.length] = tmp;
-            }
-
-            // 관련 업로드된 파일정보 모두 가져오기
-            let files = [{servername:0}];
-            for(let details of detail){
-                for(let val of details.filelink){
-                    files[files.length] = {servername : val};
-                }
-            }
-
-            // 
-            File.find({$or:files},function(err,file){
-                if(err){
-                    Log.create({document_name : "File",type:"error",contents:{error:err,content:"주문상세 페이지 file find DB에러"},wdate:Date()});
-                    console.log(err);
-                    req.flash("errors",{message : "DB ERROR"});
-                    return res.redirect('/');
-                }                // 시각화 파일 정리
-                var visualFiles  = {
-                    images : [],
-                    videos : [],
-                    gifs :[]
-                };
-                for(let fileInfo of file){ 
-                    let filetype = fileInfo.filetype.split('/');
-                    if(filetype[0] == 'image' && filetype[1] != 'gif'){
-                        visualFiles.images.push(fileInfo);
-                    } else if(filetype[0] == 'image' && filetype[1] == 'gif'){
-                        visualFiles.gifs.push(fileInfo);
-                    }
-                    else if(filetype[0] == 'video'){
-                        visualFiles.videos.push(fileInfo);
-                    }
-                    filesInfo[filesInfo.length] = {
-                        'origin' : fileInfo.originname,
-                        'server' : fileInfo.servername,
-                        'byte' : common.calculateByte(fileInfo.size)
+            (async(detail)=>{
+                for(let val of detail){
+                    let tmp = {
+                        detailnum : val.order_detailnum,
+                        summary : val.summary,
+                        description : val.description,
+                        userid : val.userid
                     };
+                    let formatWdate = moment(val.wdate).format('YYYY-MM-DD HH:mm:ss');
+                    tmp.wdate = formatWdate;
+
+                    //  선택 데이터 확인
+                    if(val.size){
+                        tmp.size = val.size;
+                    }
+                    if(val.color){
+                        tmp.color = val.color;
+                    }
+                    if(val.material){
+                        tmp.material = val.material;
+                    }
+                    if(val.quantity){
+                        tmp.quantity = val.quantity;
+                    }
+                    if(val.deadline){
+                        tmp.deadline = val.deadline;
+                    }
+
+                    // 각 디테일 파일 정보 가져오기
+                    await ((val)=>{
+                        return new Promise((resolve)=> {
+                            File.find({servername : {$in :val.filelink}},(e,files)=>{ 
+                                if(e){
+                                    Log.create({document_name : "File",type:"error",contents:{error:e,content:"주문상세 페이지 file find DB에러"},wdate:Date()});
+                                    console.log(e);
+                                }
+                                var filesInfo = [];
+                                var visualFiles = {
+                                    images:[],
+                                    gifs:[],
+                                    videos:[]
+                                }
+                                // 각 디테일에 걸려있는 파일 정보를 정제
+                                for(fileInfo of files){
+
+                                    // 보여줄 수 있는 파일 정보
+                                    let filetype = fileInfo.filetype.split('/');
+                                    if(filetype[0] == 'image' && filetype[1] != 'gif'){
+                                        visualFiles.images.push(fileInfo);
+                                    } else if(filetype[0] == 'image' && filetype[1] == 'gif'){
+                                        visualFiles.gifs.push(fileInfo);
+                                    }
+                                    else if(filetype[0] == 'video'){
+                                        visualFiles.videos.push(fileInfo);
+                                    }
+
+                                    // 다운로드 파일 정보.
+                                    filesInfo[filesInfo.length] = {
+                                        'origin' : fileInfo.originname,
+                                        'server' : fileInfo.servername,
+                                        'byte' : common.calculateByte(fileInfo.size)
+                                    };
+                                }
+                                tmp.filesInfo = filesInfo;
+                                tmp.visualFiles = visualFiles;
+                                resolve();
+                            });  
+                        });
+                    })(val);
+                    detailData[detailData.length] = tmp;
                 }
-    
-                // 해당 상태값 입력한 정보 최신화
-                detail.sort(function(a,b){
-                    return a.order_detailnum < b.order_detailnum ? -1 : a.order_detailnum > b. order_detailnum ? 1 : 0;
-                });
-        
                 res.render('order/detail',{
                     summaryData:summaryData,
-                    filesInfo:filesInfo,
-                    details:detail[0],
-                    visualFiles : visualFiles,
+                    detailData:detailData 
                 }); 
-            });
+            })(detail);
         });
        
     });
