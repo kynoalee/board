@@ -73,24 +73,27 @@
             </div>
             <%}%>
         </div>
-        <div>
-            <!-- qna -->
-        </div>
-        <div>
-            <!-- history -->
-        </div>
     </div>
     <!-- 고정 메뉴 네비게이션 -->
     <div class="nav-fixed-buttons">
       <div>
-        <a class="buton red-b" href="#">탑</a>
+        <button type='button' class="btn btn-block red-b" href="#">최상위로</button>
       </div>
+      <%if(summaryData.btn1Name){%>
       <div>
-        <a class="buton yellow-b" href="#">질문</a>
+        <button type='button' class="btn btn-block blue-b" href="#"><%=summaryData.btn1Name%></button>
       </div>
+      <%}%>
+      <%if(summaryData.btn2Name){%>
       <div>
-        <a class="buton yellow-b" href="#">넘기기</a>
+        <button type='button' class="btn btn-block yellow-b" href="#"><%=summaryData.btn2Name%></button>
       </div>
+      <%}%>
+      <%if(summaryData.btn3Name){%>
+      <div>
+        <button type='button' class="btn btn-block" href="#"><%=summaryData.btn3Name%></button>
+      </div>
+      <%}%>
     </div>
   </body>
 </html>
