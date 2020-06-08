@@ -260,8 +260,7 @@ router.get('/list',util.isLoggedin,function(req,res){
 
 // 주문상세 페이지
 router.get('/detail',(req,res)=>{
-    req.query.ordernum = 2;
-    req.query.status = 1;
+
     var findObj = {ordernum : req.query.ordernum};
     Order.Summary.findOne(findObj,function(err,summary){
         if(err){
@@ -300,6 +299,61 @@ router.get('/detail',(req,res)=>{
             statusArray.push(statusN);            
         }
         summaryData.status = statusArray;
+
+        // 상태에 따른 고정 버튼 변경
+        switch(summary.status){
+            case 1 : 
+                if(req.user.userclass == 'normal'){
+                    summaryData.btn1Name = '추가 업로드';
+                    summaryData.btn1Click = '';
+                }
+            break;
+            case 2 : 
+            break;
+            case 3 :
+                if(req.user.userclass == 'normal'){
+                    summaryData.btn1Name = '프로토타입신청';
+                    summaryData.btn1Click = '';
+                    summaryData.btn2Name = '질문';
+                    summaryData.btn2Click = '';
+                    summaryData.btn3Name = '답변';
+                    summaryData.btn3Click = '';
+                }
+                if(req.user.userclass == 'vender'){
+                    summaryData.btn1Name = '내용 업로드';
+                    summaryData.btn1Click = '';
+                    summaryData.btn2Name = '질문';
+                    summaryData.btn2Click = '';
+                    summaryData.btn3Name = '답변';
+                    summaryData.btn3Click = '';
+                } 
+            break;
+            case 4 : 
+                if(req.user.userclass == 'normal'){
+                    summaryData.btn1Name = '질문';
+                    summaryData.btn1Click = '';
+                    summaryData.btn2Name = '답변';
+                    summaryData.btn2Click = '';
+                }
+                if(req.user.userclass == 'vender'){
+                    summaryData.btn1Name = '내용 업로드';
+                    summaryData.btn1Click = '';
+                    summaryData.btn2Name = '질문';
+                    summaryData.btn2Click = '';
+                    summaryData.btn3Name = '답변';
+                    summaryData.btn3Click = '';
+                } 
+            break;
+            case 5 : 
+                if(req.user.userclass == 'normal'){
+                    summaryData.btn1Name = '구매확정';
+                    summaryData.btn1Click = '';
+                    
+                }
+            break;
+            default : break;
+        }
+
         summaryData.getStatus = req.query.status ? req.query.status : summary.status;
         // status 2는 입찰 중이므로, 입찰페이지로 이동을 권유.
         // 프론트에서 처리할것, 강제 이동시 1로 이동

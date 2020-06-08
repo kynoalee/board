@@ -269,54 +269,69 @@ router.post('/bidList',function(req,res){
                 }
                 Log.create({document_name : "Summary",type:"update",contents:{update:updateObj,content:"입찰 선정으로 인한 상태 변화 update"},wdate:Date()});
                 
-                Order.detail.findOne({orderlink:req.body.ordernum,status:1},(err3,details)=>{
-                    if(err2){
-                        Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"입찰 선정으로 인한 상태 변화 update 중 DB 에러"},wdate:Date()});
-                        console.log(err2);
+                Order.Detail.find({orderlink:req.body.ordernum,status:1},(err3,details)=>{
+                    if(err3){
+                        Log.create({document_name : "Summary",type:"error",contents:{error:err3,content:"입찰 선정으로 인한 상태 변화 update 중 DB 에러"},wdate:Date()});
+                        console.log(err3);
                         req.flash("errors",{message : "DB ERROR"});
                         return res.redirect('/');
                     }
-                   
-                    Order.Detail.find({}).sort({order_detailnum:-1}).findOne().select("order_detailnum").exec(function(err,order_detail){
-                        if(err){
-                            Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"마지막 order detail num 가져오는 find DB 에러"},wdate:Date()});
-                            console.log(err);
-                            req.flash("errors",{message : "DB ERROR"});
-                            return res.redirect('/');
-                        }
 
+                    (async(details)=>{
                         // 제작 상태에 들어갈 상세정보 입력
-                        delete details._id;
-                        details.wdate = Date();
-                        details.status =3;
-                        details.price = updateObj.price;
-                        details.deadline = updateObj.deadline;
-                        details.order_detailnum = order_detail.order_detailnum+1;
-
-                        Order.detail.create(details,(errD)=>{
-                            if(errD){
-                                Log.create({document_name : "Detail",type:"error",contents:{error:errD,content:"입찰 선정으로 인한 detail create 중 DB 에러"},wdate:Date()});
-                                console.log(errD);
-                                req.flash("errors",{message : "DB ERROR"});
-                                return res.redirect('/');
-                            }
-                            Log.create({document_name : "Detail",type:"update",contents:{update:details,content:"입찰 선정으로 인한 detail create"},wdate:Date()});
-                            
-                            // 다른 입찰 내역이 있는 경우 Bid 삭제
-                            if(otherBidIds.length != 0){
-                                Bid.updateOne({$or:otherBidIds},{status:"delete",mdate:now,donedate:now},function(err2){
-                                    if(err2){
-                                        Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"입찰 선정으로 입찰내역 status delete update 중 DB 에러"},wdate:Date()});
-                                        console.log(err2);
-                                        req.flash("errors",{message : "DB ERROR"});
-                                        return res.redirect('/');
-                                    }
-                                    Log.create({document_name : "Bid",type:"update",contents:{content:"입찰 선정으로 입찰내역 status delete update"},wdate:Date()});
+                        for(detailData of details){
+                            // 디테일 넘버 체크
+                            await ((detailData)=>{
+                                return new Promise((resolve)=>{
+                                    Order.Detail.find({}).sort({order_detailnum:-1}).findOne().select("order_detailnum").exec(function(err,order_detail){
+                                        if(err){
+                                            Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"마지막 order detail num 가져오는 find DB 에러"},wdate:Date()});
+                                            console.log(err);
+                                            req.flash("errors",{message : "DB ERROR"});
+                                            return res.redirect('/');
+                                        }
+                                        detailData.order_detailnum = order_detail.order_detailnum+1;
+                                        resolve();
+                                    });
                                 });
-                            }
-                            return res.redirect('bidList');
-                        });
-                    });
+                            })(detailData);
+                            
+                            delete detailData._id;
+                            detailData.wdate = Date();
+                            detailData.status =3;
+                            detailData.price = updateObj.price;
+                            detailData.deadline = updateObj.deadline;
+                            await ((detailData)=>{
+                                return new Promise((resolve)=>{
+                                    Order.Detail.create(detailData,(errD)=>{
+                                        if(errD){
+                                            Log.create({document_name : "Detail",type:"error",contents:{error:errD,content:"입찰 선정으로 인한 detail create 중 DB 에러"},wdate:Date()});
+                                            console.log(errD);
+                                            req.flash("errors",{message : "DB ERROR"});
+                                            return res.redirect('/');
+                                        }
+                                        Log.create({document_name : "Detail",type:"update",contents:{update:detailData,content:"입찰 선정으로 인한 detail create"},wdate:Date()});
+                                        resolve();
+                                    });
+                                }); 
+                            })(detailData);
+                        }
+                        
+                        // 다른 입찰 내역이 있는 경우 Bid 삭제
+                        if(otherBidIds.length != 0){
+                            Bid.updateOne({$or:otherBidIds},{status:"delete",mdate:now,donedate:now},function(err2){
+                                if(err2){
+                                    Log.create({document_name : "Bid",type:"error",contents:{error:err2,content:"입찰 선정으로 입찰내역 status delete update 중 DB 에러"},wdate:Date()});
+                                    console.log(err2);
+                                    req.flash("errors",{message : "DB ERROR"});
+                                    return res.redirect('/');
+                                }
+                                Log.create({document_name : "Bid",type:"update",contents:{content:"입찰 선정으로 입찰내역 status delete update"},wdate:Date()});
+                            });
+                        }
+                        return res.redirect('bidList');
+                    })(details);
+                    
                 });
             });
 
