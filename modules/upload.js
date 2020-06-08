@@ -4,8 +4,8 @@ var File = require('../models/File');
 
 var Upload = {
     delayFileCreate : (createObj) =>{
-        return new Promise(resolve => 
-            setTimeout(() => { 
+        return new Promise((resolve) => 
+            { 
                File.create(createObj,function(err,file){
                    if(err){
                        Log.create({document_name : "File",type:"error",contents:{error:err,content:"파일정보 find DB에러"},wdate:Date()});
@@ -13,7 +13,8 @@ var Upload = {
                    }
                    console.log("done");
                });                    
-               resolve(); }, 300) ); 
+               resolve(); 
+            });
     },
 
     createFiles : async(array,req,next)=>{
@@ -28,6 +29,7 @@ var Upload = {
                 size:fileInfo.size,
                 udate:Date()
             };
+            console.log('filename '+fileInfo.filename + " DB upload...")
             await Upload.delayFileCreate(creatObj);
             fileLink[fileLink.length] = fileInfo.filename;
         }
