@@ -1,16 +1,6 @@
 var formArray = {};  //파일을 담을 객체 key, value 형태로 파일을 담든다.
 var fileList = new Object();
 
-function displayByCheckbox(id,target){
-    if($("#"+id).prop('checked')){
-        $("#"+target).attr('type','text');
-    } else{
-        $("#"+target).attr('type','hidden');
-        $("#"+target).val('');
-
-    }
-}
-
 function listFiles(id,list) {
     fileList = $("#"+id)[0].files;  //파일 대상이 리스트 형태로 넘어온다.
     for(var i=0;i < fileList.length;i++){

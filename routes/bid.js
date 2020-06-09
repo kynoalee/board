@@ -280,6 +280,22 @@ router.post('/bidList',function(req,res){
                     (async(details)=>{
                         // 제작 상태에 들어갈 상세정보 입력
                         for(detailData of details){
+                            let newDetailData = {
+                                orderlink : detailData.orderlink,
+                                userid : detailData.userid,
+                                userclass : detailData.userclass,
+                                summary : detailData.summary,
+                                description : detailData.description,
+                                filelink : detailData.filelink,
+                                wdate : Date(),
+                                accepted : false,
+                                size : detailData.size,
+                                color : detailData.color,
+                                material : detailData.material,
+                                quantity : detailData.quantity,
+                                deadline : detailData.deadline,
+                                status : 3
+                            }
                             // 디테일 넘버 체크
                             await ((detailData)=>{
                                 return new Promise((resolve)=>{
@@ -294,15 +310,12 @@ router.post('/bidList',function(req,res){
                                         resolve();
                                     });
                                 });
-                            })(detailData);
+                            })(newDetailData);
                             
-                            delete detailData._id;
-                            detailData.wdate = Date();
-                            detailData.status =3;
-                            detailData.price = updateObj.price;
-                            detailData.deadline = updateObj.deadline;
                             await ((detailData)=>{
+                                
                                 return new Promise((resolve)=>{
+                                    console.log(detailData);
                                     Order.Detail.create(detailData,(errD)=>{
                                         if(errD){
                                             Log.create({document_name : "Detail",type:"error",contents:{error:errD,content:"입찰 선정으로 인한 detail create 중 DB 에러"},wdate:Date()});
@@ -310,11 +323,11 @@ router.post('/bidList',function(req,res){
                                             req.flash("errors",{message : "DB ERROR"});
                                             return res.redirect('/');
                                         }
-                                        Log.create({document_name : "Detail",type:"update",contents:{update:detailData,content:"입찰 선정으로 인한 detail create"},wdate:Date()});
+                                        Log.create({document_name : "Detail",type:"create",contents:{update:detailData,content:"입찰 선정으로 인한 detail create"},wdate:Date()});
                                         resolve();
                                     });
                                 }); 
-                            })(detailData);
+                            })(newDetailData);
                         }
                         
                         // 다른 입찰 내역이 있는 경우 Bid 삭제
@@ -329,6 +342,7 @@ router.post('/bidList',function(req,res){
                                 Log.create({document_name : "Bid",type:"update",contents:{content:"입찰 선정으로 입찰내역 status delete update"},wdate:Date()});
                             });
                         }
+                        console.log("Done selected...");
                         return res.redirect('bidList');
                     })(details);
                     

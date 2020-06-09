@@ -4,14 +4,21 @@
 <html>
   <head>
     <%- include('../partials/head') %>
+    <script src="/js/order.js"></script>
   </head>
   <body>
     <%- include('../partials/nav') %>
     <div class="container mb-3">
       <form action="/order" method="post" enctype="multipart/form-data"> 
         <div class="form-group">
-          <h2>Upload</h2>
+          <h2><%=addVal.text%>업로드</h2>
         </div>
+        <%if(addVal.ordernum){%>
+          <div class="form-group">
+            <label>연결주문번호</label> : <span><%=addVal.ordernum%></span>
+            <input type="hidden" name='ordernum' value='<%=addVal.ordernum%>'>
+          </div>
+        <%}%>
         <div class="form-group">
           <label for="file">File Upload</label> 
           <!-- 여러파일 넣고 빼기 되도록 , 넣는파일 설명-->
@@ -54,16 +61,7 @@
           <% if(errors.material){ %>
             <span class="invalid-feedback"><%= errors.material.message %></span>
           <% } %>
-        </div>
-        <div class="form-group">
-          <label for="proto_quantity">prototype quantity <input type="checkbox" value='check' id='prototypeB' name='prototypeB' value="true" onchange="displayByCheckbox('prototypeB','proto_quantity')"> </label><label for='prototypeB' class='red'>if you need prototype, check this box</label>
-          <!-- 체크박스 필요한지 여부 , 시제품 수량 -->
-          <input type="hidden" id="proto_quantity" name="proto_quantity" value="<%= order.proto_quantity %>" class="form-control <%= (errors.proto_quantity)?'is-invalid':'' %>">
-          <% if(errors.proto_quantity){ %>
-            <span class="invalid-feedback"><%= errors.proto_quantity.message %></span>
-          <% } %>
-        </div>
-        
+        </div>        
         <div class="form-group">
           <label for="quantity">quantity</label>
           <input type="text" id="quantity" name="quantity" value="<%= order.quantity %>" class="form-control <%= (errors.quantity)?'is-invalid':'' %>">

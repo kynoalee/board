@@ -13,13 +13,48 @@ var Upload = require('../modules/upload');
 var Download = require('../modules/download');
 
 // order new   
-router.get('/',util.isLoggedin,function(req, res){
+router.get('/',util.isLoggedin,async(req, res)=>{
     var order = req.flash('order')[0] || {};
     var errors = req.flash('errors')[0] || {};
+    var addVal = {text:'',ordernum:0};
+    if(req.query.ordernum){
+        var summaryFindObj = {ordernum : req.query.ordernum};
+        if(req.user.userclass=="normal"){
+            summaryFindObj.orderid = req.user.userid;
+        } else if(req.user.userclass == "vender"){
+            summaryFindObj.vender = req.user.vender;
+        }
+        await ((req,addVal)=>{
+            return new Promise((resolve)=>{
+                Order.Summary.findOne(summaryFindObj,(err,summary)=>{
+                    if(err){
+                        Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"추가 업로드 ordernum 확인 summary find DB 에러"},wdate:Date()});
+                        console.log(err);
+                        req.flash("errors",{message : "DB ERROR"});
+                        return res.redirect('/');
+                    }
+                
+
+                    // 넘겨받은 GET 변수에 대한 권한이 없는 경우
+                    if(!summary || summary.length == 0){
+                        Log.create({document_name : "Summary",type:"error",contents:{ordernum :req.query.ordernum,userid:req.user.userid ,content:"해당 주문번호에 대한 권한없음"},wdate:Date()});
+                        req.flash("errors",{message : "Permission ERROR"});
+                        return res.redirect('/');
+                    }
+
+                    addVal.ordernum = summary.ordernum;
+                    addVal.text = "추가 ";
+                    resolve();
+                });
+            });
+        })(req,addVal);
+    }
     res.render('order/new',{
         errors:errors,
-        order:order
+        order:order,
+        addVal:addVal
     });
+
      
 });
 
@@ -61,19 +96,11 @@ function (req,res,next){
         }
         req.body.order_detailnum = detail.order_detailnum+1;
 
-        // 첫 주문일시
-        req.body.status = 1;
-        Order.Summary.find({}).sort({ordernum:-1}).findOne().select("ordernum").exec(function(err,summary){
-            if(err){
-                Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"마지막 order num 가져오는 find DB 에러"},wdate:Date()});
-                console.log(err);
-                req.flash("errors",{message : "DB ERROR"});
-                return res.redirect('/');
-            }
-            req.body.orderlink = summary.ordernum + 1;
-            req.body.ordernum = summary.ordernum + 1;
-            req.body.prototypeB = req.body.prototypeB == "true" ?true:false;
-            Order.Detail.create(req.body,function(err,detail){
+        if(req.body.ordernum){
+            req.body.orderlink = req.body.ordernum;
+            req.body.status = 1;
+            req.body.orderCheck=true;
+            Order.Detail.create(req.body,function(err){
                 if(err){
                     Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"주문 detail create 중 에러"},wdate:Date()});
                     console.log(err);
@@ -84,27 +111,63 @@ function (req,res,next){
                 Log.create({document_name : "Detail",type:"create",contents:{order:req.body,content:"주문 디테일 create"},wdate:Date()});
                 next();
             });
-        });
+        }else {
+            // 첫 주문일시
+            req.body.status = 1;
+            Order.Summary.find({}).sort({ordernum:-1}).findOne().select("ordernum").exec(function(err,summary){
+                if(err){
+                    Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"마지막 order num 가져오는 find DB 에러"},wdate:Date()});
+                    console.log(err);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }
+                req.body.orderlink = summary.ordernum + 1;
+                req.body.ordernum = summary.ordernum + 1;
+                Order.Detail.create(req.body,function(err){
+                    if(err){
+                        Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"주문 detail create 중 에러"},wdate:Date()});
+                        console.log(err);
+                        req.flash('order', req.body);
+                        req.flash('errors', util.parseError(err)); // 1
+                        return res.redirect('order');
+                    }
+                    Log.create({document_name : "Detail",type:"create",contents:{order:req.body,content:"주문 디테일 create"},wdate:Date()});
+                    next();
+                });
+            });
+        }
     });
 },
 function(req,res){
     // Order Summary create
     var summaryObj ={
-        ordernum : req.body.ordernum,
-        orderid : req.body.userid,
-        orderdate : req.body.wdate,
-        mdate :req.body.wdate,
-        status : req.body.status
+        mdate :req.body.wdate
     }
-    Order.Summary.create(summaryObj,function(err,summary){
-        if(err){
-            Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"주문 summary create DB 에러"},wdate:Date()});
-            req.flash('errors',{});
-            return res.redirect('order');
-        } 
-        Log.create({document_name : "Summary",type:"create",contents:{summary:summaryObj,content:"주문 summary create"},wdate:Date()});
-        res.redirect('order/list');           
-    });
+    if(req.body.orderCheck){
+        Order.Summary.update({ordernum:req.body.ordernum},summaryObj,function(err){
+            if(err){
+                Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"주문 summary update DB 에러"},wdate:Date()});
+                req.flash('errors',{});
+                return res.redirect('order');
+            } 
+            Log.create({document_name : "Summary",type:"update",contents:{summary:summaryObj,content:"주문 summary update"},wdate:Date()});
+            res.redirect('order/list');           
+        });
+    } else{
+        summaryObj.ordernum = req.body.ordernum;
+        summaryObj.orderid = req.body.userid;
+        summaryObj.orderdate = req.body.wdate;
+        summaryObj.status = req.body.status;
+        Order.Summary.create(summaryObj,function(err){
+            if(err){
+                Log.create({document_name : "Summary",type:"error",contents:{error:err,content:"주문 summary create DB 에러"},wdate:Date()});
+                req.flash('errors',{});
+                return res.redirect('order');
+            } 
+            Log.create({document_name : "Summary",type:"create",contents:{summary:summaryObj,content:"주문 summary create"},wdate:Date()});
+            res.redirect('order/list');           
+        });
+    }
 });
 
 // my order list get
@@ -259,7 +322,7 @@ router.get('/list',util.isLoggedin,function(req,res){
 });
 
 // 주문상세 페이지
-router.get('/detail',(req,res)=>{
+router.get('/detail',util.isLoggedin,(req,res)=>{
 
     var findObj = {ordernum : req.query.ordernum};
     Order.Summary.findOne(findObj,function(err,summary){
@@ -275,6 +338,12 @@ router.get('/detail',(req,res)=>{
             orderid : summary.orderid,
             vender : summary.vender
         };
+        if(summary.price){
+            summaryData.price = summary.price;
+        }
+        if(summary.deadline){
+            summaryData.deadline = summary.deadline;
+        }
         summaryData.wdate = moment(summary.orderdate).format("YYYY-MM-DD HH:mm:ss");
         summaryData.mdate = moment(summary.mdate).format("YYYY-MM-DD HH:mm:ss");
 
@@ -305,7 +374,7 @@ router.get('/detail',(req,res)=>{
             case 1 : 
                 if(req.user.userclass == 'normal'){
                     summaryData.btn1Name = '추가 업로드';
-                    summaryData.btn1Click = '';
+                    summaryData.btn1Click = 'uploadMoreData('+summary.ordernum+')';
                 }
             break;
             case 2 : 
