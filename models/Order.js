@@ -45,8 +45,6 @@ var orderDetailSchema = mongoose.Schema({
   size:String,
   color:String,
   material:String,
-  prototypeB:Boolean,
-  proto_quantity:String,
   quantity:String,
   deadline:String,
 
