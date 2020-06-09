@@ -17,6 +17,11 @@ $(document).ready(()=>{
         }
        
     });
+    
+    // 페이지 최상단 이동
+    $('#goTop').click(()=>{
+        $('html').scrollTop(0);
+    });
 });
 
 function createStatus(statusNow,getStatus){
@@ -84,7 +89,9 @@ function getDetailInfo(ordernum,fileLinks){
 
 }
 
-
+function uploadMoreData(ordernum){
+    window.open("/order?ordernum="+ordernum);
+}
 
 
 

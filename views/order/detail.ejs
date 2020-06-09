@@ -25,6 +25,12 @@
             </div>
             <div>주문자 | <%=summaryData.orderid%></div>
             <div>제작자 | <%=summaryData.vender%></div>
+            <%if(summaryData.price){%>
+            <div>가격 | <%=summaryData.price%></div>
+            <%}%>
+            <%if(summaryData.deadline){%>
+            <div>마감시간 | <%=summaryData.deadline%></div>
+            <%}%>
             <div>주문일자 | <%=summaryData.wdate%></div>
             <div>최근작업일자 | <%=summaryData.mdate%></div>
             <!-- detail data. 주문 상세 내용 -->
@@ -77,21 +83,21 @@
     <!-- 고정 메뉴 네비게이션 -->
     <div class="nav-fixed-buttons">
       <div>
-        <button type='button' class="btn btn-block red-b" href="#">최상위로</button>
+        <button type='button' class="btn btn-block red-b" id="goTop">최상위로</button>
       </div>
       <%if(summaryData.btn1Name){%>
       <div>
-        <button type='button' class="btn btn-block blue-b" href="#"><%=summaryData.btn1Name%></button>
+        <button type='button' class="btn btn-block blue-b" onclick='<%=summaryData.btn1Click%>'><%=summaryData.btn1Name%></button>
       </div>
       <%}%>
       <%if(summaryData.btn2Name){%>
       <div>
-        <button type='button' class="btn btn-block yellow-b" href="#"><%=summaryData.btn2Name%></button>
+        <button type='button' class="btn btn-block yellow-b" ><%=summaryData.btn2Name%></button>
       </div>
       <%}%>
       <%if(summaryData.btn3Name){%>
       <div>
-        <button type='button' class="btn btn-block" href="#"><%=summaryData.btn3Name%></button>
+        <button type='button' class="btn btn-block" ><%=summaryData.btn3Name%></button>
       </div>
       <%}%>
     </div>
