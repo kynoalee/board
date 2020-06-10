@@ -382,7 +382,7 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
             case 3 :
                 if(req.user.userclass == 'normal'){
                     summaryData.btn1Name = '프로토타입신청';
-                    summaryData.btn1Click = '';
+                    summaryData.btn1Click = 'setPrototype('+summary.ordernum+')';
                     summaryData.btn2Name = '질문';
                     summaryData.btn2Click = '';
                     summaryData.btn3Name = '답변';
@@ -517,6 +517,11 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
         });
        
     });
+});
+
+// 프로토타입 신청
+router.get("/detail/proto",util.isLoggedin,(req,res)=>{
+    res.redirect('/order/detail?ordernum='+req.query.ordernum);
 });
 
 // 다운로드 라우터
