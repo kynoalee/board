@@ -92,6 +92,15 @@ function getDetailInfo(ordernum,fileLinks){
 function uploadMoreData(ordernum){
     window.open("/order?ordernum="+ordernum);
 }
-
-
+var buttonOneClick = false;
+function setPrototype(ordernum){
+    if(!buttonOneClick){
+        buttonOneClick = true;
+        if(confirm('생산품의 프로토타입을 신청하시겠습니까?')){
+            window.location.href ="/order/detail/proto?ordernum="+ordernum;
+        } else {
+            buttonOneClick = false;
+        }
+    }
+}
 
