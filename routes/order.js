@@ -520,7 +520,26 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
 });
 
 // 프로토타입 신청
-router.get("/detail/proto",util.isLoggedin,(req,res)=>{
+router.get("/detail/proto",util.isLoggedin,async(req,res)=>{
+    var updateObj = {
+        orderlink : req.query.ordernum,
+        summary : "프로토타입을 신청합니다.",
+        description : "생산품의 프로토타입을 신청합니다.",
+        wdate : Date(),
+        userid : req.user.userid,
+        userclass : req.user.userclass,
+        status : 3
+    };
+
+    Order.Detail.find({}).sort({order_detailnum:-1}).findOne().select("order_detailnum").exec(function(err,detail){
+        if(err){
+            Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"마지막 order detail num 가져오는 find DB 에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
+    });
+
     res.redirect('/order/detail?ordernum='+req.query.ordernum);
 });
 
