@@ -25,6 +25,7 @@
             </div>
             <div>주문자 | <%=summaryData.orderid%></div>
             <div>제작자 | <%=summaryData.vender%></div>
+            <div>프로토타입 신청 | <%=summaryData.prototype_bool?"신청함":"안함"%></div>
             <%if(summaryData.price){%>
             <div>가격 | <%=summaryData.price%></div>
             <%}%>
@@ -93,11 +94,6 @@
       <%if(summaryData.btn2Name){%>
       <div>
         <button type='button' class="btn btn-block yellow-b" onclick='<%=summaryData.btn2Click%>'><%=summaryData.btn2Name%></button>
-      </div>
-      <%}%>
-      <%if(summaryData.btn3Name){%>
-      <div>
-        <button type='button' class="btn btn-block" onclick='<%=summaryData.btn3Click%>'><%=summaryData.btn3Name%></button>
       </div>
       <%}%>
     </div>
