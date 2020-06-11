@@ -1,0 +1,43 @@
+<!-- views/home/welcome.ejs -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../partials/head') %>
+    <script src="/js/order.js"></script>
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+    <div class="container mb-3">
+      <form action="/order/qna" method="post" enctype="multipart/form-data"> 
+        <div class="form-group">
+          <h2>주문번호 <%=ordernum%> QnA</h2>
+          <input type="hidden" name="ordernum" value="<%=ordernum%>">
+        </div>
+        <div class="form-group">
+          <label for="file">File Upload</label> 
+          <!-- 여러파일 넣고 빼기 되도록 , 넣는파일 설명-->
+          <div>
+            <input type="file" id='file' onchange="listFiles('file','fileList')" name='file' multiple/>       
+          </div>
+          <div id="fileList">
+            <div>파일 모음</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="summary">summary *</label>
+          <input type="text" id="summary" name="summary" value="" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea id="description" name="description" rows="5" class="form-control"></textarea>
+        </div>
+        <div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+
+      </form>
+    </div>
+  </body>
+</html>
+

@@ -283,7 +283,7 @@ router.get('/list',util.isLoggedin,function(req,res){
             });
 
             // 관련 업로드된 파일정보 모두 가져오기
-            let files = [];
+            let files = [{servername:0}];
             for(let val of detailArray.filelink){
                 files[files.length] = {servername : val};
             }
@@ -336,7 +336,8 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
         let summaryData = {
             ordernum : summary.ordernum,
             orderid : summary.orderid,
-            vender : summary.vender
+            vender : summary.vender,
+            prototype_bool : summary.prototype_bool 
         };
         if(summary.price){
             summaryData.price = summary.price;
@@ -381,36 +382,29 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
             break;
             case 3 :
                 if(req.user.userclass == 'normal'){
-                    summaryData.btn1Name = '프로토타입신청';
+                    summaryData.btn1Name = 'Protype 신청';
                     summaryData.btn1Click = 'setPrototype('+summary.ordernum+')';
-                    summaryData.btn2Name = '질문';
-                    summaryData.btn2Click = '';
-                    summaryData.btn3Name = '답변';
-                    summaryData.btn3Click = '';
+                    summaryData.btn2Name = 'QnA';
+                    summaryData.btn2Click = 'setQnA('+summary.ordernum+')';
                 }
                 if(req.user.userclass == 'vender'){
                     summaryData.btn1Name = '내용 업로드';
                     summaryData.btn1Click = '';
-                    summaryData.btn2Name = '질문';
+                    summaryData.btn2Name = 'QnA';
                     summaryData.btn2Click = '';
-                    summaryData.btn3Name = '답변';
-                    summaryData.btn3Click = '';
                 } 
             break;
             case 4 : 
                 if(req.user.userclass == 'normal'){
-                    summaryData.btn1Name = '질문';
+                    summaryData.btn1Name = 'QnA';
                     summaryData.btn1Click = '';
-                    summaryData.btn2Name = '답변';
-                    summaryData.btn2Click = '';
                 }
                 if(req.user.userclass == 'vender'){
                     summaryData.btn1Name = '내용 업로드';
                     summaryData.btn1Click = '';
-                    summaryData.btn2Name = '질문';
+                    summaryData.btn2Name = 'QnA';
                     summaryData.btn2Click = '';
-                    summaryData.btn3Name = '답변';
-                    summaryData.btn3Click = '';
+
                 } 
             break;
             case 5 : 
@@ -521,7 +515,7 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
 
 // 프로토타입 신청
 router.get("/detail/proto",util.isLoggedin,async(req,res)=>{
-    var updateObj = {
+    var detailObj = {
         orderlink : req.query.ordernum,
         summary : "프로토타입을 신청합니다.",
         description : "생산품의 프로토타입을 신청합니다.",
@@ -538,9 +532,88 @@ router.get("/detail/proto",util.isLoggedin,async(req,res)=>{
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
         }
+        detailObj.order_detailnum = detail.order_detailnum + 1;
+        Order.Detail.create(detailObj,(err1)=>{
+            if(err1){
+                Log.create({document_name : "Detail",type:"error",contents:{error:err1,content:"프로토타입 신청 디테일 create DB 에러"},wdate:Date()});
+                console.log(err1);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }
+            Log.create({document_name : "Detail",type:"create",contents:{create:detailObj,content:"프로토타입 신청 디테일 create"},wdate:Date()});
+            Order.Summary.updateOne({ordernum : req.query.ordernum},{mdate:Date(),prototype_bool:true},(err2)=>{
+                if(err2){
+                    Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"프로토타입 신청 후 서머리 update DB 에러"},wdate:Date()});
+                    console.log(err2);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }
+                Log.create({document_name : "Summary",type:"update",contents:{update:{mdate:Date(),prototype_bool:true},content:"프로토타입 신청 후 서머리 update"},wdate:Date()});
+                
+                res.redirect('/order/detail?ordernum='+req.query.ordernum);
+            });
+        });
     });
+});
 
-    res.redirect('/order/detail?ordernum='+req.query.ordernum);
+// 주문 상세 QnA
+router.get("/qna",util.isLoggedin,(req,res)=>{
+    res.render('order/qna',{
+        ordernum : req.query.ordernum
+    });
+});
+
+// QnA 저장
+router.post("/qna",util.isLoggedin, async(req,res)=>{
+    
+    Order.Summary.findOne({ordernum:req.body.ordernum},(e,summ)=>{
+        if(e){
+            Log.create({document_name : "Summary",type:"error",contents:{error:e,content:"summary status 뽑기위해 find DB 에러"},wdate:Date()});
+            console.log(e);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
+
+        var detailObj = {
+            orderlink : req.body.ordernum,
+            summary : req.body.summary,
+            description : req.body.description,
+            wdate : Date(),
+            userid : req.user.userid,
+            userclass : req.user.userclass,
+            status : summ.status
+        };
+
+        Order.Detail.find({}).sort({order_detailnum:-1}).findOne().select("order_detailnum").exec(function(err,detail){
+            if(err){
+                Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"마지막 order detail num 가져오는 find DB 에러"},wdate:Date()});
+                console.log(err);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }
+            detailObj.order_detailnum = detail.order_detailnum + 1;
+            Order.Detail.create(detailObj,(err1)=>{
+                if(err1){
+                    Log.create({document_name : "Detail",type:"error",contents:{error:err1,content:"프로토타입 신청 디테일 create DB 에러"},wdate:Date()});
+                    console.log(err1);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }
+                Log.create({document_name : "Detail",type:"create",contents:{create:detailObj,content:"프로토타입 신청 디테일 create"},wdate:Date()});
+                Order.Summary.updateOne({ordernum : req.body.ordernum},{mdate:Date(),prototype_bool:true},(err2)=>{
+                    if(err2){
+                        Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"프로토타입 신청 후 서머리 update DB 에러"},wdate:Date()});
+                        console.log(err2);
+                        req.flash("errors",{message : "DB ERROR"});
+                        return res.redirect('/');
+                    }
+                    Log.create({document_name : "Summary",type:"update",contents:{update:{mdate:Date(),prototype_bool:true},content:"프로토타입 신청 후 서머리 update"},wdate:Date()});
+                    
+                    res.redirect('/pop/close');
+                });
+            });
+        });
+    });
 });
 
 // 다운로드 라우터

@@ -92,7 +92,7 @@ function getDetailInfo(ordernum,fileLinks){
 function uploadMoreData(ordernum){
     window.open("/order?ordernum="+ordernum);
 }
-var buttonOneClick = false;
+var buttonOneClickPrototype = false;
 function setPrototype(ordernum){
     if(!buttonOneClick){
         buttonOneClick = true;
@@ -102,5 +102,9 @@ function setPrototype(ordernum){
             buttonOneClick = false;
         }
     }
+}
+
+function setQnA(ordernum){
+    window.open("/order/qna?ordernum="+ordernum);
 }
 

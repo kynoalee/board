@@ -13,7 +13,8 @@ var orderSummarySchema = mongoose.Schema({
   status:Number,
   customermemo:String,
   price:Number,
-  deadline:String
+  deadline:String,
+  prototype_bool:Boolean
 });
 
 var orderDetailSchema = mongoose.Schema({
