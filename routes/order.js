@@ -22,7 +22,7 @@ router.get('/',util.isLoggedin,async(req, res)=>{
         if(req.user.userclass=="normal"){
             summaryFindObj.orderid = req.user.userid;
         } else if(req.user.userclass == "vender"){
-            summaryFindObj.vender = req.user.vender;
+            summaryFindObj.vender = req.user.userid;
         }
         await ((req,addVal)=>{
             return new Promise((resolve)=>{
@@ -33,7 +33,6 @@ router.get('/',util.isLoggedin,async(req, res)=>{
                         req.flash("errors",{message : "DB ERROR"});
                         return res.redirect('/');
                     }
-                
 
                     // 넘겨받은 GET 변수에 대한 권한이 없는 경우
                     if(!summary || summary.length == 0){
@@ -386,24 +385,28 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
                     summaryData.btn1Click = 'setPrototype('+summary.ordernum+')';
                     summaryData.btn2Name = 'QnA';
                     summaryData.btn2Click = 'setQnA('+summary.ordernum+')';
+                    summaryData.btn3Name = '배송요청';
+                    summaryData.btn3Click = '';
                 }
                 if(req.user.userclass == 'vender'){
                     summaryData.btn1Name = '내용 업로드';
-                    summaryData.btn1Click = '';
+                    summaryData.btn1Click = 'uploadMoreData('+summary.ordernum+')';
                     summaryData.btn2Name = 'QnA';
-                    summaryData.btn2Click = '';
+                    summaryData.btn2Click = 'setQnA('+summary.ordernum+')';
+                    summaryData.btn3Name = '제작증업로드';
+                    summaryData.btn3Click = '';
                 } 
             break;
             case 4 : 
                 if(req.user.userclass == 'normal'){
                     summaryData.btn1Name = 'QnA';
-                    summaryData.btn1Click = '';
+                    summaryData.btn1Click = 'setQnA('+summary.ordernum+')';
                 }
                 if(req.user.userclass == 'vender'){
                     summaryData.btn1Name = '내용 업로드';
                     summaryData.btn1Click = '';
                     summaryData.btn2Name = 'QnA';
-                    summaryData.btn2Click = '';
+                    summaryData.btn2Click = 'setQnA('+summary.ordernum+')';
 
                 } 
             break;

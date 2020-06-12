@@ -41,6 +41,7 @@
           <% } %>
         </div>
         <%}%>
+        <%if(currentUser.userclass == 'normal'){%>
         <div class="form-group">
           <label for="size">size</label>
           <input type="text" id="size" name="size" value="<%= order.size %>" class="form-control <%= (errors.size)?'is-invalid':'' %>">
@@ -77,6 +78,11 @@
             <span class="invalid-feedback"><%= errors.deadline.message %></span>
           <% } %>
         </div>
+        <%} else {%>
+          <!-- vender 영역 -->
+          
+
+        <%}%>
         <div class="form-group">
           <label for="summary">summary *</label>
           <input type="text" id="summary" name="summary" value="<%= order.summary %>" class="form-control <%= (errors.summary)?'is-invalid':'' %>">
