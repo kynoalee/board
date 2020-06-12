@@ -14,7 +14,8 @@ var orderSummarySchema = mongoose.Schema({
   customermemo:String,
   price:Number,
   deadline:String,
-  prototype_bool:Boolean
+  prototype_bool:Boolean,
+  manufacturingConfirm : Boolean
 });
 
 var orderDetailSchema = mongoose.Schema({
