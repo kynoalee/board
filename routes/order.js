@@ -96,19 +96,27 @@ function (req,res,next){
         req.body.order_detailnum = detail.order_detailnum+1;
 
         if(req.body.ordernum){
-            req.body.orderlink = req.body.ordernum;
-            req.body.status = 1;
-            req.body.orderCheck=true;
-            Order.Detail.create(req.body,function(err){
-                if(err){
-                    Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"주문 detail create 중 에러"},wdate:Date()});
-                    console.log(err);
-                    req.flash('order', req.body);
-                    req.flash('errors', util.parseError(err)); // 1
-                    return res.redirect('order');
+            Order.Summary.findOne({ordernum : req.body.ordernum},(errS,sumObj)=>{
+                if(errS){
+                    Log.create({document_name : "Summary",type:"error",contents:{error:errS,content:"추가 업로드 status find DB 에러"},wdate:Date()});
+                    console.log(errS);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
                 }
-                Log.create({document_name : "Detail",type:"create",contents:{order:req.body,content:"주문 디테일 create"},wdate:Date()});
-                next();
+                req.body.orderlink = req.body.ordernum;
+                req.body.status = sumObj.status;
+                req.body.orderCheck=true;
+                Order.Detail.create(req.body,function(err){
+                    if(err){
+                        Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"주문 detail create 중 에러"},wdate:Date()});
+                        console.log(err);
+                        req.flash('order', req.body);
+                        req.flash('errors', util.parseError(err)); // 1
+                        return res.redirect('order');
+                    }
+                    Log.create({document_name : "Detail",type:"create",contents:{order:req.body,content:"주문 디테일 create"},wdate:Date()});
+                    next();
+                });
             });
         }else {
             // 첫 주문일시
@@ -150,7 +158,7 @@ function(req,res){
                 return res.redirect('order');
             } 
             Log.create({document_name : "Summary",type:"update",contents:{summary:summaryObj,content:"주문 summary update"},wdate:Date()});
-            res.redirect('order/list');           
+            res.redirect('pop/close');           
         });
     } else{
         summaryObj.ordernum = req.body.ordernum;
@@ -385,8 +393,10 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
                     summaryData.btn1Click = 'setPrototype('+summary.ordernum+')';
                     summaryData.btn2Name = 'QnA';
                     summaryData.btn2Click = 'setQnA('+summary.ordernum+')';
-                    summaryData.btn3Name = '배송요청';
-                    summaryData.btn3Click = '';
+                    if(summary.manufacturing_confirm){
+                        summaryData.btn3Name = '배송요청';
+                        summaryData.btn3Click = 'requestDelivery('+summary.ordernum+')';
+                    }
                 }
                 if(req.user.userclass == 'vender'){
                     summaryData.btn1Name = '내용 업로드';
@@ -394,7 +404,7 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
                     summaryData.btn2Name = 'QnA';
                     summaryData.btn2Click = 'setQnA('+summary.ordernum+')';
                     summaryData.btn3Name = '제작증업로드';
-                    summaryData.btn3Click = '';
+                    summaryData.btn3Click = 'uploadManufacture('+summary.ordernum+')';
                 } 
             break;
             case 4 : 
@@ -404,7 +414,7 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
                 }
                 if(req.user.userclass == 'vender'){
                     summaryData.btn1Name = '내용 업로드';
-                    summaryData.btn1Click = '';
+                    summaryData.btn1Click = 'uploadMoreData('+summary.ordernum+')';
                     summaryData.btn2Name = 'QnA';
                     summaryData.btn2Click = 'setQnA('+summary.ordernum+')';
 
@@ -516,6 +526,12 @@ router.get('/detail',util.isLoggedin,(req,res)=>{
     });
 });
 
+// 다운로드 라우터
+router.get("/detail/:servername",util.isLoggedin,function(req,res){
+    let fileName = req.params.servername;
+    Download.fileDownload(File,fileName,res);
+});
+
 // 프로토타입 신청
 router.get("/detail/proto",util.isLoggedin,async(req,res)=>{
     var detailObj = {
@@ -619,10 +635,66 @@ router.post("/qna",util.isLoggedin, async(req,res)=>{
     });
 });
 
-// 다운로드 라우터
-router.get("/detail/:servername",util.isLoggedin,function(req,res){
-    let fileName = req.params.servername;
-    Download.fileDownload(File,fileName,res);
+// 제작증 업로드 페이지
+router.get('/manufacture',util.isLoggedin,(req,res)=>{
+    var ordernum = req.query.ordernum;
+    res.render('order/manufacture',{
+        ordernum : ordernum
+    });
+});
+
+router.post("/manufacture",order.array('file'),util.isLoggedin,(req,res,next)=>{
+    // File create
+    if(req.files.length){
+        Upload.createFiles(req.files,req,next);
+    } else{
+        console.log("upload with no file");
+        req.body.filelink = null;
+        req.files = [''];
+        next();
+    }    
+},
+(req,res)=>{
+    var ordernum = req.body.ordernum;
+    var detailCreateObj = {
+        summary: "제작증 업로드",
+        description : "제작증 업로드했습니다.",
+        orderlink : ordernum,
+        userid : req.user.userid,
+        userclass : req.user.userclass,
+        status : 3,
+        manufacture : true ,
+        wdate : Date()
+    };
+    Order.Detail.find({}).sort({order_detailnum:-1}).findOne().select('order_detailnum').exec((err,detailnum)=>{
+        if(err){
+            Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"제작증 업로드 detailnum 최신 DB 에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
+        detailCreateObj.order_detailnum = detailnum.order_detailnum;
+
+        Order.Detail.create(detailCreateObj,(err1)=>{
+            if(err1){
+                Log.create({document_name : "Detail",type:"error",contents:{error:err1,content:"제작증 업로드 디테일 create DB 에러"},wdate:Date()});
+                console.log(err1);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }
+            Log.create({document_name : "Detail",type:"create",contents:{create:detailCreateObj,content:"제작증 업로드 디테일 create"},wdate:Date()});
+            Order.Summary.updateOne({ordernum : req.body.ordernum},{mdate:Date(),manufacturing_confirm:true},(err2)=>{
+                if(err2){
+                    Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"제작증 업로드 후 서머리 update DB 에러"},wdate:Date()});
+                    console.log(err2);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }
+                Log.create({document_name : "Summary",type:"update",contents:{update:{mdate:Date(),manufacturing_confirm:true},content:"제작증 업로드 후 서머리 update"},wdate:Date()});
+                res.redirect('/pop/close');
+            });
+        });
+    });
 });
 
 module.exports = router;

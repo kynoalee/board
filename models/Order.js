@@ -15,7 +15,7 @@ var orderSummarySchema = mongoose.Schema({
   price:Number,
   deadline:String,
   prototype_bool:Boolean,
-  manufacturingConfirm : Boolean
+  manufacturing_confirm : Boolean
 });
 
 var orderDetailSchema = mongoose.Schema({
@@ -54,7 +54,8 @@ var orderDetailSchema = mongoose.Schema({
   invoice:String,
   destination:String,
   deliverycom:String,
-
+  manufacture:Boolean,
+  
   //pd side
   accepted : {
     type:Boolean,
