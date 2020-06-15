@@ -104,6 +104,14 @@ function setPrototype(ordernum){
     }
 }
 
+function uploadManufacture(ordernum){
+    window.open("/order/manufacture?ordernum="+ordernum);
+}
+
+function requestDelivery(ordernum){
+    window.location.href = "/order/delivery"
+}
+
 function setQnA(ordernum){
     window.open("/order/qna?ordernum="+ordernum);
 }
