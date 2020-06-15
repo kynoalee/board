@@ -1,0 +1,34 @@
+<!-- views/home/welcome.ejs -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../partials/head') %>
+    <script src="/js/order.js"></script>
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+    <div class="container mb-3">
+      <form action="/order/manufacture" method="post" enctype="multipart/form-data"> 
+        <div class="form-group">
+          <h2>업로드</h2>
+        </div>
+        <div class="form-group">
+          <label for="file">File Upload</label> 
+          <!-- 여러파일 넣고 빼기 되도록 , 넣는파일 설명-->
+          <div>
+            <input type="file" id='file' onchange="listFiles('file','fileList')" name='file' multiple/>       
+          </div>
+          <div id="fileList">
+            <div>파일 모음</div>
+          </div>
+        </div>
+        <div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+        <input type="hidden" name="ordernum" value="<%=ordernum%>">
+      </form>
+    </div>
+  </body>
+</html>
+
