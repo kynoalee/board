@@ -673,7 +673,7 @@ router.post("/manufacture",order.array('file'),util.isLoggedin,(req,res,next)=>{
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
         }
-        detailCreateObj.order_detailnum = detailnum.order_detailnum;
+        detailCreateObj.order_detailnum = detailnum.order_detailnum+1;
 
         Order.Detail.create(detailCreateObj,(err1)=>{
             if(err1){
@@ -697,6 +697,55 @@ router.post("/manufacture",order.array('file'),util.isLoggedin,(req,res,next)=>{
     });
 });
 
+// 배송요청
+router.get('/delivery',(req,res)=>{
+    res.render('order/delivery',{
+        ordernum : req.query.ordernum
+    });
+});
+
+router.post('/delivery',(req,res)=>{
+    var ordernum = req.body.ordernum;
+    var detailCreateObj = {
+        summary: "배송 요청",
+        description : "이 주소로 보냈습니다.",
+        address : req.body.address,
+        orderlink : ordernum,
+        userid : req.user.userid,
+        userclass : req.user.userclass,
+        status : 4,
+        wdate : Date()
+    };
+    Order.Detail.find({}).sort({order_detailnum:-1}).findOne().select('order_detailnum').exec((err,detailnum)=>{
+        if(err){
+            Log.create({document_name : "Detail",type:"error",contents:{error:err,content:"배송 요청 detailnum 최신 DB 에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
+        detailCreateObj.order_detailnum = detailnum.order_detailnum +1;
+
+        Order.Detail.create(detailCreateObj,(err1)=>{
+            if(err1){
+                Log.create({document_name : "Detail",type:"error",contents:{error:err1,content:"배송 요청 디테일 create DB 에러"},wdate:Date()});
+                console.log(err1);
+                req.flash("errors",{message : "DB ERROR"});
+                return res.redirect('/');
+            }
+            Log.create({document_name : "Detail",type:"create",contents:{create:detailCreateObj,content:"배송 요청 디테일 create"},wdate:Date()});
+            Order.Summary.updateOne({ordernum : req.body.ordernum},{mdate:Date(),status : 4},(err2)=>{
+                if(err2){
+                    Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"배송 요청 후 서머리 update DB 에러"},wdate:Date()});
+                    console.log(err2);
+                    req.flash("errors",{message : "DB ERROR"});
+                    return res.redirect('/');
+                }
+                Log.create({document_name : "Summary",type:"update",contents:{update:{mdate:Date(),manufacturing_confirm:true},content:"제작증 업로드 후 서머리 update"},wdate:Date()});
+                res.redirect('/pop/close');
+            });
+        });
+    });
+});
 module.exports = router;
 
 
