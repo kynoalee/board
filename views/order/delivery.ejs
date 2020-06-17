@@ -9,14 +9,14 @@
   <body>
     <%- include('../partials/nav') %>
     <div class="container mb-3">
-      <form action="/order/manufacture" method="post" enctype="multipart/form-data"> 
+      <form action="/order/delivery" method="post"> 
         <div class="form-group">
           <h2>배송지 입력</h2>
         </div>
         <div class="form-group">
-            <label for="address">주소지</label>
-            <input type="text" id="address" name="address" value="" class="form-control">
-          </div>
+          <label for="address">주소지</label>
+          <input type="text" id="address" name="address" value="" class="form-control">
+        </div>
         <div>
           <button type="submit" class="btn btn-primary">Submit</button>
         </div>

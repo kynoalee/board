@@ -109,10 +109,17 @@ function uploadManufacture(ordernum){
 }
 
 function requestDelivery(ordernum){
-    window.location.href = "/order/delivery"
+    window.open("/order/delivery?ordernum="+ordernum);
 }
 
 function setQnA(ordernum){
     window.open("/order/qna?ordernum="+ordernum);
+}
+
+function setOrderDone(ordernum){
+    var confirmText = `구매 확정이후에는 해당 주문에 대한 어떠한 건의도 할 수 없습니다. 정말로 구매확정하시겠습니까?`;
+    if(confirm(confirmText)){
+        window.location.href = "/order/done?ordernum="+ordernum;
+    }
 }
 
