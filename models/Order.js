@@ -49,7 +49,7 @@ var orderDetailSchema = mongoose.Schema({
   material:String,
   quantity:String,
   deadline:String,
-  addresss : String,
+  address : String,
   
   // vender side
   invoice:String,
