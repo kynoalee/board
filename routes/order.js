@@ -751,11 +751,24 @@ router.post('/delivery',(req,res)=>{
 
 router.get('/done',(req,res)=>{
     // summary status 5 update 
-
-
-    res.render('order/done',{
-        ordernum:req.query.ordernum
+    var summaryUpdateObj = {
+        mdate : Date(),
+        status : 5
+    };
+    Order.Summary.updateOne({ordernum : req.query.ordernum},summaryUpdateObj,(err2)=>{
+        if(err2){
+            Log.create({document_name : "Summary",type:"error",contents:{error:err2,content:"구매 확정 후 서머리 update DB 에러"},wdate:Date()});
+            console.log(err2);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/');
+        }
+        Log.create({document_name : "Summary",type:"update",contents:{update:summaryUpdateObj,content:"구매 확정 후 서머리 update"},wdate:Date()});
+        
+        res.render('order/done',{
+            ordernum:req.query.ordernum
+        });
     });
+    
 });
 module.exports = router;
 

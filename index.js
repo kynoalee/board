@@ -51,6 +51,7 @@ app.use('/users', require('./routes/users'));
 app.use('/order',require('./routes/order'));
 app.use('/bid',require('./routes/bid'));
 app.use('/qna',require('./routes/qna'));
+app.use('/review',require('./routes/review'));
 app.use('/pop',require('./routes/pop'));
 app.use('/ajax',require('./routes/ajax'));
 
