@@ -1,13 +1,13 @@
 <nav class="navbar navbar-expand-sm navbar-light site-header sticky-top py-1 mb-3">
   <div class="container">
-    <div class="navbar-brand">BuPum</div>
+    <div class="navbar-brand"><a href="/" class="nav-link">BuPum</a></div>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav">
-        <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
         <li class="nav-item"><a href="/about" class="nav-link">About</a></li>
+        <li class="nav-item"><a href="/review/list" class="nav-link">Review</a></li>
         <%if(currentUser && currentUser.userclass =="normal"){%>
         <li class="nav-item"><a href="/order" class="nav-link">Upload</a></li>
         <%} if(currentUser && currentUser.userclass =="vender"){%>
