@@ -19,14 +19,19 @@ var storage = multer.diskStorage({
     }
 });
 var files = multer({ storage: storage });
+router.get('/',(req,res)=>{
+    console.log('test');
+    res.redirect('/');
+});
+router.get('/new',util.isLoggedin,(req,res)=>{
 
-router.get('/new',(req,res)=>{
-
-    res.render('review/new');
+    res.render('review/new',{
+        ordernum : req.query.ordernum
+    });
 });
 
 router.get('/list',(req,res)=>{
 
-    res.render('review/list');
+    res.render('review/list'); 
 });
 module.exports = router;

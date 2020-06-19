@@ -80,7 +80,7 @@
                     <th>주문일시</th>
                     <th>마지막작업일시</th>
                     <th>상태</th>
-                    <th>주문 메모</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -90,7 +90,12 @@
                         <td><%=obj.orderdateD%><br /><%=obj.orderdateH%></td>
                         <td><%=obj.modidateD%><br /><%=obj.modidateH%></td>
                         <td><%=obj.status%></td>
-                        <td><input type="text" value="<%=obj.memo%>"></td>
+                        <td>
+                            <%if(obj.status == "확정" && !obj.reviewed){%>
+                            <button class="btn btn-warning" type="button" onclick="writeReview('<%=obj.ordernum%>')">후기 작성</button>
+                            <%}%>
+                            <button class="btn btn-primary" type="button" onclick="goPopup('<%=obj.ordernum%>')">바로가기</button>
+                        </td>
                     </tr>
                 <%}%>             
             </tbody>
