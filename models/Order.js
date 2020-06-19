@@ -8,6 +8,7 @@ var orderSummarySchema = mongoose.Schema({
   },
   orderid:String,
   orderdate:Date,
+  donedate:Date,
   mdate:Date,
   vender:String,
   status:Number,
@@ -15,7 +16,8 @@ var orderSummarySchema = mongoose.Schema({
   price:Number,
   deadline:String,
   prototype_bool:Boolean,
-  manufacturing_confirm : Boolean
+  manufacturing_confirm : Boolean,
+  reviewed : Boolean
 });
 
 var orderDetailSchema = mongoose.Schema({

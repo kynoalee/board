@@ -123,3 +123,6 @@ function setOrderDone(ordernum){
     }
 }
 
+function writeReview(ordernum){
+    window.location.href = "/review/new?ordernum="+ordernum;
+}

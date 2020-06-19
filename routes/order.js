@@ -239,7 +239,8 @@ router.get('/list',util.isLoggedin,function(req,res){
                 modidateH : dateOb.modiH,
                 modidate : ob.mdate,
                 status : stat,
-                memo : ob.customermemo
+                memo : ob.customermemo,
+                reviewed : ob.reviewed
             }
             summary.push(contents);
         }
