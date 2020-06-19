@@ -32,6 +32,6 @@ router.get('/new',util.isLoggedin,(req,res)=>{
 
 router.get('/list',(req,res)=>{
 
-    res.render('review/list');
+    res.render('review/list'); 
 });
 module.exports = router;
