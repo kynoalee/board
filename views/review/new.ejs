@@ -4,11 +4,35 @@
 <html>
   <head>
     <%- include('../partials/head') %>
+    <script src="/js/review.js"></script>
   </head>
   <body>
     <%- include('../partials/nav') %>
     <div class="container mb-3">
-      리뷰페이지라
+      <h2>후기 작성</h2>
+      <form action="/review/new">
+        <div class="form-group">
+          <label for="file">File Upload</label> 
+          <!-- 여러파일 넣고 빼기 되도록 , 넣는파일 설명-->
+          <div>
+            <input type="file" id='file' onchange="listFiles('file','fileList')" name='file' multiple/>       
+          </div>
+          <div id="fileList">
+            <div>파일 모음</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="summary">summary *</label>
+          <input type="text" id="summary" name="summary" value="" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea id="description" name="description" rows="5" class="form-control"></textarea>
+        </div>
+        <div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
     </div>
   </body>
 </html>
