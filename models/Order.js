@@ -8,6 +8,7 @@ var orderSummarySchema = mongoose.Schema({
   },
   orderid:String,
   orderdate:Date,
+  donedate:Date,
   mdate:Date,
   vender:String,
   status:Number,
