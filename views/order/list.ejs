@@ -92,7 +92,7 @@
                         <td><%=obj.status%></td>
                         <td>
                             <%if(obj.status == "확정" && !obj.reviewed){%>
-                            <button class="btn btn-warning" type="button" onclick="writeReview('<%=obj.ordernum%>')">후기 작성</button>
+                            <a class="btn-a" href="/review/new?ordernum=<%=obj.ordernum%>">후기 작성</a>
                             <%}%>
                             <button class="btn btn-primary" type="button" onclick="goPopup('<%=obj.ordernum%>')">바로가기</button>
                         </td>

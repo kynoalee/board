@@ -29,3 +29,20 @@
 .bordered {
   border: 1px solid black;
 }
+.btn-a {
+  position: relative;
+  top:2px;
+  text-decoration: none;
+  display:inline-block;
+  padding : 6px 12px 6px 12px;
+  color : black;
+  border : 1px solid wheat;
+  border-radius : 4px;
+  background-color: wheat;
+}
+.btn-a:hover {
+  background-color: rgb(223, 178, 95);
+  border : 1px solid rgb(223, 178, 95);
+  text-decoration: none;
+  color : black;
+}
