@@ -10,7 +10,7 @@
     <%- include('../partials/nav') %>
     <div class="container mb-3">
       <h2>후기 작성</h2>
-      <form action="/review/new">
+      <form action="/review/new" method=post enctype="multipart/form-data">
         <div class="form-group">
           <label for="file">File Upload</label> 
           <!-- 여러파일 넣고 빼기 되도록 , 넣는파일 설명-->
@@ -32,6 +32,7 @@
         <div>
           <button type="submit" class="btn btn-primary">Submit</button>
         </div>
+        <input type="hidden" name="ordernum" value="<%=ordernum%>">
       </form>
     </div>
   </body>

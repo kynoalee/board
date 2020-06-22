@@ -122,7 +122,3 @@ function setOrderDone(ordernum){
         window.location.href = "/order/done?ordernum="+ordernum;
     }
 }
-
-function writeReview(ordernum){
-    window.location.href = "/review/new?ordernum="+ordernum;
-}
