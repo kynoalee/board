@@ -11,11 +11,11 @@ var Upload = require('../modules/upload');
 // 파일 서버 업로드 소스
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        let newName = createServerName(file.originalname);
+        let newName = Upload.createServerName(file.originalname);
         cb(null, config.file.local+newName.addPath)
     },
     filename: function (req, file, cb) {
-        let newName = createServerName(file.originalname);
+        let newName = Upload.createServerName(file.originalname);
         cb(null, newName.serverName)
     }
 });

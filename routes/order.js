@@ -291,9 +291,11 @@ router.get('/list',util.isLoggedin,function(req,res){
             });
 
             // 관련 업로드된 파일정보 모두 가져오기
-            let files = [{servername:0}];
-            for(let val of detailArray.filelink){
-                files[files.length] = {servername : val};
+            if(detailArray.filelink.length != 0){
+                let files = [{servername:0}];
+                for(let val of detailArray.filelink){
+                    files[files.length] = {servername : val};
+                }
             }
           
 

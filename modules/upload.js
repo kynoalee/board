@@ -53,7 +53,7 @@ var Upload = {
             addPath = 'videos/';
         }
         else if(/(gif)/.test(extension)) {
-            addPath = 'gif/';
+            addPath = 'gifs/';
         }
         else if(/(pdf)/.test(extension)) {
             addPath = 'pdf/';
