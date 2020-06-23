@@ -8,7 +8,35 @@
   <body>
     <%- include('../partials/nav') %>
     <div class="container mb-3">
-      리뷰 리스트
+      <h2>후기</h2>
+      <%for(review of reviewData){%>
+      <div style="border:1px solid black">
+        <table>
+          <tr>
+            <td width = 400>
+            <%if(review.visualFile.type == "image"){%>
+              <!-- file visualizing -->
+              <img src='/images/<%=review.visualFile.fileName%>' style='width:100%' />
+              <%} else if(review.visualFile.type == "gif"){%>
+                  <!-- file visualizing -->
+                  <img src='/gifs/<%=review.visualFile.fileName%>' style='width:100%' />
+                  
+              <%} else if(review.visualFile.type == "video"){%>      
+              <video src='/videos/<%=review.visualFile.fileName%>' style='width:100%' loop controls></video>
+              <%}%>
+            </td>
+            <td>
+              <h3><%=review.summary%></h3>
+              <p><%=review.description%></p>
+              <div>
+                <span>글쓴이 : <%=review.userid%></span>
+                <span> (<%=review.wdate%>)</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+        <%}%>
     </div>
   </body>
 </html>

@@ -55,6 +55,9 @@ app.use('/review',require('./routes/review'));
 app.use('/pop',require('./routes/pop'));
 app.use('/ajax',require('./routes/ajax'));
 
+app.use('/pd',require('./routes/pd/index'));
+app.use('/pd/home',require('./routes/pd/home'));
+
 // Port setting
 var port = 3000;
 app.listen(port, function(){
