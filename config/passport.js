@@ -72,4 +72,30 @@ passport.use('relogin',
     })
 );
 
+// pd login
+passport.use('pd-login',
+  new LocalStrategy({
+      usernameField : 'userid', // 3-1
+      passwordField : 'password', // 3-1
+      passReqToCallback : true
+    },
+    function(req, userid, password, done) { // 3-2
+      User.findOne({userid:userid})
+        .select({password:1,userclass:1})
+        .exec(function(err, user) {
+          if (err) return done(err);
+          if (!user || !user.authenticate(password)){ // 3-3
+            req.flash('userid', userid);
+            req.flash('errors', {login:'The userid or password is incorrect.'});
+            return done(null, false);
+          }
+          if (user.userclass != "pd") {
+            req.flash('errors', {login:'Permission reject'});
+            return done(null, false);
+          }
+          return done(null, user);
+        });
+    }
+));
+
 module.exports = passport;
