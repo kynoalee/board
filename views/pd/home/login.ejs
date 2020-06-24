@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <%- include('../partials/head') %>
+    </head>
+    <body>
+        <form class="user-form" action="/pd/login" method="post">
+            <div>로그인</div>
+            <div>아이디</div>
+            <input type="text" name="userid">
+            <% if(errors.userid){ %>
+                <span class="invalid-feedback"><%= errors.userid %></span>
+              <% } %>
+            <div>비밀번호</div>
+            <input type="password" name="password">
+            <% if(errors.password){ %>
+                <span class="invalid-feedback"><%= errors.password %></span>
+              <% } %>
+            <% if(errors.login){ %>
+                <div class="invalid-feedback d-block"><%= errors.login %></div>
+            <% } %>
+            <div><button type='submit' class="btn">로그인</button></div>
+        </form>
+    </body>
+</html>
