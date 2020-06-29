@@ -56,7 +56,7 @@ app.use('/pop',require('./routes/pop'));
 app.use('/ajax',require('./routes/ajax'));
 
 app.use('/pd',require('./routes/pd/index'));
-app.use('/pd/home',require('./routes/pd/home'));
+app.use('/pd/user',require('./routes/pd/user'));
 
 // Port setting
 var port = 3000;

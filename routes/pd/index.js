@@ -1,10 +1,13 @@
 var express  = require('express');
 var router = express.Router();
+var util = require('./pdUtil');
 var passport = require('../../config/passport');
 
 //
-router.get('/',isLogIn,function(req,res){
-    return res.render('pd/home/home');
+router.get('/',util.isLogIn,function(req,res){
+    return res.render('pd/home/home',{
+      menu : []
+    });
 });
 
 router.get('/login',function(req,res){
@@ -42,24 +45,10 @@ router.post('/login',
   }
 ));
 
-router.get('/logout',function(req,res){
+router.get('/logout',util.isLogIn,function(req,res){
     req.logout();
     res.redirect('/pd/login');
 });
 
 module.exports = router;
 
-function isLogIn(req, res, next){
-    if(req.isAuthenticated()){
-        if(req.user.userclass=="pd"){
-            next();
-        } else {
-            req.flash('errors', {login:'Permission reject'});
-            res.redirect('/pd/login');
-        }
-    } 
-    else {
-      req.flash('errors', {login:'Please login first'});
-      res.redirect('/pd/login');
-    }
-}
