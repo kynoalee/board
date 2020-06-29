@@ -18,3 +18,10 @@
     </div>
   </div>
 </nav>
+<%if(menu.length != 0){%>
+<div class="side-menu">
+  <%for(menuData of menu){%>
+  <div><a href='<%=menuData.href%>' class="<%=menuData.selected%>" >><%=menuData.name%></a></div>
+  <%}%>
+</div>  
+<%}%>

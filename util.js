@@ -19,7 +19,12 @@ util.parseError = function(errors){
 
 util.isLoggedin = function(req, res, next){
     if(req.isAuthenticated()){
-      next();
+      if(req.user.userclass!="pd"){
+        next();
+      } else {
+        req.flash('errors', {login:'Permission reject'});
+            res.redirect('/login');
+      }
     } 
     else {
       req.flash('errors', {login:'Please login first'});
