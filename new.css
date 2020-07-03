@@ -10,8 +10,9 @@ html, body { margin:10px;padding:0;
   background-size: 192px 1080px;
 }
 .table {
-  width:1900px;
-  height : 500px;
+  width:1800px;
+  height : 700px;
+  margin-left : 50px;
 }
 tr {
   margin : 0;
@@ -22,18 +23,46 @@ td {
   margin : 0;
   padding : 0;
 }
+.short-td {
+  width:230px;
+}
+.short-td span {
+  position: relative;
+}
+.long-td {
+  width:810px;
+}
+.title-tr {
+  padding-bottom: 5px; 
+  height:90px;
+}
+
 .time {
+  padding:10px 20px;
   display:inline-block;
   text-align:center;
   font: 35px 'Roboto Slab', sans-serif;
   color : #dddddd;
+  border: 1px solid white;
+  box-sizing:border-box;
+  border-radius:18px;
+  background-color: #222222;
+  box-shadow: inset 0 1px 8px rgba(0,0,0);
+
 }
 .stage {
+  padding:10px 20px;
+
   display:inline-block;
   color : #dddddd;
   font: 35px 'Roboto Slab', sans-serif;
-
   text-align:center;
+  border: 1px solid white;
+  box-sizing:border-box;
+  border-radius:18px;
+  background-color: #222222;
+  box-shadow: inset 0 1px 8px rgba(0,0,0);
+
 }
 .clock {
   width:800px;
@@ -48,6 +77,7 @@ td {
 .num2 {
   position:relative;
   display:inline-block;
+  top:5px;
   width:100px;
   height:60px;
   font: 40px 'Roboto Slab', sans-serif;
@@ -69,8 +99,10 @@ td {
 }
 
 .colon {
+  position: relative;
+  top:-15px;
   display:inline-block;
-  font: 70px 'Roboto Slab', sans-serif;
+  font: 50px 'Roboto Slab', sans-serif;
 
   color:#ffffff;
 }
@@ -127,8 +159,8 @@ td {
 .num3 {
   position:relative;
   display:inline-block;
-  width:500px;
-  height:700px;
+  width:400px;
+  height:550px;
   background:#000000;
   box-sizing:border-box;
   border-radius:18px;
@@ -194,18 +226,13 @@ td {
 /* 인디케이터 */
 
 #indicater {
-  position:fixed;
-  top : 200px;
-  left : 280px;
-  width : 80px;
-  height : 650px;
+  position: relative;
 }
 
-.airplan {
+#airplan {
   position : relative;
-  top : 400px;
-  width : 80px;
-  filter : blue;
+  top : 0px;
+  width : 60px;
 }
 .blinking{
 	-webkit-animation:blink 1.5s ease-in-out infinite alternate;
