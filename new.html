@@ -5,10 +5,7 @@
         <script src="./tweenMax.min.js"></script>
     </head>
     <body>
-      <div id="indicater">
-        <img class="airplan neon" src="./explan.png">
-      </div>
-      <div style="text-align: center;">
+      <div style="text-align: center;margin-bottom: 10px;">
         <span style="padding:100">
         <span class="neon">
           Great Gatsby 
@@ -22,14 +19,14 @@
         </span>
       </div>
       <table class="table">
-        <tr style="padding-bottom: 5px;">
-          <td class="time">Time</td>
+        <tr class='title-tr'>
+          <td><span class="time">Time</span></td>
           <td></td>
-          <td class="stage">Tonight on Stage</td>
+          <td><span class="stage">Tonight on Stage</span></td>
           <td></td>
         </tr>
         <tr>
-          <td>
+          <td class='short-td'>
             <span class="clock2">
               <div id='h0' class="num2">
                 <div class="upper"></div>
@@ -48,7 +45,11 @@
               </div>
             </span>
           </td>
-          <td class="blank"></td>
+          <td class="blank" rowspan=8>
+            <span id="indicater">
+              <img id="airplan" src="./explan.png">
+            </span>
+          </td>
           <td>
             <span class="clock">
               <div id="s0" class="num">
@@ -74,7 +75,7 @@
         </tr>
        
         <tr>
-          <td>
+          <td class='short-td'>
             <span class="clock2">
               <div id='h1' class="num2">
                 <div class="upper"></div>
@@ -93,8 +94,7 @@
               </div>
             </span>
           </td>
-          <td><span class="blank"></span></td>
-          <td>
+          <td class="long-td">
             <span class="clock">
               <div id="s1" class="num">
                 <div class="upper"></div>
@@ -106,7 +106,7 @@
           </td>
         </tr>
         <tr>
-          <td>
+          <td class='short-td'>
             <span class="clock2">
               <div id='h2' class="num2">
                 <div class="upper"></div>
@@ -125,8 +125,7 @@
               </div>
             </span>
           </td>
-          <td><span class="blank"></span></td>
-          <td>
+          <td class="long-td">
             <span class="clock">
               <div id="s2" class="num">
                 <div class="upper"></div>
@@ -138,7 +137,7 @@
           </td>
         </tr>
         <tr>
-          <td>
+          <td class='short-td'>
             <span class="clock2">
               <div id='h3' class="num2">
                 <div class="upper"></div>
@@ -157,8 +156,7 @@
               </div>
             </span>
           </td>
-          <td><span class="blank"></span></td>
-          <td>
+          <td class="long-td">
             <span class="clock">
               <div id="s3" class="num">
                 <div class="upper"></div>
@@ -170,7 +168,7 @@
           </td>
         </tr>
         <tr>
-          <td>
+          <td class='short-td'>
             <span class="clock2">
               <div id='h4' class="num2">
                 <div class="upper"></div>
@@ -189,8 +187,7 @@
               </div>
             </span>
           </td>
-          <td><span class="blank"></span></td>
-          <td>
+          <td class="long-td">
             <span class="clock">
               <div id="s4" class="num">
                 <div class="upper"></div>
@@ -202,7 +199,7 @@
           </td>
         </tr>
         <tr>
-          <td>
+          <td class='short-td'>
             <span class="clock2">
               <div id='h5' class="num2">
                 <div class="upper"></div>
@@ -221,8 +218,7 @@
               </div>
             </span>
           </td>
-          <td><span class="blank"></span></td>
-          <td>
+          <td class="long-td">
             <span class="clock">
               <div id="s5" class="num">
                 <div class="upper"></div>
@@ -234,7 +230,7 @@
           </td>
         </tr>
         <tr>
-          <td>
+          <td class='short-td'>
             <span class="clock2">
               <div id='h6' class="num2">
                 <div class="upper"></div>
@@ -253,8 +249,7 @@
               </div>
             </span>
           </td>
-          <td><span class="blank"></span></td>
-          <td>
+          <td class="long-td">
             <span class="clock">
               <div id="s6" class="num">
                 <div class="upper"></div>
@@ -266,7 +261,7 @@
           </td>
         </tr>
         <tr>
-          <td>
+          <td class='short-td'>
             <span class="clock2">
               <div id='h7' class="num2">
                 <div class="upper"></div>
@@ -285,8 +280,7 @@
               </div>
             </span>
           </td>
-          <td><span class="blank"></span></td>
-          <td>
+          <td class="long-td">
             <span class="clock">
               <div id="s7" class="num">
                 <div class="upper"></div>
@@ -310,50 +304,74 @@ var textArray = [
   {
     korean : "테스트 무대 1 / 안녕하세요",
     english : "Test Stage 1 / Annyenghaseyo",
-    hour : '17',
-    minute : '25'
+    hour : '16',
+    minute : '25',
+    hId : 'h0',
+    mId : 'm0',
+    sId : 's0'
   },
   {
     korean : "테스트 무대 2 / 안녕하세요",
     english : "Test Stage 2 / Annyenghaseyo",
-    hour : '19',
-    minute : '36'
+    hour : '17',
+    minute : '13',
+    hId : 'h1',
+    mId : 'm1',
+    sId : 's1'
   },
   {
     korean : "테스트 무대 3 / 안녕하세요",
     english : "Test Stage 3 / Annyenghaseyo",
-    hour : '20',
-    minute : '45'
+    hour : '17',
+    minute : '42',
+    hId : 'h2',
+    mId : 'm2',
+    sId : 's2'
   },
   {
     korean : "테스트 무대 4 / 안녕하세요",
     english : "Test Stage 4 / Annyenghaseyo",
-    hour : '21',
-    minute : '35'
+    hour : '17',
+    minute : '47',
+    hId : 'h3',
+    mId : 'm3',
+    sId : 's3'
   },
   {
     korean : "테스트 무대 5 / 안녕하세요",
     english : "Test Stage 5 / Annyenghaseyo",
-    hour : '22',
-    minute : '55'
+    hour : '17',
+    minute : '58',
+    hId : 'h4',
+    mId : 'm4',
+    sId : 's4'
   },
   {
     korean : "테스트 무대 6 / 안녕하세요",
     english : "Test Stage 6 / Annyenghaseyo",
-    hour : '00',
-    minute : '23'
+    hour : '18',
+    minute : '02',
+    hId : 'h5',
+    mId : 'm5',
+    sId : 's5'
   },
   {
     korean : "테스트 무대 7 / 안녕하세요",
     english : "Test Stage 7 / Annyenghaseyo",
-    hour : '01',
-    minute : '00'
+    hour : '17',
+    minute : '17',
+    hId : 'h6',
+    mId : 'm6',
+    sId : 's6'
   },
   {
     korean : "테스트 무대 8 / 안녕하세요",
     english : "Test Stage 8 / Annyenghaseyo",
-    hour : '01',
-    minute : '25'
+    hour : '17',
+    minute : '17',
+    hId : 'h7',
+    mId : 'm7',
+    sId : 's7'
   }
 ];
 
@@ -430,24 +448,6 @@ tick(s7,stringF[7],stringE[7],3500);
 
 }, 7000)
 
-function tick(mc,stringF,stringE,delay){
-    // set numbers
-  setTimeout(function(){
-    mc.childNodes[3].innerHTML = "<span>"+stringF+"</span>"; //start upper
-    mc.childNodes[5].innerHTML = "<span>"+stringF+"</span>"; //start lower
-    mc.childNodes[1].innerHTML = "<span>"+stringE+"</span>"; //end upper
-    mc.childNodes[7].innerHTML = "<span>"+stringE+"</span>"; //end lower
-    // animate tick
-    TweenMax.fromTo(mc.childNodes[1], .3, {alpha:0},{alpha:1, ease:Power4.easeIn})  
-    TweenMax.fromTo(mc.childNodes[3], .3, {rotationX:0, background:"linear-gradient(0deg, #000000,#0000000 15%)"},{rotationX:-90, ease:Power1.easeIn})
-    TweenMax.fromTo(mc.childNodes[7], .5+.2*Math.random(), {rotationX:90},{rotationX:0, ease:Bounce.easeOut, delay:.3})
-    TweenMax.fromTo(mc.childNodes[5], .6, {alpha:1},{alpha:0, ease:Bounce.easeOut, delay:.3})  
-  },delay);
-}
-
-
-
-
 // set 3d transforms
 TweenMax.set("#clock3", {perspective:1500, scale:0.7125})
 TweenMax.set(".upper3", {rotationX:0.01, transformOrigin:"50% 100%"})
@@ -465,6 +465,76 @@ var interval2 = setInterval(function(){
   tick(img1,startImg,endImg,0);
 
 }, 5000);
+checkNow();
+var interval2 = setInterval(() => {
+  checkNow();
+}, 60000);
+
+function checkNow(){
+  var d = new Date();
+  var hour = d.getHours();
+  var min = d.getMinutes()-1;
+  var index = 0;
+  here : for(time of textArray){
+    var staticH = parseInt(time.hour);
+    var staticM = parseInt(time.minute);
+
+    if(staticH < 10){
+      staticH += 24;
+    }
+    console.log(hour +"|"+staticH + " "+min + "|"+staticM);
+    if(hour <= staticH){
+      var minT = true;
+      if(hour == staticH){
+        if(min > staticM){
+          minT = false;
+        }
+      }
+      if(minT){
+        let j = index != 0 ? index - 1 : 0;
+        let x = j !=0 ? j-1 : 0;
+        let hour = document.getElementById(textArray[j].hId);
+        let min = document.getElementById(textArray[j].mId);
+        let stage = document.getElementById(textArray[j].sId);
+        let exHour = document.getElementById(textArray[x].hId);
+        let exMin = document.getElementById(textArray[x].mId);
+        let exStage = document.getElementById(textArray[x].sId);
+        let height = (index-1)*75 - 260;
+        hour.style.color = "green";
+        min.style.color = "green";
+        stage.style.color = "green";
+        exHour.style.color = "white";
+        exMin.style.color = "white";
+        exStage.style.color = "white";
+        airplan.style.top = height;
+
+        break;
+      }
+    }
+    console.log(index);
+    if(index == textArray.length-1){
+      let j = index != 0 ? index - 1 : 0;
+      let hour = document.getElementById(textArray[index].hId);
+      let min = document.getElementById(textArray[index].mId);
+      let stage = document.getElementById(textArray[index].sId);
+      let exHour = document.getElementById(textArray[j].hId);
+      let exMin = document.getElementById(textArray[j].mId);
+      let exStage = document.getElementById(textArray[j].sId);
+      let height = (index)*75 - 260;
+      hour.style.color = "green";
+      min.style.color = "green";
+      stage.style.color = "green";
+      exHour.style.color = "white";
+      exMin.style.color = "white";
+      exStage.style.color = "white";
+      airplan.style.top = height;
+
+      break;
+    }
+    index++;
+  }
+}
+
 function setRotateImage(){
 
 startImg = "<img class='image3' src='images/"+imageArray[trigger]+"' />";
@@ -475,6 +545,24 @@ endImg = "<img class='image3' src='images/"+imageArray[trigger+1]+"' />";
 
 trigger++;
 }
+function tick(mc,stringF,stringE,delay){
+    // set numbers
+  setTimeout(function(){
+    mc.childNodes[3].innerHTML = "<span>"+stringF+"</span>"; //start upper
+    mc.childNodes[5].innerHTML = "<span>"+stringF+"</span>"; //start lower
+    mc.childNodes[1].innerHTML = "<span>"+stringE+"</span>"; //end upper
+    mc.childNodes[7].innerHTML = "<span>"+stringE+"</span>"; //end lower
+    // animate tick
+    TweenMax.fromTo(mc.childNodes[1], .3, {alpha:0},{alpha:1, ease:Power4.easeIn})  
+    TweenMax.fromTo(mc.childNodes[3], .3, {rotationX:0, background:"linear-gradient(0deg, #000000,#0000000 15%)"},{rotationX:-90, ease:Power1.easeIn})
+    TweenMax.fromTo(mc.childNodes[7], .5+.2*Math.random(), {rotationX:90},{rotationX:0, ease:Bounce.easeOut, delay:.3})
+    TweenMax.fromTo(mc.childNodes[5], .6, {alpha:1},{alpha:0, ease:Bounce.easeOut, delay:.3})  
+  },delay);
+}
+
+// var timeout = setTimeout(function(){
+//   window.location.reload();
+// },10000)
         </script>
     </body>
 </html>
