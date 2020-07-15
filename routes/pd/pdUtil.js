@@ -15,5 +15,11 @@ util.isLogIn = function(req, res, next){
     }
 };
 
+// side menu
+util.menu = function(name,href,selected){
+    this.name = name;
+    this.href = href;
+    this.selected = selected;   
+};
 
 module.exports = util;
