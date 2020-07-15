@@ -75,9 +75,6 @@ var userSchema = mongoose.Schema({
     type:String,
     trim:true
   },
-  edate:{
-    type:Date
-  },
   disabled:{
     type:Boolean,
     default:false
@@ -110,7 +107,9 @@ var userSchema = mongoose.Schema({
     trim:true,
     required:[true,"zipcode is required"]
   },
-  
+  accepted:Boolean,
+  aceept_subject:String,
+  adate:Date
 },{
   toObject:{virtuals:true}
 });
