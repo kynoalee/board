@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-sm navbar-light site-header sticky-top py-1 mb-3" style="background-color: rgb(45, 74, 82);">
   <div class="container">
-    <div class="navbar-brand">BuPum Admin</div>
+    <div class="navbar-brand"><a href="/pd" class="nav-link">BuPum Admin</a></div>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -20,7 +20,7 @@
 </nav>
 <%if(menu.length != 0){%>
 <div class="side-menu">
-  <%for(menuData of menu){%>
+  <%for(var menuData of menu){%>
   <div><a href='<%=menuData.href%>' class="<%=menuData.selected%>" >><%=menuData.name%></a></div>
   <%}%>
 </div>  

@@ -1,6 +1,7 @@
 .side-menu{
     position : fixed;
-    top : 100;
+    top : 100px;
+    left : 10px;
     padding : 5px;
     border : 1px solid black;
     border-radius: 3px;
@@ -13,4 +14,10 @@
 
 .selected {
     font-weight: bold;
+}
+.red {
+    color:red;
+}
+.blue {
+    color:blue;
 }
