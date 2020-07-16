@@ -1,13 +1,14 @@
+
+html, body { padding:0;
+  background-color:#222222;
+  /* background-image: url('./back4.png');
+  background-size: 192px 1080px; */
+}
 @font-face{
   font-family: "Roboto Slab";
   src:url('ttf/RobotoSlab-VariableFont_wght.ttf') format('truetype');
   font-style: normal;
   font-weight: normal;
-}
-html, body { margin:10px;padding:0;
-  background-color:#222222;
-  background-image: url('./back4.png');
-  background-size: 192px 1080px;
 }
 .table {
   width:1800px;
@@ -30,7 +31,7 @@ td {
   position: relative;
 }
 .long-td {
-  width:810px;
+  width:710px;
 }
 .title-tr {
   padding-bottom: 5px; 
@@ -89,7 +90,7 @@ td {
 .num {
   position:relative;
   display:inline-block;
-  width:800px;
+  width:700px;
   height:60px;
   font: 40px 'Roboto Slab', sans-serif;
   color:#ffffff;
@@ -159,8 +160,8 @@ td {
 .num3 {
   position:relative;
   display:inline-block;
-  width:400px;
-  height:550px;
+  width:550px;
+  height:610px;
   background:#000000;
   box-sizing:border-box;
   border-radius:18px;
@@ -183,7 +184,7 @@ td {
   position:absolute;  
   width:100%;
   height:50%;
-  background:linear-gradient(0deg, #222222,#222222 15%);
+  background:linear-gradient(0deg, #000000,#000000 15%);
   border-radius:10px 10px 0 0;  
   box-shadow: inset 0 1px 8px rgba(0,0,0);
   overflow:hidden;
@@ -196,7 +197,7 @@ td {
   top:50%;
   width:100%;
   height:50%;
-  background:linear-gradient(180deg,  #222222,#222222 15%);
+  background:linear-gradient(180deg,  #000000,#000000 15%);
   border-radius:0 0 10px 10px;    
   box-shadow: inset 0 1px 8px rgba(0,0,0);
   overflow:hidden;
@@ -276,9 +277,9 @@ td {
 }
 
 .neon {
-  animation: neon 1s ease infinite;
-  -moz-animation: neon 1s ease infinite;
-  -webkit-animation: neon 1s ease infinite;
+  animation: neon 2s ease infinite;
+  -moz-animation: neon 2s ease infinite;
+  -webkit-animation: neon 2s ease infinite;
 }
 
 @keyframes neon {
@@ -317,10 +318,10 @@ td {
   }
 }
 .flux {
-  animation: flux 2s linear infinite;
-  -moz-animation: flux 2s linear infinite;
-  -webkit-animation: flux 2s linear infinite;
-  -o-animation: flux 2s linear infinite;
+  animation: flux 3s linear infinite;
+  -moz-animation: flux 3s linear infinite;
+  -webkit-animation: flux 3s linear infinite;
+  -o-animation: flux 3s linear infinite;
 }
 
 @keyframes flux {
@@ -332,5 +333,30 @@ td {
   50% {
     text-shadow: 0 0 .5vw #082180, 0 0 1.5vw #082180, 0 0 5vw #082180, 0 0 5vw #082180, 0 0 .2vw #082180, .5vw .5vw .1vw #0A3940;
     color: #146C80;
+  }
+}
+
+
+.neon3 {
+  color: #98ff98;
+  font-size: 40px;
+  line-height: 3vw;
+}
+
+.neon3 {
+  animation: neon3 2s ease infinite;
+  -moz-animation: neon3 2s ease infinite;
+  -webkit-animation: neon3 2s ease infinite;
+}
+
+@keyframes neon3 {
+  0%,
+  100% {
+    text-shadow: 0 0 1vw #FA1C16, 0 0 3vw #FA1C16, 0 0 10vw #FA1C16, 0 0 10vw #FA1C16;
+    color: #FED128;
+  }
+  50% {
+    text-shadow: 0 0 .5vw #800E0B, 0 0 1.5vw #800E0B, 0 0 5vw #800E0B, 0 0 5vw #800E0B;
+    color: #806914;
   }
 }
