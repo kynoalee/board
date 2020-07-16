@@ -1,0 +1,136 @@
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <link rel="stylesheet" href="./css/bootstrap.css">
+        <script src="./js/jquery.js"></script>
+        <style>
+            body {
+                background-color: #333333;
+                color : #dddddd;
+                margin : 20px;
+            }
+            
+            div {
+                padding : 5px;
+            }
+            .fff {
+                background-color: #333333;
+                color : #dddddd;
+
+            }
+        </style>
+    </head>
+    <body>
+        <h1 id ="test">무대 내용 입력</h1>
+        <form class="form-inline">
+        <div id='stageData'>
+
+        </div>
+        <div>
+            <button class="btn btn-default" type="button" onclick='setLocalStorage()'>변경</button>
+        </div>
+        </form>
+        <script>
+            setHtml();
+            setData();
+
+            function setHtml(){
+                var div = document.getElementById('stageData');
+                var html = '';
+                for(var i=0; i<9; i++){
+                    var d = new Date();
+                    var nowH = d.getHours();
+                    var nowM = d.getMinutes();
+                    html += '<div class="fff">';
+                    html += '<div><h4>'+(i+1)+'번째 무대</h4></div>';
+                    html += '<span>시작 </span>';
+                    html += '<select class="form-control" id="sHour'+i+'" onchange="setEndHour('+i+')">';
+                    for(var j=0;j<24;j++){
+                        html+= '<option value="'+numFormat(j)+'">'+numFormat(j)+'</option>';
+                    }
+                    html += '</select>';
+                    html += ' : ';
+                    html += '<select class="form-control" id="sMinute'+i+'" >';
+                    
+                    for(var x=0;x<60;x+=5){
+                        html+= '<option value="'+numFormat(x)+'">'+numFormat(x)+'</option>';
+                    }
+                    html += '</select>';
+                    html += '<span> 종료 </span>';
+                    html += '<select class="form-control" id="eHour'+i+'">';
+                    for(var j=0;j<24;j++){
+                        html+= '<option value="'+numFormat(j)+'">'+numFormat(j)+'</option>';
+                    }
+                    html += '</select>';
+                    html += ' : ';
+                    html += '<select class="form-control" id="eMinute'+i+'">';
+                    
+                    for(var x=0;x<60;x+=5){
+                        html+= '<option value="'+numFormat(x)+'">'+numFormat(x)+'</option>';
+                    }
+                    html += '</select>';
+
+                    html += '<div><span>한글명</span> <input class="form-control fff" size="40" name="korean'+i+'" / > ';
+                    html += '<span>영어명</span> <input class="form-control fff" size="40" name="english'+i+'" / > </div>';
+                    html += '</div>';
+                }
+                html += '<br />';
+                html += '<div><h4>이미지 파일명 나열 (띄어쓰기 없이 ","로 구분해주세요. 파일은 images폴더에 저장해주세요. ex test.jpg,sing.png)</h4></div>';
+                html += '<input class="form-control fff" type="text" style="width:500" name="images" value="">';
+                div.innerHTML=html;
+            }
+
+            function setData(){
+                var jsonString = localStorage.getItem('data');
+                var json = JSON.parse(jsonString);
+                var jsonData = json.textArray;
+                var index = 0;
+                for(var val of jsonData){
+                    $('#sHour'+index).val(val.hour).prop('selected',true);
+                    $('#sMinute'+index).val(val.minute).prop('selected',true);
+                    $('#eHour'+index).val(val.eHour).prop('selected',true);
+                    $('#eMinute'+index).val(val.eMinute).prop('selected',true);
+                    $('input[name=korean'+index+']').val(val.korean);
+                    $('input[name=english'+index+']').val(val.english);
+                    index++;
+                }
+                $('input[name=images]').val(json.images);
+            }
+            function setLocalStorage(){
+                var textArray = [];
+                for(var i = 0 ; i < 9 ; i ++){
+                    let tmpObj = {};
+                    tmpObj.hId = 'h'+i;
+                    tmpObj.mId = 'm'+i;
+                    tmpObj.sId = 's'+i;
+                    tmpObj.korean = $('input[name=korean'+i+']').val();
+                    tmpObj.english = $('input[name=english'+i+']').val();
+                    tmpObj.hour = $('#sHour'+i+' option:selected').val();
+                    tmpObj.minute = $('#sMinute'+i+' option:selected').val();
+                    tmpObj.eHour = $('#eHour'+i+' option:selected').val();
+                    tmpObj.eMinute = $('#eMinute'+i+' option:selected').val();
+                    textArray.push(tmpObj);
+                }
+                localStorage.removeItem('data');
+                let obj = {
+                    textArray : textArray,
+                    images : $('input[name=images]').val()
+                }; 
+                let json = JSON.stringify(obj);
+                localStorage.setItem('data', json);
+
+                alert('변경 완료');
+                window.location.reload();
+            }
+
+            function numFormat(variable) { 
+                variable = Number(variable).toString(); 
+                if(Number(variable) < 10 && variable.length == 1) variable = "0" + variable; 
+                return variable; 
+            }
+            function setEndHour(num){
+                $('#eHour'+num).val($('#sHour'+num+' option:selected').val()).prop('selected',true);
+            }
+        </script>
+    </body>
+</html>
