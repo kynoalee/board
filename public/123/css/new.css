@@ -4,11 +4,22 @@ html, body { padding:0;
   /* background-image: url('./back4.png');
   background-size: 192px 1080px; */
 }
+body {
+  margin : 0;
+}
 @font-face{
   font-family: "Roboto Slab";
-  src:url('ttf/RobotoSlab-VariableFont_wght.ttf') format('truetype');
+  src:url('../ttf/RobotoSlab-VariableFont_wght.ttf') format('truetype');
   font-style: normal;
   font-weight: normal;
+}
+.main {
+  display:block;
+}
+.backContent1 {
+  width : 1920px;
+  height : 1080px;
+  display:none;
 }
 .table {
   width:1800px;
@@ -63,8 +74,8 @@ td {
   border-radius:18px;
   background-color: #222222;
   box-shadow: inset 0 1px 8px rgba(0,0,0);
-
 }
+
 .clock {
   width:800px;
   height:60px;
@@ -152,8 +163,8 @@ td {
 
 #clock3 {
   display:inline-block;
-  width:500px;
-  height: 500px;
+  width:550px;
+  height: 610px;
   text-align:center;
 }
 
@@ -174,17 +185,11 @@ td {
   vertical-align: middle;
 }
 
-.base3 span {
-  position:absolute;
-  display:block;
-  width:100%;
-}
-
 .upper3 {
   position:absolute;  
   width:100%;
   height:50%;
-  background:linear-gradient(0deg, #000000,#000000 15%);
+  background:linear-gradient(0deg, #222222,#222222 15%);
   border-radius:10px 10px 0 0;  
   box-shadow: inset 0 1px 8px rgba(0,0,0);
   overflow:hidden;
@@ -197,7 +202,7 @@ td {
   top:50%;
   width:100%;
   height:50%;
-  background:linear-gradient(180deg,  #000000,#000000 15%);
+  background:linear-gradient(180deg,  #222222,#222222 15%);
   border-radius:0 0 10px 10px;    
   box-shadow: inset 0 1px 8px rgba(0,0,0);
   overflow:hidden;
@@ -255,7 +260,7 @@ td {
 
 @font-face{
   font-family: "signPainter";
-  src:url('ttf/SignPainter.ttf') format('truetype');
+  src:url('../ttf/SignPainter.ttf') format('truetype');
   font-style: normal;
   font-weight: normal;
 }
@@ -336,27 +341,30 @@ td {
   }
 }
 
-
-.neon3 {
-  color: #98ff98;
+.font-css {
+  color: #ffffff;
   font-size: 40px;
   line-height: 3vw;
 }
 
 .neon3 {
-  animation: neon3 2s ease infinite;
-  -moz-animation: neon3 2s ease infinite;
-  -webkit-animation: neon3 2s ease infinite;
+  color: #a0ffab;
+  font-size: 40px;
+  line-height: 3vw;
+}
+
+.neon3 {
+  animation: neon3 6s ease infinite;
+  -moz-animation: neon3 6s ease infinite;
+  -webkit-animation: neon3 6s ease infinite;
 }
 
 @keyframes neon3 {
   0%,
   100% {
-    text-shadow: 0 0 1vw #FA1C16, 0 0 3vw #FA1C16, 0 0 10vw #FA1C16, 0 0 10vw #FA1C16;
-    color: #FED128;
+    text-shadow: 0 0 1vw #40e240, 0 0 3vw #40e240;
   }
   50% {
-    text-shadow: 0 0 .5vw #800E0B, 0 0 1.5vw #800E0B, 0 0 5vw #800E0B, 0 0 5vw #800E0B;
-    color: #806914;
+    text-shadow: 0 0 .5vw #072507, 0 0 1.5vw #072507;
   }
 }

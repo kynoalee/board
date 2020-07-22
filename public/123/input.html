@@ -16,7 +16,13 @@
             .fff {
                 background-color: #333333;
                 color : #dddddd;
-
+            }
+            .btn-dark {
+                background-color: #222222;
+                color : #ffffff;
+            }
+            .btn-dark:hover {
+                color : #aaaaaa;
             }
         </style>
     </head>
@@ -31,9 +37,10 @@
         </div>
         </form>
         <script>
+            var bIndex = 0;
+
             setHtml();
             setData();
-
             function setHtml(){
                 var div = document.getElementById('stageData');
                 var html = '';
@@ -77,6 +84,9 @@
                 html += '<br />';
                 html += '<div><h4>이미지 파일명 나열 (띄어쓰기 없이 ","로 구분해주세요. 파일은 images폴더에 저장해주세요. ex test.jpg,sing.png)</h4></div>';
                 html += '<input class="form-control fff" type="text" style="width:500" name="images" value="">';
+                html += '<br />';
+                html += '<div><h4>배경 화면 나열 <button class="btn btn-dark" type="button" onclick="addBack()">추가</button></h4></div>';
+                html += '<div id="backgrounds"></div>';
                 div.innerHTML=html;
             }
 
@@ -84,6 +94,7 @@
                 var jsonString = localStorage.getItem('data');
                 var json = JSON.parse(jsonString);
                 var jsonData = json.textArray;
+                var backData = json.backArray;
                 var index = 0;
                 for(var val of jsonData){
                     $('#sHour'+index).val(val.hour).prop('selected',true);
@@ -94,10 +105,47 @@
                     $('input[name=english'+index+']').val(val.english);
                     index++;
                 }
+                var html = '';
+                for(var back of backData){
+                    let aaa = bbb = ccc = '';
+
+                    html += '<div id="back'+bIndex+'">';
+                    html += '<div class="label1">'+(bIndex+1)+'번째 배경</div>';
+                    html += '<select class="form-control" id="kindOf'+bIndex+'" onchange="checkMain('+bIndex+')">';
+                    if(back.kind == 'main'){
+                        aaa = 'selected';
+                    } else if(back.kind == 'image'){
+                        bbb = 'selected';
+                    } else if(back.kind == 'video'){
+                        ccc = 'selected';
+                    }
+                    html += `
+                        <option value='main' `+aaa+`>메인화면</option>
+                        <option value='image' `+bbb+`>이미지</option>
+                        <option value='video' `+ccc+`>동영상</option>
+                    `;
+                    html += '</select>';
+                    if(aaa != 'selected'){
+                        html += '<span class="addData">';
+                        html += ' 파일명 ';
+                        html += '<input class="form-control fff" type="text" style="width:300" name="backFile'+bIndex+'" value="'+back.filename+'">';
+                        html += '</span>';
+                    }
+                    html += ' 지속시간(초) ';
+                    html += '<input class="form-control fff" type="text" style="width:50" name="backSec'+bIndex+'" value="'+back.sec+'">';
+                    html += 'sec';
+                    html += ' <button type="button" class="btn btn-dark" onclick="deleteBack('+bIndex+')"> - </button>';
+                    html += '</div>';
+                    bIndex++;
+                }
+                $('#backgrounds').html(html);
                 $('input[name=images]').val(json.images);
+                $('input[name=background]').val(json.backgrounds);
             }
+
             function setLocalStorage(){
                 var textArray = [];
+                var backArray = [];
                 for(var i = 0 ; i < 9 ; i ++){
                     let tmpObj = {};
                     tmpObj.hId = 'h'+i;
@@ -111,10 +159,21 @@
                     tmpObj.eMinute = $('#eMinute'+i+' option:selected').val();
                     textArray.push(tmpObj);
                 }
+                for(var j = 0 ; j < bIndex ; j++){
+                    let tmpObj = {};
+                    
+                    tmpObj.kind = $('#kindOf'+j+' option:selected').val();
+                    tmpObj.index = j;
+                    tmpObj.filename = $('input[name=backFile'+j+']').val();
+                    tmpObj.sec = $('input[name=backSec'+j+']').val();;
+                    
+                    backArray.push(tmpObj);
+                }
                 localStorage.removeItem('data');
                 let obj = {
                     textArray : textArray,
-                    images : $('input[name=images]').val()
+                    images : $('input[name=images]').val(),
+                    backArray : backArray
                 }; 
                 let json = JSON.stringify(obj);
                 localStorage.setItem('data', json);
@@ -123,6 +182,56 @@
                 window.location.reload();
             }
 
+            function addBack() {
+                html = '<div id="back'+bIndex+'">';
+                html += '<div class="label1">'+(bIndex+1)+'번째 배경</div>';
+                html += '<select class="form-control" id="kindOf'+bIndex+'" onchange="checkMain('+bIndex+')">';
+                html += `
+                    <option value='main' selected>메인화면</option>
+                    <option value='image'>이미지</option>
+                    <option value='video'>동영상</option>
+                `;
+                html += '</select>';
+                html += '<span class="addData">';
+                html += ' 파일명 ';
+                html += '<input class="form-control fff" type="text" style="width:300" name="backFile'+bIndex+'" value="">';
+                html += '</span>';
+                html += ' 지속시간(초) ';
+                html += '<input class="form-control fff" type="text" style="width:50" name="backSec'+bIndex+'" value="">';
+                html += 'sec';
+                html += ' <button type="button" class="btn btn-dark" onclick="deleteBack('+bIndex+')"> - </button>';
+                html += '</div>';
+                $('#backgrounds').append(html);
+                bIndex++;
+            }
+            
+            function deleteBack(index){
+                var jsonString = localStorage.getItem('data');
+                var json = JSON.parse(jsonString);
+                var backData = json.backgrounds.split(',');
+
+                var max = backData.length;
+                $('#back'+index).remove();
+                for(var i = index+1; i < max;i++){
+                    $('#back'+i).children('.label1').text(i+'번째 배경');
+                    $('#kindOf'+i).removeAttr('onchange');
+                    $('#kindOf'+i).attr('onchange','checkMain('+(i-1)+')');
+                    $('#kindOf'+i).attr('id','kindOf'+(i-1));
+                    $('input[name=backFile'+i+']').attr('name','backFile'+(i-1));
+                    $('input[name=backSec'+i+']').attr('name','backSec'+(i-1));
+                    $('#back'+i).children('button').removeAttr('onclick');
+                    $('#back'+i).children('button').attr('onclick','deleteBack('+(i-1)+')');
+                    
+                    $('#back'+i).attr('id','back'+(i-1));
+                }
+                bIndex--;
+
+            }
+            function checkMain(index){
+                if($('#kindOf'+index).val() == 'main'){
+                    $('#back'+index).children('.addData').remove();
+                }
+            }
             function numFormat(variable) { 
                 variable = Number(variable).toString(); 
                 if(Number(variable) < 10 && variable.length == 1) variable = "0" + variable; 

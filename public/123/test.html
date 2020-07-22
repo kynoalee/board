@@ -1,0 +1,56 @@
+<html>
+    <head>
+        <script src="./js/jquery.js"></script>
+        <script src="./js/tweenMax.min.js"></script>
+        <style>
+            body {
+                margin : 100;
+            }
+            #test {
+                width : 1000px;
+                height : 700px;
+                display:block;
+                background-color: pink;
+            }
+           
+            #test2{
+                width : 0;
+                height : 0;
+                display:none;
+                background-color: rgb(123, 255, 0);
+            }
+        </style>
+    </head>
+    <body>
+        <div id='test'>
+            sibal
+        </div>
+        <div id='test2'>
+            jotgga
+        </div>
+        <script>
+            setInterval(function(){
+                if($('#test').css('display') !='none'){
+                    var ss = $('#test');
+                    var ee = $('#test2');
+                } 
+                if($('#test').css('display') =='none'){
+                    var ss = $('#test2');
+                    var ee = $('#test');
+                }
+                moveRight(ss,ee);
+            },2000);
+            var myBox = new TimelineLite();
+            function moveRight(start,end) {
+                myBox.to(start,.3,{width:0,height:0});
+                setTimeout(function() {
+                    end.css('display','block');
+                },300);
+                myBox.to(end,.3,{width:1000,height:700});
+                setTimeout(function() {
+                    start.css('display','none');
+                },300);
+            }
+        </script>
+    </body>
+</html>
