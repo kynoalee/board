@@ -6,8 +6,7 @@
         <script src="./js/jquery.js"></script>
     </head>
     <body>
-      <div class="wholeContent">
-
+      <div class="backContent1">
       </div>
       <div class="main">
         <div style="text-align: center;margin-bottom: 10px;">
@@ -344,6 +343,7 @@ var getValue = localStorage.getItem('data');
 var stageData = JSON.parse(getValue);
 var textArray = stageData.textArray;
 var imageArray = stageData.images.split(',');
+var backgroundArray = stageData.backArray;
 setHtml(s0,textArray[0].korean);
 setHtml(s1,textArray[1].korean);
 setHtml(s2,textArray[2].korean);
@@ -417,43 +417,46 @@ var interval3 = setInterval(() => {
   checkNow();
 }, 60000);
 
+var backIndex = 0;
+var delayBack = parseFloat(backgroundArray[0].sec)*1000;
 var interval4 = setInterval(function(){
-  if($('.main').css('display') !='none'){
-      var ss = $('.main');
-      var ee = $('.wholeContent');
-      document.getElementById('video2').play();
 
-  } 
-  if($('.main').css('display') =='none'){
-      var ss = $('.wholeContent');
-      var ee = $('.main');
-      document.getElementById('video2').pause();
+  setBackContent();
+  if(backIndex == backgroundArray.length){
+    backIndex = -1;
   }
-  changePanel(ss,ee);
-},10000);
+  backIndex++;
+},delayBack);
 
 // 페이지 리로딩. 
 var timeout = setTimeout(function(){
   window.location.reload();
 },3600000);
-changeWholeContents(1);
 
-// 전체 화면 변경
-function changeWholeContents(delay){
-  let html = '';
-  $('body').css('margin','0');
-  //html += '<img src="./background/gatsby.jpg" style="width:100%;vertical-align:middle;" />';
-  html += '<video id="video2" src="./background/music.mp4" style="width:100%;vertical-align:middle;"></video>'
-  $('.wholeContent').html(html);
-
+function setBackContent(){
+  for(var background of backgroundArray){
+    if(background.index == backIndex){
+      if(background.kind == 'main'){
+        $('.main').css('display','block');
+        $('.backContent1').css('display','none');
+        $('.backContent1').html('');
+      } 
+      if(background.kind == 'image'){
+        $('.main').css('display','none');
+        $('.backContent1').html('<img src="./background/'+background.filename+'" style="width:100%" />');
+        $('.backContent1').css('display','block');
+      }
+      if(background.kind == 'video'){
+        $('.main').css('display','none');
+        $('.backContent1').html('<video src="./background/'+background.filename+'" style="width:100%" muted="muted" autoplay="autoplay" loop/>');
+        $('.backContent1').css('display','block');
+      }
+      delayBack = parseFloat(background.sec) * 1000 ;
+      break;
+    }
+  }
 }
 
-var myBox = new TimelineLite();
-function changePanel(start,end) {
-      end.css('display','block');
-      start.css('display','none');
-
-}
 function setHtml(node,value){
   node.childNodes[3].innerHTML = node.childNodes[7].innerHTML = "<span class='font-css'>"+value+"</span>";
 }
