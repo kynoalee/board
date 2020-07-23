@@ -30,8 +30,10 @@ router.get('/customer',util.isLogIn,function(req,res){
             menu : [menu1,menu2,menu3]
         });
     });
+});
 
-    
+router.get('/customer/detail',function(req,res){
+    return res.render('pd/user/customerDetail');
 });
 
 router.get('/vender',util.isLogIn,function(req,res){
