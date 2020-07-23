@@ -2,6 +2,7 @@
 <html>
   <head>
     <%- include('../partials/head') %>
+    <script src="/js/pd/user.js"></script>
   </head>
   <body>
     <%- include('../partials/nav') %>
@@ -22,7 +23,7 @@
               <th>disabled</th>
             </tr>
             <%for(var user of users){%>
-            <tr>
+            <tr style="cursor:pointer" onclick="popupDetail('user')">
               <td><%=user.userid%></td>
               <td><%=user.name%></td>
               <td><%=user.email%></td>
