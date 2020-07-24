@@ -9,8 +9,30 @@
     <div class="container mb-3">
 
       <h2 class="mb-3">벤더 정보 조회/수정</h2>
-
-      <P>앙앙</p>
+      <div>
+        <table class="table">
+            <tr>
+              <th>userid</th>
+              <th>name</th>
+              <th>email</th>
+              <th>wdate(mdate)</th>
+              <th>verified</th>
+              <th>accepted</th>
+              <th>disabled</th>
+            </tr>
+            <%for(var vender of venders){%>
+            <tr style="cursor:pointer" onclick="popupDetail('vender','<%=vender.userid%>')">
+              <td><%=vender.userid%></td>
+              <td><%=vender.name%></td>
+              <td><%=vender.email%></td>
+              <td><%=vender.wdateFormated%>(<%=vender.mdateFormated%>)</td>
+              <td><%=vender.verified?'verified':'not verified'%></td>
+              <td><%=vender.accepted%></td>
+              <td><span class="<%=vender.disabled?'red':''%>"><%=vender.disabled?'탈퇴':'활동'%></span></td>
+            </tr>
+            <%}%>
+        </table>
+      </div>
     </div>
   </body>
 </html>

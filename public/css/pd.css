@@ -21,3 +21,14 @@
 .blue {
     color:blue;
 }
+
+.span-sm {
+    display:inline-block;
+    width : 120px;
+}
+.input-mm {
+    width: 250px;
+}
+.span-mm {
+
+}
