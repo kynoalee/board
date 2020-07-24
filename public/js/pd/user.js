@@ -1,3 +1,3 @@
-function popupDetail(where){
-    window.open("/pd/user/customer/detail","",'width=430,height=500,location=no,status=no,scrollbars=yes');
+function popupDetail(where,userid){
+    window.open("/pd/user/"+where+"/detail?userid="+userid,"pdUserDetail"+where+userid,'width=600,height=800,location=no,status=no,scrollbars=yes');
 }

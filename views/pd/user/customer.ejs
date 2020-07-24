@@ -23,7 +23,7 @@
               <th>disabled</th>
             </tr>
             <%for(var user of users){%>
-            <tr style="cursor:pointer" onclick="popupDetail('user')">
+            <tr style="cursor:pointer" onclick="popupDetail('customer','<%=user.userid%>')">
               <td><%=user.userid%></td>
               <td><%=user.name%></td>
               <td><%=user.email%></td>
