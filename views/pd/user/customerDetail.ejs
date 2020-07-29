@@ -13,7 +13,7 @@
       </div>
       <div>
         <span class='span-sm'>사용자 비밀번호</span>| 
-        <span class='span-mm'><input type="password" name='password'></span>
+        <span class='span-mm'><button type='button'>비밀번호 변경</button></span>
       </div>
       <div>
         <span class='span-sm'>사용자 이름</span>| 
@@ -36,6 +36,9 @@
       <div>
         <span class='span-sm'>사용자 이메일</span>| 
         <span class='span-mm'><input class='input-mm' type="text" name='email' value='<%=userData.email%>'></span>
+        <%if(!userData.verified){%>
+          <span class='span-sm'><button type='button' onclick='forceVerified()'>인증</button></span>
+        <%}%>
       </div>
       <div>
         <span class='span-sm'>사용자 주소</span>| 
