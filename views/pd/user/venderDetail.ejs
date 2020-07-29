@@ -36,6 +36,9 @@
       <div>
         <span class='span-sm'>사용자 이메일</span>| 
         <span class='span-mm'><input class='input-mm' type="text" name='email' value='<%=userData.email%>'></span>
+        <%if(!userData.verified){%>
+        <span class='span-sm'><button type='button' >인증</button></span>
+        <%}%>
       </div>
       <div>
         <span class='span-sm'>사용자 주소</span>| 
