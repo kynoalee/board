@@ -2,6 +2,7 @@ var express  = require('express');
 var router = express.Router();
 var File = require("../models/File");
 var Board = require("../models/Board");
+var User = require("../models/User");
 var Log = require("../models/Log");
 var common = require("../modules/common");
 
@@ -70,6 +71,10 @@ router.post('/getQnaDetail',(req,res)=>{
         console.log("all done");
         res.send({result:"success",data:board});
     }); 
+});
+
+router.post('/pd/forceVerified',(req,res)=>{
+    
 });
 
 module.exports = router;
