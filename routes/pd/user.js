@@ -49,6 +49,31 @@ router.get('/customer/detail',util.isLogIn,function(req,res){
     });
 });
 
+router.post('/customer/detail/post',util.isLogIn,function(req,res){
+    var updateData = {};
+    updateData.name = req.body.name;
+    updateData.company = req.body.company;
+    updateData.countrycode = req.body.countrycode;
+    updateData.contactnumber = req.body.contactnumber;
+    updateData.email = req.body.email;
+    updateData.province = req.body.province;
+    updateData.city = req.body.city;
+    updateData.address1 = req.body.address1;
+    updateData.address2 = req.body.address2;
+
+    User.updateOne({userid:req.body.userid,userclass:"normal"},updateData,(err)=>{
+        if(err){
+            Log.create({document_name : "User",type:"error",contents:{error:err,content:"pd customer 상세 수정 DB에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/pop/close');
+        }
+        Log.create({document_name : "User",type:"Update",contents:{update:updateData,content:"pd customer 상세 수정"},wdate:Date()});
+        
+        return res.redirect('/pd/user/customer/detail?userid='+req.body.userid);
+    });
+});
+
 router.get('/vender',util.isLogIn,function(req,res){
     var menu1= new util.menu("사용자 정보 조회/수정","/pd/user/customer","");
     var menu2= new util.menu("벤더 정보 조회/수정","","selected");
