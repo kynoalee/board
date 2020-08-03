@@ -60,6 +60,7 @@ var userSchema = mongoose.Schema({
     type:Boolean,
     default:false
   },
+  verified_subject : String,
   verifytoken:{
     type:String
   },
@@ -108,8 +109,9 @@ var userSchema = mongoose.Schema({
     required:[true,"zipcode is required"]
   },
   accepted:Boolean,
-  aceept_subject:String,
-  adate:Date
+  accept_subject:String,
+  adate:Date,
+  tempPassword:String
 },{
   toObject:{virtuals:true}
 });
