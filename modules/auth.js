@@ -37,7 +37,7 @@ var verifyToken = async function(email,token){
         }
         // DB 키값 저장
         (async()=>{
-            await User.updateOne({email:email},{$set:{verified : true,verifytoken:null}});
+            await User.updateOne({email:email},{$set:{verified : true,verifytoken:null,verified_subject:"userself"}});
             await Log.create({document_name : "User",type:"update",contents:{email:email,content:"이메일 인증 완료"},wdate:Date()});
             await console.log("DB updated!");
             return true;
