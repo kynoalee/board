@@ -118,6 +118,7 @@ router.put("/:userid", util.isLoggedin, checkPermission, function(req, res, next
       if(req.body.password){
         user.password = req.body.password;
         user.passwordConfirmation = req.body.passwordConfirmation;
+        user.tempPassword = '';
         changed = true;
         
       }      
