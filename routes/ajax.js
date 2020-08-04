@@ -123,21 +123,20 @@ router.post('/pd/password',(req,res)=>{
     console.log('ajax generating...');
     console.log('userid is ' + req.body.userid);
     var tempPassword = Math.random().toString(36).slice(2);
-    var usr = {
-        password : tempPassword,
-        tempPassword : tempPassword,
-        mdate : Date(),
-        msubject : req.user.userid,
-    };
+    
     User.findOne({userid:req.body.userid},(err,usr)=>{
         usr.password = tempPassword;
+        usr.passwordConfirmation = tempPassword;
+        usr.tempPassword = tempPassword;
+        usr.mdate = Date();
+        usr.msubject = req.user.userid;
         usr.save((err2)=>{
             if(err2){
                 Log.create({document_name : "User",type:"error",contents:{error:err,content:"PD 임시비밀번호 update 중 DB 에러"},wdate:Date()});
                 console.log(err2);
                 return res.send({result:"mongo error"});
             }
-            Log.create({document_name : "User",type:"update",contents:{udate:updateData,content:"PD 임시비밀번호 update"},wdate:Date()});
+            Log.create({document_name : "User",type:"update",contents:{udate:usr,content:"PD 임시비밀번호 update"},wdate:Date()});
             console.log('done');
             console.log('mailing...');
             nodeMailer.mailVerification('부품',req.body.email,'임시비밀번호 발급입니다.', "빠른 시일내에 변경 바랍니다. 임시비밀번호 : "+tempPassword);
