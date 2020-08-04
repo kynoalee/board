@@ -13,6 +13,10 @@ var config = {
     },
     mail:{
         service: 'gmail',
+        prot : 587,
+        host :'smtp.gmlail.com',
+        secure : false,
+        requireTLS : true,
         auth: {
           user: 'mohandasgo93@gmail.com',  // gmail 계정 아이디를 입력
           pass: '12qwaszx!'          // gmail 계정의 비밀번호를 입력
