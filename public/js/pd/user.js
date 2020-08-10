@@ -27,8 +27,15 @@ function forceVerified(userid){
     }
 }
 
-function setData(){
+function setData(userClass){
     if(confirm('수정하시겠습니까?')){
+        if(userClass=='normal'){
+            $('input[name=where]').val('customer');
+        }else if(userClass=='vender'){
+            $('input[name=where]').val('vender');
+        } else {
+            $('input[name=where]').val('pd');
+        }
         $('#mainForm').submit();
     }
 }

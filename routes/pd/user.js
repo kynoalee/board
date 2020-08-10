@@ -61,16 +61,16 @@ router.post('/customer/detail/post',util.isLogIn,function(req,res){
     updateData.address1 = req.body.address1;
     updateData.address2 = req.body.address2;
 
-    User.updateOne({userid:req.body.userid,userclass:"normal"},updateData,(err)=>{
+    User.updateOne({userid:req.body.userid},updateData,(err)=>{
         if(err){
-            Log.create({document_name : "User",type:"error",contents:{error:err,content:"pd customer 상세 수정 DB에러"},wdate:Date()});
+            Log.create({document_name : "User",type:"error",contents:{error:err,content:"pd "+req.body.where+" 상세 수정 DB에러"},wdate:Date()});
             console.log(err);
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/pop/close');
         }
-        Log.create({document_name : "User",type:"Update",contents:{update:updateData,content:"pd customer 상세 수정"},wdate:Date()});
+        Log.create({document_name : "User",type:"Update",contents:{update:updateData,content:"pd "+req.body.where+" 상세 수정"},wdate:Date()});
         
-        return res.redirect('/pd/user/customer/detail?userid='+req.body.userid);
+        return res.redirect('/pd/user/'+req.body.where+'/detail?userid='+req.body.userid);
     });
 });
 
@@ -115,12 +115,43 @@ router.get('/vender/detail',util.isLogIn,function(req,res){
 });
 
 router.get('/admin',util.isLogIn,function(req,res){
-    var menu1= new util.menu("사용자 정보 조회/수정","/pd/user/customer","");
-    var menu2= new util.menu("벤더 정보 조회/수정","/pd/user/vender","");
-    var menu3= new util.menu("PD 정보 조회/수정","","selected");
+    User.find({userclass:"pd"},(err,pds)=>{
+        if(err){
+            Log.create({document_name : "User",type:"error",contents:{error:err,content:"pd admin 상세 조회 DB에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/pop/close');
+        }
+        for(var pd of pds){
+            pd.wdateFormated = moment(pd.wdate).format("YYYY-MM-DD HH:mm:ss");
+            pd.mdateFormated = moment(pd.mdate).format("YYYY-MM-DD HH:mm:ss");
 
-     return res.render('pd/user/admin',{
-         menu : [menu1,menu2,menu3]
-     });
+        }
+        var menu1= new util.menu("사용자 정보 조회/수정","/pd/user/customer","");
+        var menu2= new util.menu("벤더 정보 조회/수정","/pd/user/vender","");
+        var menu3= new util.menu("PD 정보 조회/수정","","selected");
+
+        return res.render('pd/user/admin',{
+            menu : [menu1,menu2,menu3],
+            pds : pds
+        });
+    });
 });
+
+router.get('/admin/detail',util.isLogIn,function(req,res){
+    User.findOne({userid:req.query.userid,userclass:"pd"},(err,pd)=>{
+        if(err){
+            Log.create({document_name : "User",type:"error",contents:{error:err,content:"pd admin 상세 조회 DB에러"},wdate:Date()});
+            console.log(err);
+            req.flash("errors",{message : "DB ERROR"});
+            return res.redirect('/pop/close');
+        }
+        pd.wdateFormated = moment(pd.wdate).format("YYYY-MM-DD HH:mm:ss");
+        pd.mdateFormated = moment(pd.mdate).format("YYYY-MM-DD HH:mm:ss");
+        return res.render('pd/user/adminDetail',{
+            userData : pd
+        });
+    });
+});
+
 module.exports = router;
