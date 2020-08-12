@@ -12,81 +12,84 @@
         <span class='span-mm'><%=userData.userid%></span>
         <input type="hidden" name='userid' value="<%=userData.userid%>">
       </div>
-      <div>
-        <span class='span-sm'>벤더 비밀번호</span>| 
-        <span class='span-mm'><button type='button' onclick='setTempPassword("<%=userData.userid%>","<%=userData.email%>")'>임시비밀번호 발행</button></span>
-      </div>
-      <div>
-        <span class='span-sm'>벤더 이름</span>| 
-        <span class='span-mm'><input type="text" name='name' value='<%=userData.name%>'></span>
-      </div>
-      <div>
-        <span class='span-sm'>벤더 회사</span>| 
-        <span class='span-mm'> <input type="text" name='company' value='<%=userData.company%>'></span>
-      </div>
-      <div>
-        <span class='span-sm'>벤더 연락처</span>| 
-        <span class='span-mm'>
-          <select name="countrycode" id="countrycode">
-            <option value="86" <%=userData.countrycode=='86'?'selected':''%>>+86</option>
-            <option value="82" <%=userData.countrycode=='82'?'selected':''%>>+82</option>
-          </select>
-          <input type="text" name='contactnumber' value='<%=userData.contactnumber%>'>
-        </span>
-      </div>
-      <div>
-        <span class='span-sm'>벤더 이메일</span>| 
-        <span class='span-mm'><input class='input-mm' type="text" name='email' value='<%=userData.email%>'></span>
-        <%if(!userData.verified){%>
-          <span class='span-sm'><button type='button' onclick='forceVerified("<%=userData.userid%>")'>인증</button></span>
+      <form id="mainForm" action="detail/post" method='post'>
+        <input type="hidden" name='userid' value="<%=userData.userid%>">
+        <div>
+          <span class='span-sm'>벤더 비밀번호</span>| 
+          <span class='span-mm'><button type='button' onclick='setTempPassword("<%=userData.userid%>","<%=userData.email%>")'>임시비밀번호 발행</button></span>
+        </div>
+        <div>
+          <span class='span-sm'>벤더 이름</span>| 
+          <span class='span-mm'><input type="text" name='name' value='<%=userData.name%>'></span>
+        </div>
+        <div>
+          <span class='span-sm'>벤더 회사</span>| 
+          <span class='span-mm'> <input type="text" name='company' value='<%=userData.company%>'></span>
+        </div>
+        <div>
+          <span class='span-sm'>벤더 연락처</span>| 
+          <span class='span-mm'>
+            <select name="countrycode" id="countrycode">
+              <option value="86" <%=userData.countrycode=='86'?'selected':''%>>+86</option>
+              <option value="82" <%=userData.countrycode=='82'?'selected':''%>>+82</option>
+            </select>
+            <input type="text" name='contactnumber' value='<%=userData.contactnumber%>'>
+          </span>
+        </div>
+        <div>
+          <span class='span-sm'>벤더 이메일</span>| 
+          <span class='span-mm'><input class='input-mm' type="text" name='email' value='<%=userData.email%>'></span>
+          <%if(!userData.verified){%>
+            <span class='span-sm'><button type='button' onclick='forceVerified("<%=userData.userid%>")'>인증</button></span>
+          <%}%>
+        </div>
+        <div>
+          <span class='span-sm'>벤더 주소</span>| 
+          <span class='span-mm'></span>
+        </div>
+        <div>
+          <span class='span-sm'>도/시</span> <input type="text" name="city" value="<%=userData.city%>">
+        </div> 
+        <div>
+          <span class='span-sm'>시/구/군/읍/면</span>  <input type="text" name="province" value="<%=userData.province%>">
+        </div>
+        <div>
+          <span class='span-sm'>기타 주소</span> <input type="text" name="address2" value="<%=userData.address2%>">
+        </div>
+        <div>        
+          <input class="input-mm"  type="text" name="address1" value="<%=userData.address1%>">
+        </div>
+        <div>
+          <span class='span-sm'>벤더 가입일</span>| 
+          <span class='span-mm'><%=userData.wdateFormated%></span>
+        </div>
+        <div>
+          <span class='span-sm'>벤더 수정일</span>| 
+          <span class='span-mm'><%=userData.mdateFormated%></span>
+        </div>
+        <div>
+          <span class='span-sm'>수정 주체</span>| 
+          <span class='span-mm'><%=userData.msubject%></span>
+        </div>
+        <div>
+          <span class='span-sm'>인증 여부</span>| 
+          <span class='span-mm'><%=userData.verified ?'인증됨':'인증되지않음'%></span>
+        </div>
+        <div>
+          <span class='span-sm'>승인 여부</span>| 
+          <span class='span-mm'><%=userData.accepted ?'승인됨':'승인되지않음'%></span>
+        </div>
+        <div>
+          <span class='span-sm'>탈퇴 여부</span>| 
+          <span class='span-mm'><%=userData.disabled?'탈퇴':'활동'%></span>
+        </div>
+        <div>
+          <span><button type="button" onclick='setData()'>수정</button></span>
+        <%if(!userData.accepted){%>
+          <span><button type="button" onclick="setUserAccepted('<%=userData.userid%>')">승인</button></span>
         <%}%>
-      </div>
-      <div>
-        <span class='span-sm'>벤더 주소</span>| 
-        <span class='span-mm'></span>
-      </div>
-      <div>
-        <span class='span-sm'>도/시</span> <input type="text" name="city" value="<%=userData.city%>">
-      </div> 
-      <div>
-        <span class='span-sm'>시/구/군/읍/면</span>  <input type="text" name="province" value="<%=userData.province%>">
-      </div>
-      <div>
-        <span class='span-sm'>기타 주소</span> <input type="text" name="address2" value="<%=userData.address2%>">
-      </div>
-      <div>        
-        <input class="input-mm"  type="text" name="address1" value="<%=userData.address1%>">
-      </div>
-      <div>
-        <span class='span-sm'>벤더 가입일</span>| 
-        <span class='span-mm'><%=userData.wdateFormated%></span>
-      </div>
-      <div>
-        <span class='span-sm'>벤더 수정일</span>| 
-        <span class='span-mm'><%=userData.mdateFormated%></span>
-      </div>
-      <div>
-        <span class='span-sm'>수정 주체</span>| 
-        <span class='span-mm'><%=userData.msubject%></span>
-      </div>
-      <div>
-        <span class='span-sm'>인증 여부</span>| 
-        <span class='span-mm'><%=userData.verified ?'인증됨':'인증되지않음'%></span>
-      </div>
-      <div>
-        <span class='span-sm'>승인 여부</span>| 
-        <span class='span-mm'><%=userData.accepted ?'승인됨':'승인되지않음'%></span>
-      </div>
-      <div>
-        <span class='span-sm'>탈퇴 여부</span>| 
-        <span class='span-mm'><%=userData.disabled?'탈퇴':'활동'%></span>
-      </div>
-      <div>
-        <span><button type="button" onclick='setData("<%=userData.userclass%>")'>수정</button></span>
-      <%if(!userData.accepted){%>
-        <span><button type="button" onclick="setUserAccepted('<%=userData.userid%>')">승인</button></span>
-      <%}%>
-      </div>
+        </div>
+      </form>
     </div>
   </body>
 </html>
