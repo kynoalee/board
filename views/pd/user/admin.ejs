@@ -2,6 +2,7 @@
 <html>
   <head>
     <%- include('../partials/head') %>
+    <script src="/js/pd/user.js"></script>
   </head>
   <body>
     <%- include('../partials/nav') %>
@@ -10,7 +11,29 @@
 
       <h2 class="mb-3">PD 정보 조회/수정</h2>
 
-      <P>앙앙</p>
-    </div>
+      <div>
+        <table class="table">
+            <tr>
+              <th>userid</th>
+              <th>name</th>
+              <th>email</th>
+              <th>wdate(mdate)</th>
+              <th>verified</th>
+              <th>accepted</th>
+              <th>disabled</th>
+            </tr>
+            <%for(var pd of pds){%>
+            <tr style="cursor:pointer" onclick="popupDetail('admin','<%=pd.userid%>')">
+              <td><%=pd.userid%></td>
+              <td><%=pd.name%></td>
+              <td><%=pd.email%></td>
+              <td><%=pd.wdateFormated%>(<%=pd.mdateFormated%>)</td>
+              <td><%=pd.verified?'verified':'not verified'%></td>
+              <td><%=pd.accepted%></td>
+              <td><span class="<%=pd.disabled?'red':''%>"><%=pd.disabled?'탈퇴':'활동'%></span></td>
+            </tr>
+            <%}%>
+        </table>
+      </div>    </div>
   </body>
 </html>

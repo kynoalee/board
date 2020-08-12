@@ -6,27 +6,27 @@
   </head>
   <body>
     <div class="container mb-3">
-      <h2 class="mb-3">벤더 정보 상세 조회/수정</h2>
+      <h2 class="mb-3">어드민 정보 상세 조회/수정</h2>
       <div>
-        <span class='span-sm'>벤더 아이디</span>| 
+        <span class='span-sm'>어드민 아이디</span>| 
         <span class='span-mm'><%=userData.userid%></span>
       </div>
       <form id="mainForm" action="detail/post" method='post'>
         <input type="hidden" name='userid' value="<%=userData.userid%>">
         <div>
-          <span class='span-sm'>벤더 비밀번호</span>| 
+          <span class='span-sm'>어드민 비밀번호</span>| 
           <span class='span-mm'><button type='button' onclick='setTempPassword("<%=userData.userid%>","<%=userData.email%>")'>임시비밀번호 발행</button></span>
         </div>
         <div>
-          <span class='span-sm'>벤더 이름</span>| 
+          <span class='span-sm'>어드민 이름</span>| 
           <span class='span-mm'><input type="text" name='name' value='<%=userData.name%>'></span>
         </div>
         <div>
-          <span class='span-sm'>벤더 회사</span>| 
+          <span class='span-sm'>어드민 회사</span>| 
           <span class='span-mm'> <input type="text" name='company' value='<%=userData.company%>'></span>
         </div>
         <div>
-          <span class='span-sm'>벤더 연락처</span>| 
+          <span class='span-sm'>어드민 연락처</span>| 
           <span class='span-mm'>
             <select name="countrycode" id="countrycode">
               <option value="86" <%=userData.countrycode=='86'?'selected':''%>>+86</option>
@@ -36,14 +36,14 @@
           </span>
         </div>
         <div>
-          <span class='span-sm'>벤더 이메일</span>| 
+          <span class='span-sm'>어드민 이메일</span>| 
           <span class='span-mm'><input class='input-mm' type="text" name='email' value='<%=userData.email%>'></span>
           <%if(!userData.verified){%>
             <span class='span-sm'><button type='button' onclick='forceVerified("<%=userData.userid%>")'>인증</button></span>
           <%}%>
         </div>
         <div>
-          <span class='span-sm'>벤더 주소</span>| 
+          <span class='span-sm'>어드민 주소</span>| 
           <span class='span-mm'></span>
         </div>
         <div>
@@ -59,11 +59,11 @@
           <input class="input-mm"  type="text" name="address1" value="<%=userData.address1%>">
         </div>
         <div>
-          <span class='span-sm'>벤더 가입일</span>| 
+          <span class='span-sm'>어드민 가입일</span>| 
           <span class='span-mm'><%=userData.wdateFormated%></span>
         </div>
         <div>
-          <span class='span-sm'>벤더 수정일</span>| 
+          <span class='span-sm'>어드민 수정일</span>| 
           <span class='span-mm'><%=userData.mdateFormated%></span>
         </div>
         <div>
