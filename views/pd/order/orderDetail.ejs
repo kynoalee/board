@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../partials/head') %>
+    <script src="/js/pd/user.js"></script>
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+    <div class="container mb-3">
+      <h2 class="mb-3">PD 주문 상세 조회</h2>
+      <div>
+        <div><%=detail.order_detailnum%></div>
+        <div><%=detail.summary%></div>
+      </div>
+      
+      <%=detail%>
+    </div>
+  </body>
+</html>
