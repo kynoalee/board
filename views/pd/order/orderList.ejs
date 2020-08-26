@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../partials/head') %>
+    <script src="/js/pd/user.js"></script>
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+    <div class="container mb-3">
+      <h2 class="mb-3">PD 주문 전체 조회</h2>
+      <table class='table'>
+        <tr>
+          <th>주문번호</th>
+          <th>주문자</th>
+          <th>제작자</th>
+          <th>주문일자</th>
+          <th>주문상태</th>
+          <th>가격</th>
+          <th>마감기한</th>
+        </tr>
+        <%for(var order of orders){%>
+        <tr>
+          <td><%=order.ordernum%></td>
+          <td><%=order.orderid%></td>
+          <td><%=order.vender%></td>
+          <td><%=order.wdateFormated%></td>
+          <td><%=order.statusN%></td>
+          <td><%=order.price%></td>
+          <td><%=order.deadline%></td>
+        </tr>
+        <%}%>
+      </table>
+    </div>
+  </body>
+</html>
