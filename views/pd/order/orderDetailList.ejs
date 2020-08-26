@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('../partials/head') %>
+    <script src="/js/pd/order.js"></script>
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+    <div class="container mb-3">
+      <h2 class="mb-3">PD 주문 상세 전체 조회</h2>
+      <table class='table'>
+        <tr>
+          <th>주문디테일번호</th>
+          <th>연관주문번호</th>
+          <th>글쓴이</th>
+          <th>등급</th>
+          <th>주문상태</th>
+          <th>쓴날짜</th>
+          <th>상세보기</th>
+        </tr>
+        <%for(var order of orders){%>
+        <tr>
+            <td><%=order.order_detailnum%></td>
+            <td><%=order.orderlink%></td>
+            <td><%=order.userid%></td>
+            <td><%=order.userclassN%></td>
+            <td><%=order.statusN%></td>
+            <td><%=order.wdateFormated%></td>
+            <td><button onclick='goPage("detail","<%=order.order_detailnum%>")'>상세보기</button></td>
+        </tr>
+        <%}%>
+      </table>
+    </div>
+  </body>
+</html>
