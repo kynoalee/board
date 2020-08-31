@@ -2,8 +2,11 @@ var moment = require('moment');
 var express  = require('express');
 var router = express.Router();
 var util = require('./pdUtil');
+var common = require('../../modules/common');
+var Download = require('../../modules/download');
 var nameSetting = require('../../config/nameSetting');
 var Order = require('../../models/Order');
+var File = require('../../models/File');
 var Log = require('../../models/Log');
 
 router.get('/',util.isLogIn,function(req,res){
@@ -97,20 +100,73 @@ router.get('/orderDetailList',util.isLogIn,function(req,res){
 
 router.get('/detail',util.isLogIn,(req,res)=>{
     var orderDetailNum = req.query.detailnum;
-    Order.Detail.find({order_detailnum : orderDetailNum},(err,detail)=>{
+    Order.Detail.findOne({order_detailnum : orderDetailNum},(err,detail)=>{
         if(err){
             Log.create({document_name : "Order",type:"error",contents:{error:err,content:"pd order detail find DB에러"},wdate:Date()});
             console.log(err);
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/pd');
         }
-        res.render('pd/order/orderDetail',{
-            menu : [],
-            detail : detail
-        });
+        detail.wdateFormated = moment(detail.wdate).format("YYYY-MM-DD HH:mm:ss");
+        detail.mdateFormated = moment(detail.mdate).format("YYYY-MM-DD HH:mm:ss");
+
+        switch(detail.userclass){
+            case 'normal' : detail.userclassN = "주문자";
+                break;
+            case 'vender' : detail.userclassN = "제작자";
+                break;
+            default : break;
+        }
+
+        // 각 디테일 파일 정보 가져오기
+
+        File.find({servername : {$in :detail.filelink}},(e,files)=>{ 
+            if(e){
+                Log.create({document_name : "File",type:"error",contents:{error:e,content:"주문상세 페이지 file find DB에러"},wdate:Date()});
+                console.log(e);
+            }
+            var filesInfo = [];
+            var visualFiles = {
+                images:[],
+                gifs:[],
+                videos:[]
+            }
+            // 각 디테일에 걸려있는 파일 정보를 정제
+            for(fileInfo of files){
+
+                // 보여줄 수 있는 파일 정보
+                let filetype = fileInfo.filetype.split('/');
+                if(filetype[0] == 'image' && filetype[1] != 'gif'){
+                    visualFiles.images.push(fileInfo);
+                } else if(filetype[0] == 'image' && filetype[1] == 'gif'){
+                    visualFiles.gifs.push(fileInfo);
+                }
+                else if(filetype[0] == 'video'){
+                    visualFiles.videos.push(fileInfo);
+                }
+
+                // 다운로드 파일 정보.
+                filesInfo[filesInfo.length] = {
+                    'origin' : fileInfo.originname,
+                    'server' : fileInfo.servername,
+                    'byte' : common.calculateByte(fileInfo.size)
+                };
+            }
+            detail.filesInfo = filesInfo;
+            detail.visualFiles = visualFiles;
+
+            res.render('pd/order/orderDetail',{
+                menu : [],
+                detail : detail
+            });
+        });  
     });
-    
 });
 
+// 다운로드 라우터
+router.get("/detail/:servername",util.isLogIn,function(req,res){
+    let fileName = req.params.servername;
+    Download.fileDownload(File,fileName,res);
+});
 
 module.exports = router;

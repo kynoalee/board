@@ -9,6 +9,7 @@ var fileDownload = function(DB,fileName,res){
             req.flash("errors",{message : "DB ERROR"});
             return res.redirect('/');
         }
+        console.log('Download ');
         console.log(file[0]);
         res.setHeader('Content-disposition','attachment;filename='+file[0].originname);
         res.setHeader('Content-type',file[0].filetype);
