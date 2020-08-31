@@ -9,11 +9,71 @@
     <div class="container mb-3">
       <h2 class="mb-3">PD 주문 상세 조회</h2>
       <div>
-        <div><%=detail.order_detailnum%></div>
-        <div><%=detail.summary%></div>
+        <div>
+          <span>연결된 주문번호 | </span>
+          <span><%=detail.orderlink%></span>
+        </div>
+        <div>
+          <span>주문상세번호 | </span>
+          <span><%=detail.order_detailnum%></span>
+        </div>
+        <div>
+          <span>작성날짜 (수정날짜) | </span>
+          <span><%=detail.wdateFormated%> ( <%=detail.mdateFormated%> )</span>
+        </div>
+        <div>
+          <span>주문자 | </span>
+          <span><%=detail.userid%></span>
+        </div>
+        <div>
+          <span>주문자등급 | </span>
+          <span><%=detail.userclassN%></span>
+        </div>
+        <div>
+          <span>제목 | </span>
+          <span><%=detail.summary%></span>
+        </div>  
+        <div>
+          <span>내용 | </span>
+          <span><%=detail.description%></span>
+          <%for(let imageInfo of detail.visualFiles.images){%>
+          <!-- file visualizing -->
+          <div><img src='/images/<%=imageInfo.servername%>' width = 350 /></div>
+          <%}%>
+          <%for(let gifInfo of detail.visualFiles.gifs){%>
+            <!-- file visualizing -->
+            <div><img src='/gifs/<%=gifInfo.servername%>' width = 350 /></div>
+            <%}%>
+          <%for(let videoInfo of detail.visualFiles.videos){%>      
+          <div><video src='/videos/<%=videoInfo.servername%>' style='width:350px' controls loop></video></div>
+          <%}%>
+        </div>
+        <div>
+          <span>파일</span>
+          <%for(let downloadFile of detail.filesInfo){%>
+          <div><a href="/pd/order/detail/<%=downloadFile.server%>"><%=downloadFile.origin%></a> (<%=downloadFile.byte%>)</div>
+          <%}%>
+        </div>
+        <div>
+          추가 내용
+        </div>
+        <div>
+          <span>마감시간 | </span>
+          <span><%=detail.deadline%></span>
+        </div>
+        <div>
+          <span>색 | </span>
+          <span><%=detail.color%></span>
+        </div>
+        <div>
+          <span>크기 | </span>
+          <span><%=detail.size%></span>
+        </div>
+        <div>
+          <span>수량 | </span>
+          <span><%=detail.quantity%></span>
+        </div>
       </div>
-      
-      <%=detail%>
     </div>
   </body>
 </html>
